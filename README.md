@@ -34,19 +34,15 @@ Basert på denne statistikken kan bibliotekarer ta informerte beslutninger om hv
 
 - **Frontend:**  
   - React (opprettet med Create React App)
+  - Javascript(JSX) språk
   - Axios for HTTP-forespørsler
   - CSS for styling (egne CSS-filer for komponentene)
 
 - **Backend:**  
-  (Skal implementeres med Express og MySQL – for øyeblikket brukes dummy-data)
-  - Express
-  - MySQL2
-  - CORS
-  - Dotenv
+  (implementeres med MySQL, for øyeblikket brukes dummy-data)
 
 ## Prosjektstruktur
 
-```plaintext
 .
 ├── server
 │   └── server.js               # Express backend-server (eventuelt i en egen mappe)
