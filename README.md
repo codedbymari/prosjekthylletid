@@ -1,6 +1,6 @@
 # Quria Reservasjonsdashboard
 
-Dette prosjektet er et dashboard som viser statistikk over hvor lenge lånemateriale står på hentehylla. Hensikten er å gi beslutningsgrunnlag for å fastsette en optimal hentefrist for lånere.
+Dette prosjektet er et prototype dashboard som viser statistikk over hvor lenge lånemateriale står på hentehylla i biblioteksystemet Quria. 
 
 ## Innhold
 
@@ -12,6 +12,7 @@ Dette prosjektet er et dashboard som viser statistikk over hvor lenge lånemater
 ## Om prosjektet
 
 Dette dashboardet er utviklet for å gi bibliotekarer en visuell oversikt over reserveringsdata. Dashboardet henter data (i utgangspunktet dummy-data) for å vise hvor lenge materialet har stått på hentehylla. Statistikkene gir innsikt i:
+
 - Antall dager materialet venter på henting.
 - Totalt antall materialer på hentehylla.
 - Andelen materialer som faktisk hentes innen fastsatt frist.
