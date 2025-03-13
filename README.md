@@ -42,23 +42,23 @@ Basert på denne statistikken kan bibliotekarer ta informerte beslutninger om hv
   (implementeres med MySQL, for øyeblikket brukes dummy-data)
 
 ## Prosjektstruktur
-
+```plaintext
 .
 ├── server
-│   └── server.js               # Express backend-server (eventuelt i en egen mappe)
+│   └── server.js               # Express backend-server (eventuelt i en egen mappe)
 ├── public                      # Offentlige ressurser for React
 ├── src
-│   ├── components              # React-komponenter
-│   │   ├── Header.js           # Header-komponent
-│   │   ├── Header.css          # Styling for header
-│   │   ├── Sidebar.js          # Sidebar-komponent
-│   │   ├── Sidebar.css         # Styling for sidebar
-│   │   ├── Reportchart.js      # Diagramkomponent for visning av rapportdata
-│   │   ├── ReservationDashboard.js  # Hovedkomponenten for dashboardet
-│   │   └── ReserveringDashboard.css # Styling for dashboardet
-│   ├── dummyData.js            # Dummy-data for testing
-│   ├── App.js                  # Hoved-React-komponent
-│   ├── App.css                 # Globale stiler for appen
-│   ├── index.js                # React-entry point
-│   ├── index.css               # Globale stiler
-│   └── ...                     # Andre filer som test,
+│   ├── components              # React-komponenter
+│   │   ├── Header.js           # Header-komponent
+│   │   ├── Header.css          # Styling for header
+│   │   ├── Sidebar.js          # Sidebar-komponent
+│   │   ├── Sidebar.css         # Styling for sidebar
+│   │   ├── Reportchart.js      # Diagramkomponent for visning av rapportdata
+│   │   ├── ReservationDashboard.js  # Hovedkomponenten for dashboardet
+│   │   └── ReserveringDashboard.css # Styling for dashboardet
+│   ├── dummyData.js            # Dummy-data for testing
+│   ├── App.js                  # Hoved-React-komponent
+│   ├── App.css                 # Globale stiler for appen
+│   ├── index.js                # React-entry point
+│   ├── index.css               # Globale stiler
+│   └── ...                     # Andre filer som test, etc.
