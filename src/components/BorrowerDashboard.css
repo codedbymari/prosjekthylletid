@@ -1,0 +1,300 @@
+.app-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+.main-content {
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+.content-area {
+  flex: 1;
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin: 16px;
+}
+
+/* Page header styling */
+.page-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid #eaedf3;
+  padding-bottom: 16px;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+/* Borrower Info Card */
+.borrower-info-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  border: 1px solid #eaedf3;
+  overflow: hidden;
+}
+
+.borrower-info-header {
+  background-color: #f8f9fa;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eaedf3;
+}
+
+.borrower-info-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.borrower-info-content {
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  margin-right: 40px;
+  margin-bottom: 12px;
+  min-width: 200px;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #7c8a97;
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.info-value {
+  font-size: 15px;
+  color: #2c3e50;
+}
+
+.membership-badge {
+  display: inline-block;
+  background-color: #e3f2fd;
+  color: #2196f3;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Tab navigation */
+.tab-navigation {
+  display: flex;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #eaedf3;
+}
+
+.tab-navigation button {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #7c8a97;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.tab-navigation button:hover {
+  color: #3498db;
+}
+
+.tab-navigation button.active {
+  color: #3498db;
+  font-weight: 600;
+}
+
+.tab-navigation button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #3498db;
+}
+
+/* Table styling */
+.reservations-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.reservations-table thead {
+  background-color: #f8f9fa;
+}
+
+.reservations-table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #5a6570;
+  border-bottom: 2px solid #eaedf3;
+}
+
+.reservations-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eaedf3;
+  font-size: 14px;
+}
+
+.reservations-table tbody tr:hover {
+  background-color: #f5f7fa;
+}
+
+/* Status styles */
+.status-venter {
+  color: #e67e22;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.status-klar {
+  color: #27ae60;
+  font-weight: 500;
+  padding: 4px 8px;
+  background-color: rgba(39, 174, 96, 0.1);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.status-hentet {
+  color: green;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.status-utlånt {
+  color: #8e44ad;
+  font-weight: 500;
+  padding: 4px 8px;
+  background-color: rgba(142, 68, 173, 0.1);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* Add these styles to your BorrowerDashboard.css file */
+
+/* Message container styling */
+.message-container {
+    max-width: 800px;
+margin-left: 10px;    
+  }
+  
+  /* Email message styling */
+  .email-message {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  /* Email header styling */
+  .email-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f5f5f5;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .email-meta {
+    display: flex;
+    align-items: center;
+  }
+  
+  .email-date {
+    font-weight: 500;
+    margin-right: 16px;
+    color: #555;
+  }
+  
+  .email-subject {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .message-delivery-info {
+    font-size: 0.85rem;
+    color: #666;
+    background-color: #e8f4f8;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  
+  /* Email body styling */
+  .email-body {
+    padding: 16px;
+    line-height: 1.5;
+    color: #333;
+  }
+  
+  /* Existing styles remain unchanged */
+
+/* Navigation link */
+.navigation-link {
+  margin-top: 24px;
+}
+
+.navigation-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 8px 0;
+}
+
+.navigation-link a:hover {
+  color: #2980b9;
+  text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+  
+  .tab-navigation {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .reservations-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .info-item {
+    width: 100%;
+    margin-right: 0;
+  }
+}
