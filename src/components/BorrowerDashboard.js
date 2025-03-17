@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from './Headerloaner';
-import Sidebar from './Sidebarloaner';
+import Sidebar from './Sidebar';
 import './BorrowerDashboard.css';
 
 function BorrowerDashboard() {
@@ -34,14 +34,14 @@ function BorrowerDashboard() {
         id: 'msg2', 
         date: '17.03.2025', 
         subject: 'Påminnelse om reservering',
-        message: 'Hei, Hanna Nguyen. Det er 2 dager igjen av hentefristen på din reservering: «Søvngjengeren» av Lars Kepler. Siste frist: 18.03.2025. Hylle: 23B. Velkommen innom! Hilsen Kolboen, Nordre Follo bibliotek',
+        message: 'Hei, Hanna Nguyen. Det er 2 dager igjen av hentefristen på din reservering: «Søvngjengeren» av Lars Kepler. Siste frist: 18.03.2025. Hylle: 23B. Velkommen innom! Hilsen Nordre Follo Bibliotek',
         sentVia: ['melding', 'epost']
       },
       { 
         id: 'msg1', 
         date: '26.01.2025', 
         subject: 'Forsinket innlevering',
-        message: 'Hei, Hanna Nguyen. Boken «Skriket» av Jørn Lier Horst skulle vært levert 20.01.2025 og er nå 6 dager forsinket. Lever snarest for å unngå purregebyr på 100 kr. Hilsen Kolboen, Nordre Follo bibliotek.',
+        message: 'Hei, Hanna Nguyen. Boken «Skriket» av Jørn Lier Horst skulle vært levert 20.01.2025 og er nå 6 dager forsinket. Lever snarest for å unngå purregebyr på 100 kr. Hilsen Nordre Follo Bibliotek.',
         sentVia: ['melding', 'epost']
       }
     ]);
