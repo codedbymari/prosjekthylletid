@@ -1,19 +1,19 @@
 /* Header.css */
 .app-header {
   display: flex;
-  align-items: flex-start; /* Justert for å matche bildet */
+  align-items: flex-start; 
   
-  border-bottom: 1.5px solid #9a3941; /* Legger til en tynn, lys grå strek under headeren */
+  border-bottom: 1.5px solid #9a3941; 
 
 }
 
 .left-panel {
   display: flex;
   flex-direction: column;
-  background-color: #9a3941; /* Burgunderfarge fra bildet */
+  background-color: #9a3941; 
   color: white;
   padding: 10px;
-  width: 160px; /* Juster bredden etter behov */
+  width: 160px; 
   align-items: center;
 position: fix;}
 
@@ -37,7 +37,7 @@ position: fix;}
   flex-direction: column;
   align-items: center;
   font-weight: bold;
-  font-size: small;
+  font-size: 15px;
   
 }
 
@@ -49,4 +49,7 @@ position: fix;}
 
 }
 
-
+.user-id{
+  font-weight: 500;
+  font-size: 12px;
+}

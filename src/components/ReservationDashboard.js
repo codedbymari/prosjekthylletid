@@ -89,8 +89,35 @@ function ReserveringDashboard() {
   
     // Sjekk og send automatiske påminnelser
     checkAndSendAutomaticReminders(mockReservations);
-    
-  }, [pickupTimeLimit, reminderDays, checkAndSendAutomaticReminders]);
+   // --- Start of Sidebar Height Adjustment Code ---
+   function adjustSidebarHeight() {
+    const sidebar = document.querySelector('.sidebar');
+    const reservationsSection = document.querySelector('.reservations-section');
+    const sidebarFooter = document.querySelector('.sidebar-footer');
+
+    if (sidebar && reservationsSection && sidebarFooter) {
+      const reservationsSectionRect = reservationsSection.getBoundingClientRect();
+      const sidebarRect = sidebar.getBoundingClientRect();
+      const newSidebarHeight = reservationsSectionRect.bottom - sidebarRect.top;
+      sidebar.style.height = `${newSidebarHeight}px`;
+    }
+  }
+
+  adjustSidebarHeight(); // Call initially
+
+  const observer = new MutationObserver(adjustSidebarHeight);
+  const contentArea = document.querySelector('.content-area');
+  if(contentArea){
+    observer.observe(contentArea, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+  // --- End of Sidebar Height Adjustment Code ---
+
+}, [pickupTimeLimit, reminderDays, checkAndSendAutomaticReminders]);
+
   
   // Send påminnelser manuelt uten alerts
   const sendAutomaticReminders = () => {

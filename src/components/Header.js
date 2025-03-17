@@ -9,8 +9,10 @@ function Header() {
       <div className="left-panel">
         <div className="user-info">
           <div className="user-details">
-            <span className="user-name">Therese Engen</span>
-            <span className="user-id">Nordre Follo.</span>
+            <span className="user-name">Therese Engan</span>
+            <span className="user-id">Nordre Follo</span>
+            <span className="user-id">Superbruker</span>
+
           </div>
         </div>
       </div>
