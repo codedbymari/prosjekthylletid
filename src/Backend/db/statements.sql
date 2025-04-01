@@ -1,5 +1,0 @@
-CREATE TABLE bøker(
-    ISBN INTEGER PRIMARY KEY,
-    Navn TEXT NOT NULL,
-    Alder INEGER   
-)
