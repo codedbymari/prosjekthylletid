@@ -1,23 +1,29 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+// src/components/ReserveringDashboard.js
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './ReserveringDashboard.css';
-import Header from './Header';
-import Sidebar from './Sidebar';
 import ReportChart from './Reportchart';
 
 function ReserveringDashboard() {
-  const [statisticsView, setStatisticsView] = useState('weekly'); // 'weekly', 'monthly', 'yearly'
-  const [pickupTimeLimit, setPickupTimeLimit] = useState(7); // Standard hentefrist i dager
-  const [reminderDays, setReminderDays] = useState(2); // Dager før hentefrist for påminnelse
+  const navigate = useNavigate();
+  
+  // State management
+  const [statisticsView, setStatisticsView] = useState('weekly');
+  const [pickupTimeLimit, setPickupTimeLimit] = useState(7);
+  const [reminderDays, setReminderDays] = useState(2);
   const [materialData, setMaterialData] = useState([]);
   const [reminderLogs, setReminderLogs] = useState([]);
   const [pendingReminders, setPendingReminders] = useState(0);
   const [averagePickupTime, setAveragePickupTime] = useState(0);
   const [notPickedUpRate, setNotPickedUpRate] = useState(0);
   const [sentAutomaticReminders, setSentAutomaticReminders] = useState([]);
-  const [showStatistics, setShowStatistics] = useState(true); // Toggle for showing stats
+  const [showStatistics, setShowStatistics] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Sjekker for automatiske påminnelser uten popup
+
+  // Check and send automatic reminders
   const checkAndSendAutomaticReminders = useCallback((reservations) => {
     const today = new Date();
     const remindersToSend = reservations
@@ -62,64 +68,91 @@ function ReserveringDashboard() {
     setPendingReminders(pendingCount);
   }, [pickupTimeLimit, reminderDays, sentAutomaticReminders]);
 
+  // Load reservation data
   useEffect(() => {
-    const mockReservations = [
-      { id: 1, title: 'Sjøfareren', author: 'Erika Fatland', reservedDate: '14.03.2025', readyDate: '15.03.2025', pickedUpDate: '16.03.2025', status: 'Hentet', daysOnShelf: 2, borrowerId: 'N00123456' },
-      { id: 2, title: 'Lur familiemat', author: 'Ida Gran-Jansen', reservedDate: '13.03.2025', readyDate: '14.03.2025', pickedUpDate: '17.03.2025', status: 'Hentet', daysOnShelf: 4, borrowerId: 'N00234567' },
-      { id: 3, title: 'Råsterk på et år', author: 'Jørgine Massa Vasstrand', reservedDate: '15.03.2025', readyDate: '16.03.2025', pickedUpDate: null, status: 'Venter', daysOnShelf: 1, borrowerId: 'N00345678' },
-      { id: 4, title: 'Tørt land', author: 'Jørn Lier Horst', reservedDate: '14.03.2025', readyDate: '15.03.2025', pickedUpDate: '16.03.2025', status: 'Hentet', daysOnShelf: 2, borrowerId: 'N00456789' },
-      { id: 5, title: 'Kongen av Os', author: 'Jo Nesbø', reservedDate: '15.03.2025', readyDate: '16.03.2025', pickedUpDate: null, status: 'Venter', daysOnShelf: 1, borrowerId: 'N00567890' },
-      { id: 6, title: '23 meter offside (Pondus)', author: 'Frode Øverli', reservedDate: '12.03.2025', readyDate: '13.03.2025', pickedUpDate: '14.03.2025', status: 'Hentet', daysOnShelf: 2, borrowerId: 'N00678901' },
-      { id: 7, title: 'Felix har følelser', author: 'Charlotte Mjelde', reservedDate: '15.03.2025', readyDate: '16.03.2025', pickedUpDate: null, status: 'Venter', daysOnShelf: 1, borrowerId: 'N00789012' },
-      { id: 8, title: 'Skriket', author: 'Jørn Lier Horst og Jan-Erik Fjell', reservedDate: '13.03.2025', readyDate: '14.03.2025', pickedUpDate: '15.03.2025', status: 'Hentet', daysOnShelf: 2, borrowerId: 'N00890123' },
-      { id: 9, title: 'Juleroser', author: 'Herborg Kråkevik', reservedDate: '14.03.2025', readyDate: '15.03.2025', pickedUpDate: null, status: 'Utløpt', daysOnShelf: 1, borrowerId: 'N00901234' },
-      { id: 10, title: 'Søvngjengeren', author: 'Lars Kepler', reservedDate: '10.03.2025', readyDate: '12.03.2025', pickedUpDate: null, status: 'Venter', daysOnShelf: 5, borrowerId: 'N00012345' },
-    ];
-  
-    setMaterialData(mockReservations);
-  
-    // Kalkuler statistikk
-    const pickedUpItems = mockReservations.filter(res => res.pickedUpDate);
-    const avgDays = pickedUpItems.reduce((sum, item) => sum + item.daysOnShelf, 0) / pickedUpItems.length || 0;
-    setAveragePickupTime(avgDays.toFixed(1));
-  
-    const expiredItems = mockReservations.filter(res => res.status === 'Utløpt');
-    const notPickedRate = (expiredItems.length / mockReservations.length) * 100;
-    setNotPickedUpRate(notPickedRate.toFixed(1));
-  
-    // Sjekk og send automatiske påminnelser
-    checkAndSendAutomaticReminders(mockReservations);
-   // --- Start of Sidebar Height Adjustment Code ---
-   function adjustSidebarHeight() {
-    const sidebar = document.querySelector('.sidebar');
-    const reservationsSection = document.querySelector('.reservations-section');
-    const sidebarFooter = document.querySelector('.sidebar-footer');
+    setIsLoading(true);
+    
+    // Simulate API call with a delay
+    const fetchData = async () => {
+      try {
+        // In a real application, this would be an API call
+        // await fetch('/api/reservations')
+        
+        // Mock data for demonstration
+        const mockReservations = [
+          { id: 1, title: 'Sjøfareren', author: 'Erika Fatland', reservedDate: '14.03.2025', readyDate: '15.03.2025', pickedUpDate: '16.03.2025', status: 'Hentet', daysOnShelf: 2, borrowerId: 'N00123456' },
+          { id: 2, title: 'Lur familiemat', author: 'Ida Gran-Jansen', reservedDate: '13.03.2025', readyDate: '14.03.2025', pickedUpDate: '17.03.2025', status: 'Hentet', daysOnShelf: 4, borrowerId: 'N00234567' },
+          { id: 3, title: 'Råsterk på et år', author: 'Jørgine Massa Vasstrand', reservedDate: '15.03.2025', readyDate: '16.03.2025', pickedUpDate: null, status: 'Venter', daysOnShelf: 1, borrowerId: 'N00345678' },
+          { id: 4, title: 'Tørt land', author: 'Jørn Lier Horst', reservedDate: '14.03.2025', readyDate: '15.03.2025', pickedUpDate: '16.03.2025', status: 'Hentet', daysOnShelf: 2, borrowerId: 'N00456789' },
+          { id: 5, title: 'Kongen av Os', author: 'Jo Nesbø', reservedDate: '15.03.2025', readyDate: '16.03.2025', pickedUpDate: null, status: 'Venter', daysOnShelf: 1, borrowerId: 'N00567890' },
+          { id: 6, title: '23 meter offside (Pondus)', author: 'Frode Øverli', reservedDate: '12.03.2025', readyDate: '13.03.2025', pickedUpDate: '14.03.2025', status: 'Hentet', daysOnShelf: 2, borrowerId: 'N00678901' },
+          { id: 7, title: 'Felix har følelser', author: 'Charlotte Mjelde', reservedDate: '15.03.2025', readyDate: '16.03.2025', pickedUpDate: null, status: 'Venter', daysOnShelf: 1, borrowerId: 'N00789012' },
+          { id: 8, title: 'Skriket', author: 'Jørn Lier Horst og Jan-Erik Fjell', reservedDate: '13.03.2025', readyDate: '14.03.2025', pickedUpDate: '15.03.2025', status: 'Hentet', daysOnShelf: 2, borrowerId: 'N00890123' },
+          { id: 9, title: 'Juleroser', author: 'Herborg Kråkevik', reservedDate: '14.03.2025', readyDate: '15.03.2025', pickedUpDate: null, status: 'Utløpt', daysOnShelf: 1, borrowerId: 'N00901234' },
+          { id: 10, title: 'Søvngjengeren', author: 'Lars Kepler', reservedDate: '10.03.2025', readyDate: '12.03.2025', pickedUpDate: null, status: 'Venter', daysOnShelf: 5, borrowerId: 'N00012345' },
+        ];
+      
+        setMaterialData(mockReservations);
+      
+        // Calculate statistics
+        const pickedUpItems = mockReservations.filter(res => res.pickedUpDate);
+        const avgDays = pickedUpItems.reduce((sum, item) => sum + item.daysOnShelf, 0) / pickedUpItems.length || 0;
+        setAveragePickupTime(avgDays.toFixed(1));
+      
+        const expiredItems = mockReservations.filter(res => res.status === 'Utløpt');
+        const notPickedRate = (expiredItems.length / mockReservations.length) * 100;
+        setNotPickedUpRate(notPickedRate.toFixed(1));
+      
+        // Check and send automatic reminders
+        checkAndSendAutomaticReminders(mockReservations);
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching reservation data:", error);
+        setIsLoading(false);
+      }
+    };
 
-    if (sidebar && reservationsSection && sidebarFooter) {
-      const reservationsSectionRect = reservationsSection.getBoundingClientRect();
-      const sidebarRect = sidebar.getBoundingClientRect();
-      const newSidebarHeight = reservationsSectionRect.bottom - sidebarRect.top;
-      sidebar.style.height = `${newSidebarHeight}px`;
+    fetchData();
+    
+    // Adjust sidebar height (if needed)
+    const adjustSidebarHeight = () => {
+      const sidebar = document.querySelector('.sidebar');
+      const reservationsSection = document.querySelector('.reservations-section');
+      const sidebarFooter = document.querySelector('.sidebar-footer');
+
+      if (sidebar && reservationsSection && sidebarFooter) {
+        const reservationsSectionRect = reservationsSection.getBoundingClientRect();
+        const sidebarRect = sidebar.getBoundingClientRect();
+        const newSidebarHeight = reservationsSectionRect.bottom - sidebarRect.top;
+        sidebar.style.height = `${newSidebarHeight}px`;
+      }
+    };
+
+    // Set up observer for dynamic height adjustment
+    const observer = new MutationObserver(adjustSidebarHeight);
+    const contentArea = document.querySelector('.content-area');
+    
+    if (contentArea) {
+      observer.observe(contentArea, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+      
+      // Initial adjustment
+      setTimeout(adjustSidebarHeight, 100);
     }
-  }
+    
+    // Cleanup
+    return () => {
+      if (contentArea) {
+        observer.disconnect();
+      }
+    };
+  }, [pickupTimeLimit, reminderDays, checkAndSendAutomaticReminders]);
 
-  adjustSidebarHeight(); // Call initially
-
-  const observer = new MutationObserver(adjustSidebarHeight);
-  const contentArea = document.querySelector('.content-area');
-  if(contentArea){
-    observer.observe(contentArea, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
-  }
-  // --- End of Sidebar Height Adjustment Code ---
-
-}, [pickupTimeLimit, reminderDays, checkAndSendAutomaticReminders]);
-
-  
-  // Send påminnelser manuelt uten alerts
+  // Send reminders manually
   const sendAutomaticReminders = () => {
     const today = new Date();
     const remindersToSend = materialData
@@ -154,7 +187,7 @@ function ReserveringDashboard() {
     }
   };
 
-  // Generer chart-data basert på valgt statistikk-visning
+  // Generate chart data based on selected statistics view
   const generateChartData = () => {
     switch (statisticsView) {
       case 'weekly':
@@ -185,12 +218,12 @@ function ReserveringDashboard() {
     }
   };
 
-  // Ekstra funksjon for eksport av data
+  // Export chart data to CSV
   const exportChartData = () => {
-    // Lag CSV-innhold
+    // Create CSV content
     const csvRows = [];
     
-    // Seksjon 1: Oppsummerende statistikk
+    // Section 1: Summary statistics
     csvRows.push('# OPPSUMMERENDE STATISTIKK');
     csvRows.push(`Gjennomsnittlig hentetid,${averagePickupTime} dager`);
     csvRows.push(`Andel ikke-hentet materiale,${notPickedUpRate}%`);
@@ -198,7 +231,7 @@ function ReserveringDashboard() {
     csvRows.push(`Påminnelse sendes,${reminderDays} dager før frist`);
     csvRows.push('');
     
-    // Seksjon 2: Chart-data
+    // Section 2: Chart data
     csvRows.push('# AGGREGERT STATISTIKK');
     const chartData = generateChartData();
     if (chartData.length > 0) {
@@ -211,7 +244,7 @@ function ReserveringDashboard() {
     }
     csvRows.push('');
     
-    // Seksjon 3: Detaljert reservasjonsinformasjon
+    // Section 3: Detailed reservation information
     csvRows.push('# DETALJERT RESERVASJONSINFORMASJON');
     if (materialData.length > 0) {
       csvRows.push('ID,Tittel,Forfatter,Lånernummer,Reservert dato,Klar dato,Hentet dato,Status,Dager på hylle');
@@ -231,7 +264,7 @@ function ReserveringDashboard() {
     }
     csvRows.push('');
     
-    // Seksjon 4: Påminnelseslogg
+    // Section 4: Reminder logs
     csvRows.push('# PÅMINNELSESLOGG');
     if (reminderLogs.length > 0) {
       csvRows.push('ID,Tittel,Forfatter,Lånernummer,Klar dato,Utløpsdato,Påminnelse sendt,Status');
@@ -249,7 +282,7 @@ function ReserveringDashboard() {
       });
     }
     
-    // Opprett og last ned CSV-fil
+    // Create and download CSV file
     const csvString = csvRows.join('\n');
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
@@ -264,6 +297,7 @@ function ReserveringDashboard() {
     window.URL.revokeObjectURL(url);
   };
 
+  // Update pickup time limit
   const updatePickupTimeLimit = () => {
     const newLimit = window.prompt("Endre hentefrist (antall dager):", pickupTimeLimit);
     if (newLimit && !isNaN(newLimit) && newLimit > 0) {
@@ -272,6 +306,7 @@ function ReserveringDashboard() {
     }
   };
 
+  // Update reminder days
   const updateReminderDays = () => {
     const newDays = window.prompt("Endre påminnelse (antall dager før hentefrist):", reminderDays);
     if (newDays && !isNaN(newDays) && newDays > 0 && newDays < pickupTimeLimit) {
@@ -280,6 +315,7 @@ function ReserveringDashboard() {
     }
   };
 
+  // Check for reminders periodically
   useEffect(() => {
     const checkTimer = setTimeout(() => {
       checkAndSendAutomaticReminders(materialData);
@@ -287,16 +323,46 @@ function ReserveringDashboard() {
     return () => clearTimeout(checkTimer);
   }, [materialData, reminderDays, pickupTimeLimit, sentAutomaticReminders, checkAndSendAutomaticReminders]);
 
+  // Filter and search functionality
+  const filteredMaterialData = useMemo(() => {
+    return materialData.filter(item => {
+      // Filter by status
+      if (filterStatus !== 'all' && item.status.toLowerCase() !== filterStatus) {
+        return false;
+      }
+      
+      // Filter by search term
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          item.title.toLowerCase().includes(searchLower) ||
+          item.author.toLowerCase().includes(searchLower) ||
+          item.borrowerId.toLowerCase().includes(searchLower)
+        );
+      }
+      
+      return true;
+    });
+  }, [materialData, filterStatus, searchTerm]);
+
+  // Navigate to borrower details
+  const handleBorrowerClick = (borrowerId) => {
+    navigate(`/låner/${borrowerId}`);
+  };
+
   return (
-    <div className="app-container">
-      <Header username="Jens Christian Strandos" department="Fjellhyten" role="Oslo1" />
-      <div className="main-content">
-        <Sidebar active="reservering" />
-        <div className="content-area">
-          <div className="page-header">
-            <h1>Dashboard</h1>
-          </div>
-          
+   <div className="dashboard-wrapper">
+      <div className="page-header">
+        <h1>Reserveringer Dashboard</h1>
+      </div>
+      
+      {isLoading ? (
+        <div className="loading-indicator">
+          <div className="spinner"></div>
+          <p>Laster inn reservasjonsdata...</p>
+        </div>
+      ) : (
+        <>
           <div className="dashboard-summary">
             <div className="stats-card">
               <h3>Gjennomsnittlig hentetid</h3>
@@ -372,44 +438,135 @@ function ReserveringDashboard() {
               </div>
             </div>
           )}
-          
-       
-            
-     
-          
+        
           <div className="reservations-section">
-            <h2>Aktive reserveringer</h2>
-            <table className="reservations-table">
-              <thead>
-                <tr>
-                  <th>Tittel</th>
-                  <th>Forfatter</th>
-                  <th>Lånernummer</th>
-                  <th>Reservert dato</th>
-                  <th>Klar dato</th>
-                  <th>Hentet dato</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {materialData.map(item => (
-                  <tr key={item.id} className={item.status === 'Utløpt' ? 'expired-row' : ''}>
-                    <td>{item.title}</td>
-                    <td>{item.author}</td>
-                    <td>
-                      <Link to={`/lanere/${item.borrowerId}`}>{item.borrowerId}</Link>
-                    </td>
-                    <td>{item.reservedDate}</td>
-                    <td>{item.readyDate}</td>
-                    <td>{item.pickedUpDate || '-'}</td>
-                    <td className={`status-${item.status.toLowerCase()}`}>{item.status}</td>
+            <div className="section-header">
+              <h2>Aktive reserveringer</h2>
+              <div className="action-buttons">
+                {pendingReminders > 0 && (
+                  <button 
+                    className="btn-primary" 
+                    onClick={sendAutomaticReminders}
+                  >
+                    Send {pendingReminders} påminnelser
+                  </button>
+                )}
+                <button className="btn-primary">Ny reservering</button>
+              </div>
+            </div>
+            
+            <div className="filter-controls">
+              <div className="search-container">
+                <input
+                  type="text"
+                  placeholder="Søk etter tittel, forfatter eller lånernummer"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+              
+              <div className="filter-container">
+                <label htmlFor="statusFilter">Status:</label>
+                <select
+                  id="statusFilter"
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="styled-select"
+                >
+                  <option value="all">Alle</option>
+                  <option value="venter">Venter</option>
+                  <option value="hentet">Hentet</option>
+                  <option value="utløpt">Utløpt</option>
+                </select>
+              </div>
+            </div>
+            
+            {filteredMaterialData.length > 0 ? (
+              <table className="reservations-table">
+                <thead>
+                  <tr>
+                    <th>Tittel</th>
+                    <th>Forfatter</th>
+                    <th>Lånernummer</th>
+                    <th>Reservert dato</th>
+                    <th>Klar dato</th>
+                    <th>Hentet dato</th>
+                    <th>Status</th>
+                    <th>Handlinger</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filteredMaterialData.map(item => (
+                    <tr key={item.id} className={item.status === 'Utløpt' ? 'expired-row' : ''}>
+                      <td>{item.title}</td>
+                      <td>{item.author}</td>
+                      <td>
+                        <Link to={`/låner/${item.borrowerId}`}>{item.borrowerId}</Link>
+                      </td>
+                      <td>{item.reservedDate}</td>
+                      <td>{item.readyDate}</td>
+                      <td>{item.pickedUpDate || '-'}</td>
+                      <td className={`status-${item.status.toLowerCase()}`}>{item.status}</td>
+                      <td>
+                        <div className="action-buttons-cell">
+                          <button 
+                            className="btn-small"
+                            onClick={() => handleBorrowerClick(item.borrowerId)}
+                          >
+                            Vis låner
+                          </button>
+                          {item.status === 'Venter' && (
+                            <button className="btn-small">Merk hentet</button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="no-data-message">
+                {searchTerm || filterStatus !== 'all' 
+                  ? 'Ingen reserveringer matcher søkekriteriene' 
+                  : 'Ingen aktive reserveringer'}
+              </div>
+            )}
           </div>
-        </div>
-      </div>
+          
+          {reminderLogs.length > 0 && (
+            <div className="reminders-section">
+              <h2>Påminnelseslogg</h2>
+              <table className="logs-table">
+                <thead>
+                  <tr>
+                    <th>Tittel</th>
+                    <th>Forfatter</th>
+                    <th>Lånernummer</th>
+                    <th>Utløpsdato</th>
+                    <th>Påminnelse sendt</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reminderLogs.map(log => (
+                    <tr key={log.id}>
+                      <td>{log.title}</td>
+                      <td>{log.author}</td>
+                      <td>
+                        <Link to={`/låner/${log.borrowerId}`}>{log.borrowerId}</Link>
+                      </td>
+                      <td>{log.expiryDate}</td>
+                      <td>{log.reminderSentDate}</td>
+                      <td>{log.status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
