@@ -1,55 +1,63 @@
-/* Header.css */
+/* Modify your Header.css */
 .app-header {
+  position: fixed; /* Change from sticky to fixed */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 101; /* Higher than sidebar */
+  width: 100%;
   display: flex;
-  align-items: flex-start; 
-  
-  border-bottom: 1.5px solid #9a3941; 
-
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: var(--header-height, 60px);
 }
 
 .left-panel {
   display: flex;
   flex-direction: column;
-  background-color: #9a3941; 
+  background-color: var(--secondary-color, #9a3941);
   color: white;
-  padding: 10px;
-  width: 160px; 
-  align-items: center;
-position: fix;}
+  width: var(--sidebar-width, 220px);
+  height: var(--header-height, 60px);
+  justify-content: center;
+}
 
 .user-info {
-  padding-top: 20px;
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  padding: 0 16px;
 }
-
-/*user-image {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-  */
 
 .user-details {
   display: flex;
   flex-direction: column;
-  align-items: center;
   font-weight: bold;
   font-size: 15px;
-  
+}
+
+.user-name {
+  font-weight: 600;
+}
+
+.user-id {
+  font-weight: 500;
+  font-size: 12px;
+  opacity: 0.9;
 }
 
 .header-title {
-  padding-left: 20px;
+  padding-left: 24px;
+}
+
+.header-title h1 {
   font-size: 24px;
   font-weight: normal;
   color: rgb(45, 44, 44);
-
+  margin: 0;
 }
 
-.user-id{
-  font-weight: 500;
-  font-size: 12px;
+@media (max-width: 768px) {
+  .user-details {
+    display: none;
+  }
 }
