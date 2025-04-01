@@ -20,7 +20,7 @@ function Header({ onMenuClick }) {
         </div>
       </div>
       <div className="header-title">
-        <h1>Biblioteksystem</h1>
+        <h1></h1>
       </div>
     </header>
   );
