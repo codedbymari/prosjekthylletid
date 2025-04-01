@@ -1,25 +1,26 @@
-// Header.jsx
+// src/components/Header.js
 import React from 'react';
-import './Header.css'; // Importer CSS-filen
+import './Header.css';
 
-function Header() {
+function Header({ onMenuClick }) {
   return (
     <header className="app-header">
-      {/* Left panel with user info */}
       <div className="left-panel">
         <div className="user-info">
+          <button className="mobile-menu-button" onClick={onMenuClick} aria-label="Toggle menu">
+            <span className="menu-icon-bar"></span>
+            <span className="menu-icon-bar"></span>
+            <span className="menu-icon-bar"></span>
+          </button>
           <div className="user-details">
             <span className="user-name">Therese Engan</span>
             <span className="user-id">Nordre Follo</span>
             <span className="user-id">Superbruker</span>
-
           </div>
         </div>
       </div>
-
-      {/* Reservering title on the right */}
       <div className="header-title">
-        <br></br>Reservering
+        <h1></h1>
       </div>
     </header>
   );
