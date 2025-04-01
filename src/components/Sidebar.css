@@ -24,14 +24,12 @@
   transition: transform 0.3s ease, width 0.3s ease;
 }
 
-/* Main navigation area that can scroll */
 .sidebar-nav {
   flex: 1;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow-y: auto;
-  /* Add scrollbar styling for better UX */
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
@@ -53,7 +51,6 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  /* Space for the fixed help link */
   padding-bottom: 70px;
 }
 
@@ -95,7 +92,7 @@
 }
 
 
-/* Simple placeholder icons - replace with actual icons */
+/*  placeholder icons  */
 .home-icon {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'%3E%3Cpath d='M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'/%3E%3C/svg%3E");
 }
@@ -141,8 +138,8 @@
   width: 100%;
   background-color: var(--sidebar-bg-color);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 10; /* Ensure it's above the scrolling content */
-  box-shadow: 0 -4px 6px -2px rgba(0, 0, 0, 0.1); /* Subtle shadow for separation */
+  z-index: 10;
+  box-shadow: 0 -4px 6px -2px rgba(0, 0, 0, 0.1); 
 }
 
 .help-link {
@@ -203,7 +200,7 @@
 /* Mobile styles */
 @media (max-width: 768px) {
   body {
-    padding-left: 0; /* Remove body padding on mobile when sidebar is hidden */
+    padding-left: 0; 
   }
   
   .sidebar-toggle {
@@ -252,7 +249,6 @@
   }
 }
 
-/* Ensure the focus states are visible for accessibility */
 .sidebar-nav a:focus,
 .help-link:focus,
 .sidebar-toggle:focus {
@@ -260,7 +256,6 @@
   outline-offset: -2px;
 }
 
-/* Adjust main content to accommodate fixed sidebar */
 @media (min-width: 769px) {
   body {
     padding-left: var(--sidebar-width-desktop);

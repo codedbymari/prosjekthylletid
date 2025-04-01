@@ -75,10 +75,9 @@ function ReserveringDashboard() {
     // Simulate API call with a delay
     const fetchData = async () => {
       try {
-        // In a real application, this would be an API call
-        // await fetch('/api/reservations')
+  
         
-        // Mock data for demonstration
+        // Mock data 
         const mockReservations = [
           { id: 1, title: 'Sjøfareren', author: 'Erika Fatland', reservedDate: '14.03.2025', readyDate: '15.03.2025', pickedUpDate: '16.03.2025', status: 'Hentet', daysOnShelf: 2, borrowerId: 'N00123456' },
           { id: 2, title: 'Lur familiemat', author: 'Ida Gran-Jansen', reservedDate: '13.03.2025', readyDate: '14.03.2025', pickedUpDate: '17.03.2025', status: 'Hentet', daysOnShelf: 4, borrowerId: 'N00234567' },
@@ -140,7 +139,6 @@ function ReserveringDashboard() {
         characterData: true,
       });
       
-      // Initial adjustment
       setTimeout(adjustSidebarHeight, 100);
     }
     

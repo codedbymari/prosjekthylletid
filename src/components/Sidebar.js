@@ -7,7 +7,6 @@ function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -30,10 +29,8 @@ function Sidebar() {
     }
   };
 
-  // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event) => {
-      // Close sidebar with Escape key
       if (event.key === 'Escape' && isOpen) {
         setIsOpen(false);
       }
