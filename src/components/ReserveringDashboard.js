@@ -1,3 +1,5 @@
+//src/components/ReserveringDashboard.js
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ReserveringDashboard.css';
@@ -10,7 +12,7 @@ import {
   FiArrowUp, FiArrowDown, FiInfo, FiMail
 } from 'react-icons/fi';
 
-// Constants for filter values
+//   filter 
 const FILTER_STATUSES = {
   ALL: 'all',
   WAITING: 'venter',
@@ -44,7 +46,7 @@ const calculateDaysBetween = (startDate, endDate) => {
 function ReserveringDashboard() {
   const navigate = useNavigate();
   
-  // UI state
+  // UI 
   const [showStatistics, setShowStatistics] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,27 +54,29 @@ function ReserveringDashboard() {
   const [columnMenuOpen, setColumnMenuOpen] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
   const [viewMode, setViewMode] = useState('table');
+  const [tempSettings, setTempSettings] = useState(null);
   
-  // Settings state
+  // Settings 
   const [pickupTimeLimit, setPickupTimeLimit] = useState(7);
   const [reminderDays, setReminderDays] = useState(2);
   
-  // Data state
+  // Data 
   const [materialData, setMaterialData] = useState([]);
   const [reminderLogs, setReminderLogs] = useState([]);
   const [sentAutomaticReminders, setSentAutomaticReminders] = useState([]);
   
-  // Statistics state
+  // Statistics 
   const [pendingReminders, setPendingReminders] = useState(0);
   const [averagePickupTime, setAveragePickupTime] = useState(0);
   const [notPickedUpRate, setNotPickedUpRate] = useState(0);
+  const [activeExplanation, setActiveExplanation] = useState(null);
   
-  // Filtering and sorting state
+  // Filtering and sorting 
   const [filterStatus, setFilterStatus] = useState(FILTER_STATUSES.ALL);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'readyDate', direction: 'desc' });
   
-  // Column visibility state
+  // Column visibility 
   const [visibleColumns, setVisibleColumns] = useState({
     title: true,
     author: true,
@@ -87,13 +91,12 @@ function ReserveringDashboard() {
     actions: false
   });
 
-  // Show toast notification
+  //  toast notification
   const showToast = (message, type = 'success') => {
     setToast({ visible: true, message, type });
     setTimeout(() => setToast({ visible: false, message: '', type: 'success' }), 3000);
   };
 
-  // Safety timeout to prevent stuck loading state
   useEffect(() => {
     if (isLoading) {
       const safetyTimer = setTimeout(() => {
@@ -103,7 +106,6 @@ function ReserveringDashboard() {
     }
   }, [isLoading]);
 
-  // Calculate expiry date based on ready date and pickup time limit
   const calculateExpiryDate = useCallback((readyDate) => {
     if (!readyDate) return null;
     const date = parseNorwegianDate(readyDate);
@@ -113,65 +115,61 @@ function ReserveringDashboard() {
     return formatDateNorwegian(date);
   }, [pickupTimeLimit]);
 
-  // Check and send automatic reminders
-  const checkAndSendAutomaticReminders = useCallback((reservations) => {
-    const today = new Date();
-    
-    // Find reservations that need reminders
-    const remindersToSend = reservations
-      .filter(res => {
-        if (res.status !== 'Venter' || res.pickedUpDate) return false;
-        
-        const readyDate = parseNorwegianDate(res.readyDate);
-        if (!readyDate) return false;
-        
-        const expiryDate = new Date(readyDate);
-        expiryDate.setDate(readyDate.getDate() + pickupTimeLimit);
-        
-        const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-        return daysUntilExpiry === reminderDays && !sentAutomaticReminders.includes(res.id);
-      })
-      .map(res => ({
-        id: `rem-${res.id}`,
-        reservationId: res.id,
-        title: res.title,
-        author: res.author,
-        borrowerId: res.borrowerId,
-        borrowerName: res.borrowerName,
-        readyDate: res.readyDate,
-        expiryDate: res.expiryDate,
-        reminderSentDate: formatDateNorwegian(today),
-        status: 'Sendt automatisk'
-      }));
+const checkAndSendAutomaticReminders = useCallback((reservations) => {
+  const today = new Date();
+  
+  const remindersToSend = reservations
+    .filter(res => {
+      if (res.status !== 'Venter' || res.pickedUpDate) return false;
+      
+      const readyDate = parseNorwegianDate(res.readyDate);
+      if (!readyDate) return false;
+      
+      const expiryDate = new Date(readyDate);
+      expiryDate.setDate(readyDate.getDate() + pickupTimeLimit);
+      
+      const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+      return daysUntilExpiry === reminderDays && !sentAutomaticReminders.includes(res.id);
+    })
+    .map(res => ({
+      id: `rem-${res.id}`,
+      reservationId: res.id,
+      title: res.title,
+      author: res.author,
+      borrowerId: res.borrowerId,
+      borrowerName: res.borrowerName,
+      readyDate: res.readyDate,
+      expiryDate: res.expiryDate,
+      reminderSentDate: formatDateNorwegian(today),
+      status: 'Sendt automatisk'
+    }));
 
-    // Update state if reminders were sent
-    if (remindersToSend.length > 0) {
-      setReminderLogs(prevLogs => [...prevLogs, ...remindersToSend]);
-      setSentAutomaticReminders(prev => [...prev, ...remindersToSend.map(r => r.reservationId)]);
-      showToast(`${remindersToSend.length} automatiske påminnelser har blitt sendt.`, 'info');
-    }
-    
-    // Calculate pending reminders for tomorrow
-    const pendingCount = reservations
-      .filter(res => {
-        if (res.status !== 'Venter' || res.pickedUpDate) return false;
-        
-        const readyDate = parseNorwegianDate(res.readyDate);
-        if (!readyDate) return false;
-        
-        const expiryDate = new Date(readyDate);
-        expiryDate.setDate(readyDate.getDate() + pickupTimeLimit);
-        
-        const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-        return daysUntilExpiry === reminderDays + 1 && !sentAutomaticReminders.includes(res.id);
-      }).length;
-    
-    setPendingReminders(pendingCount);
-  }, [pickupTimeLimit, reminderDays, sentAutomaticReminders]);
+  
+  if (remindersToSend.length > 0) {
+    setReminderLogs(prevLogs => [...prevLogs, ...remindersToSend]);
+    setSentAutomaticReminders(prev => [...prev, ...remindersToSend.map(r => r.reservationId)]);
+   
+  }
+  
+  
+}, [pickupTimeLimit, reminderDays, sentAutomaticReminders]);
 
-// ReserveringDashboard.js - continued
 
-  // Load reservation data
+useEffect(() => {
+  const savedPickupTimeLimit = localStorage.getItem('pickupTimeLimit');
+  const savedReminderDays = localStorage.getItem('reminderDays');
+  
+  if (savedPickupTimeLimit) {
+    setPickupTimeLimit(parseInt(savedPickupTimeLimit));
+  }
+  
+  if (savedReminderDays) {
+    setReminderDays(parseInt(savedReminderDays));
+  }
+}, []);
+
+
+
   useEffect(() => {
     let isMounted = true;
     
@@ -179,24 +177,18 @@ function ReserveringDashboard() {
       setIsLoading(true);
       
       try {
-        // Simulate API call with a delay
         await new Promise(resolve => setTimeout(resolve, 800));
         
-        // Get mock data from separate file
         const mockReservations = generateMockData();
 
-        // Process the reservation data
         const processedReservations = mockReservations.map(item => {
-          // Format dates in Norwegian format
           const readyDateFormatted = formatDateNorwegian(item.readyDate);
           const pickedUpDateFormatted = item.pickedUpDate ? formatDateNorwegian(item.pickedUpDate) : null;
           const reservedDateFormatted = formatDateNorwegian(item.reservedDate);
           
-          // Calculate days on shelf (for picked up items)
           const daysOnShelf = item.pickedUpDate ? 
             calculateDaysBetween(readyDateFormatted, pickedUpDateFormatted) : null;
           
-          // Calculate expiry date (hentefrist)
           const expiryDate = calculateExpiryDate(readyDateFormatted);
           
           return {
@@ -217,11 +209,9 @@ function ReserveringDashboard() {
           };
         });
         
-        // Only update state if component is still mounted
         if (isMounted) {
           setMaterialData(processedReservations);
           
-          // Calculate statistics
           const pickedUpItems = processedReservations.filter(res => res.pickedUpDate);
           const avgDays = pickedUpItems.reduce((sum, item) => sum + item.daysOnShelf, 0) / pickedUpItems.length || 0;
           setAveragePickupTime(avgDays.toFixed(1));
@@ -230,7 +220,6 @@ function ReserveringDashboard() {
           const notPickedRate = (expiredItems.length / processedReservations.length) * 100;
           setNotPickedUpRate(notPickedRate.toFixed(1));
           
-          // Initial reminder logs
           const initialReminderLogs = [
             {
               id: 'rem-history-1',
@@ -241,13 +230,13 @@ function ReserveringDashboard() {
               borrowerName: 'Petter Hansen',
               readyDate: processedReservations.find(r => r.id === 3).readyDate,
               expiryDate: processedReservations.find(r => r.id === 3).expiryDate,
-              reminderSentDate: formatDateNorwegian(new Date(Date.now() - 86400000)), // Yesterday
+              reminderSentDate: formatDateNorwegian(new Date(Date.now() - 86400000)), 
               status: 'Sendt automatisk'
             }
           ];
           
           setReminderLogs(initialReminderLogs);
-          setSentAutomaticReminders([3]); // Mark that we've sent a reminder for item #3
+          setSentAutomaticReminders([3]); 
           setIsLoading(false);
         }
       } catch (error) {
@@ -261,32 +250,25 @@ function ReserveringDashboard() {
 
     fetchData();
     
-    // Cleanup function
     return () => {
       isMounted = false;
     };
   }, [calculateExpiryDate]);
 
-  // Separate effect for checking reminders
   useEffect(() => {
-    // Only run this effect when data is loaded and we're not in loading state
     if (!isLoading && materialData.length > 0) {
-      // Check reminders once
       checkAndSendAutomaticReminders(materialData);
       
-      // Set up interval for periodic checks (every 30 seconds)
       const checkTimer = setInterval(() => {
         checkAndSendAutomaticReminders(materialData);
       }, 30000);
       
-      // Cleanup
       return () => {
         clearInterval(checkTimer);
       };
     }
   }, [isLoading, materialData, checkAndSendAutomaticReminders]);
 
-  // Send reminders manually
   const sendAutomaticReminders = () => {
     const today = new Date();
     const remindersToSend = materialData
@@ -325,7 +307,6 @@ function ReserveringDashboard() {
     }
   };
 
-  // Generate chart data based on selected statistics view
   const generateChartData = () => {
     switch (statisticsView) {
       case 'weekly':
@@ -359,9 +340,9 @@ function ReserveringDashboard() {
     }
   };
 
-  // Export chart data to CSV
+  // Export  data to CSV
   const exportChartData = () => {
-    // Create CSV content
+    // Create CSV 
     const csvRows = [];
     
     // Section 1: Summary statistics
@@ -385,7 +366,7 @@ function ReserveringDashboard() {
     }
     csvRows.push('');
     
-    // Section 3: Detailed reservation information
+    // Section 3:  reservation info
     csvRows.push('# DETALJERT RESERVASJONSINFORMASJON');
     if (materialData.length > 0) {
       csvRows.push('ID,Tittel,Forfatter,Lånernummer,Reservert dato,Klar dato,Hentefrist,Hentet dato,Status,Dager på hylle,Hentenummer');
@@ -442,7 +423,6 @@ function ReserveringDashboard() {
     showToast('Eksport fullført. Filen er lastet ned.', 'success');
   };
 
-  // Update pickup time limit
   const updatePickupTimeLimit = () => {
     const newLimit = window.prompt("Endre hentefrist (antall dager):", pickupTimeLimit);
     if (newLimit && !isNaN(newLimit) && parseInt(newLimit) > 0) {
@@ -572,35 +552,24 @@ function ReserveringDashboard() {
   };
 
   return (
-    <div className="dashboard-wrapper">
-      {/* Modern page header with gradient */}
-      <div className="page-header">
-        <div className="header-content">
-          <h1>Reserveringer Dashboard</h1>
-          <div className="header-actions">
-            {pendingReminders > 0 && (
-              <button 
-                className="btn-notify" 
-                onClick={sendAutomaticReminders}
-                aria-label={`Send ${pendingReminders} ventende påminnelser`}
-              >
-                <FiMail className="icon" />
-                Send påminnelser
-                <span className="badge">{pendingReminders}</span>
-              </button>
-            )}
-            <button 
-              className="btn-settings"
-              onClick={() => setShowSettings(!showSettings)}
-              aria-expanded={showSettings}
-              aria-controls="settings-panel"
-            >
-              <FiSettings className="icon" />
-              Innstillinger
-            </button>
-          </div>
-        </div>
+<div className="dashboard-wrapper">
+  <div className="page-header">
+    <div className="header-content">
+      <div className="header-actions">
+       
+        <button 
+          className="btn-settings"
+          onClick={() => setShowSettings(!showSettings)}
+          aria-expanded={showSettings}
+          aria-controls="settings-panel"
+        >
+          <FiSettings className="icon" />
+          <span>Innstillinger</span>
+        </button>
       </div>
+    </div>
+  </div>
+  
       
       {toast.visible && (
         <div className={`toast toast-${toast.type}`} role="alert">
@@ -627,68 +596,110 @@ function ReserveringDashboard() {
 
 <section className="stats-section">
   <div className="stats-grid">
+    {/* Average Pickup Time Card */}
     <div className="stat-card">
-      <div className="stat-icon time-icon">
-        <FiClock />
+      <div className="stat-header">
+        <div className="stat-icon time-icon">
+          <FiClock />
+        </div>
+        <button 
+          className="info-button" 
+          onClick={() => setActiveExplanation(activeExplanation === 'pickup-time' ? null : 'pickup-time')}
+          aria-label="Vis info om gjennomsnittlig hentetid"
+          aria-expanded={activeExplanation === 'pickup-time'}
+        >
+          <FiInfo />
+        </button>
       </div>
       <div className="stat-content">
         <h3>Gjennomsnittlig hentetid</h3>
-        <p className="stat-value">{averagePickupTime} <span>dager</span></p>
+        <div className="stat-value-container">
+          <p className="stat-value">{averagePickupTime}<span>dager</span></p>
+        </div>
+        
+        {activeExplanation === 'pickup-time' && (
+          <div className="stat-explanation">
+            <div className="explanation-header">
+              <h4>Om gjennomsnittlig hentetid</h4>
+              <button 
+                onClick={() => setActiveExplanation(null)}
+                aria-label="Lukk forklaring"
+                className="close-explanation"
+              >
+                <FiX />
+              </button>
+            </div>
+            <p>Tiden det tar fra en reservasjon er klar til den blir hentet.</p>
+            <ul>
+              <li>Beregnes kun for materiale som faktisk er hentet</li>
+              <li>Lavere verdi indikerer mer effektiv materialsirkulasjon</li>
+              <li>Påvirkes av hentefristen ({pickupTimeLimit} dager)</li>
+            </ul>
+            <div className="chart-reference">
+              <div className="color-indicator" style={{backgroundColor: "#8884d8"}}></div>
+              <span>Vises som lilla søyler i statistikken</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
     
+    {/* Not Picked Up Rate Card */}
     <div className="stat-card">
-      <div className="stat-icon pickup-icon">
-        <FiCheckCircle />
+      <div className="stat-header">
+        <div className="stat-icon pickup-icon">
+          <FiAlertCircle />
+        </div>
+        <button 
+          className="info-button" 
+          onClick={() => setActiveExplanation(activeExplanation === 'not-picked' ? null : 'not-picked')}
+          aria-label="Vis info om ikke-hentet materiale"
+          aria-expanded={activeExplanation === 'not-picked'}
+        >
+          <FiInfo />
+        </button>
       </div>
       <div className="stat-content">
         <h3>Ikke-hentet materiale</h3>
-        <p className="stat-value">{notPickedUpRate}<span>%</span></p>
+        <div className="stat-value-container">
+          <p className="stat-value">{notPickedUpRate}<span>%</span></p>
+        </div>
+        
+        {activeExplanation === 'not-picked' && (
+          <div className="stat-explanation">
+            <div className="explanation-header">
+              <h4>Om ikke-hentet materiale</h4>
+              <button 
+                onClick={() => setActiveExplanation(null)}
+                aria-label="Lukk forklaring" 
+                className="close-explanation"
+              >
+                <FiX />
+              </button>
+            </div>
+            <p>Andel reservasjoner som aldri blir hentet av låner.</p>
+            <ul>
+              <li>Beregnes som antall utløpte reservasjoner delt på totalt antall</li>
+              <li>Høy verdi kan indikere behov for bedre påminnelsesrutiner</li>
+              <li>Påvirkes av hvor populære titlene er</li>
+            </ul>
+            <div className="chart-reference">
+              <div className="color-indicator" style={{backgroundColor: "#82ca9d"}}></div>
+              <span>Vises som grønne søyler i statistikken</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
     
-    <div className="stat-card settings-preview-card">
-      <div className="settings-preview">
-        <div className="settings-preview-item">
-          <div className="preview-label">
-            <FiClock className="preview-icon" />
-            <span>Hentefrist:</span>
-          </div>
-          <div className="preview-value">
-            <strong>{pickupTimeLimit}</strong> dager
-            <button 
-              className="btn-quick-edit" 
-              onClick={updatePickupTimeLimit}
-              aria-label="Endre hentefrist"
-              title="Endre hentefrist"
-            >
-              <FiSettings />
-            </button>
-          </div>
-        </div>
-        
-        <div className="settings-preview-item">
-          <div className="preview-label">
-            <FiMail className="preview-icon" />
-            <span>Påminnelse:</span>
-          </div>
-          <div className="preview-value">
-            <strong>{reminderDays}</strong> dager før frist
-            <button 
-              className="btn-quick-edit" 
-              onClick={updateReminderDays}
-              aria-label="Endre påminnelsesdager"
-              title="Endre påminnelsesdager"
-            >
-              <FiSettings />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
   
- {/* Settings drawer that slides in when settings button is clicked */}
+       
+     
+   
+  </div>
+ 
+  
+ {/* hentefrist/påminnelse setting */}
 {showSettings && (
   <>
     <div className="settings-backdrop" onClick={() => setShowSettings(false)}></div>
@@ -722,18 +733,13 @@ function ReserveringDashboard() {
                   id="pickup-time-limit"
                   min="1" 
                   max="30"
-                  value={pickupTimeLimit}
+                  value={tempSettings?.pickupTimeLimit || pickupTimeLimit}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    if (value > 0) {
-                      setPickupTimeLimit(value);
-                      setMaterialData(prevData => 
-                        prevData.map(item => ({
-                          ...item,
-                          expiryDate: calculateExpiryDate(item.readyDate)
-                        }))
-                      );
-                    }
+                    const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                    setTempSettings(prev => ({
+                      ...prev,
+                      pickupTimeLimit: value
+                    }));
                   }}
                 />
                 <span className="input-suffix">dager</span>
@@ -754,13 +760,14 @@ function ReserveringDashboard() {
                   type="number" 
                   id="reminder-days"
                   min="1" 
-                  max={pickupTimeLimit - 1}
-                  value={reminderDays}
+                  max={tempSettings?.pickupTimeLimit ? tempSettings.pickupTimeLimit - 1 : pickupTimeLimit - 1}
+                  value={tempSettings?.reminderDays || reminderDays}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    if (value > 0 && value < pickupTimeLimit) {
-                      setReminderDays(value);
-                    }
+                    const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                    setTempSettings(prev => ({
+                      ...prev,
+                      reminderDays: value
+                    }));
                   }}
                 />
                 <span className="input-suffix">dager</span>
@@ -771,9 +778,46 @@ function ReserveringDashboard() {
         
         <div className="settings-actions">
           <button 
+            className="btn-cancel-settings"
+            onClick={() => {
+              setTempSettings(null);
+              setShowSettings(false);
+            }}
+          >
+            Avbryt
+          </button>
+          <button 
             className="btn-apply-settings"
             onClick={() => {
-              showToast('Innstillinger er lagret', 'success');
+              if (tempSettings) {
+                // Validate the values before saving
+                const newPickupTimeLimit = typeof tempSettings.pickupTimeLimit === 'number' ? 
+                  tempSettings.pickupTimeLimit : pickupTimeLimit;
+                
+                const newReminderDays = typeof tempSettings.reminderDays === 'number' ? 
+                  tempSettings.reminderDays : reminderDays;
+                
+                // Save to localStorage for persistence
+                localStorage.setItem('pickupTimeLimit', newPickupTimeLimit);
+                localStorage.setItem('reminderDays', newReminderDays);
+                
+                // Update state
+                setPickupTimeLimit(newPickupTimeLimit);
+                setReminderDays(newReminderDays);
+                
+                // Update expiry dates for all items if pickup time limit changed
+                if (newPickupTimeLimit !== pickupTimeLimit) {
+                  setMaterialData(prevData => 
+                    prevData.map(item => ({
+                      ...item,
+                      expiryDate: calculateExpiryDate(item.readyDate)
+                    }))
+                  );
+                }
+                
+                setTempSettings(null);
+                showToast('Innstillinger er lagret', 'success');
+              }
               setShowSettings(false);
             }}
           >
