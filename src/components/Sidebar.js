@@ -6,12 +6,12 @@ function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState('Fjerdingen');
+  const [selectedBranch, setSelectedBranch] = useState('Kolbotn');
   const userMenuRef = useRef(null);
   const navigate = useNavigate();
   
   // filialer
-  const branches = ['Kolbtn', 'Ski'];
+  const branches = ['Kolbotn', 'Ski'];
   
   useEffect(() => {
     const handleResize = () => {
