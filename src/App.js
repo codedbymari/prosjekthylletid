@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import BorrowerDashboard from './components/BorrowerDashboard';
 import ReserveringDashboard from './components/ReserveringDashboard';
+import Reservations from './Backend/Reservations'
 import './layout.css'; // Import the global layout styles
 import './App.css';
 
@@ -25,7 +26,7 @@ function App() {
             <Route path="/" element={<div>Home Dashboard</div>} />
             <Route path="/låner" element={<BorrowerDashboard />} />
             <Route path="/låner/:borrowerId" element={<BorrowerDashboard />} />
-            <Route path="/reservering" element={<ReserveringDashboard />} />
+            <Route path="/reservering" element={<Reservations />}/>
             {/* Add other routes as needed */}
           </Routes>
         </div>
