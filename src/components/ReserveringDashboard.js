@@ -1,7 +1,5 @@
-//src/components/ReserveringDashboard.js
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './ReserveringDashboard.css';
 import ReportChart from './Reportchart';
 import { generateMockData } from '../mockData';
@@ -9,10 +7,10 @@ import {
   FiSettings, FiDownload, FiSearch, FiFilter, FiChevronDown, 
   FiChevronUp, FiX, FiUser, FiBook, FiCalendar, FiClock, 
   FiCheckCircle, FiAlertCircle, FiGrid, FiList, FiEye, FiEyeOff,
-  FiArrowUp, FiArrowDown, FiInfo, FiMail
+  FiArrowUp, FiArrowDown, FiInfo, FiMail, FiSave, FiRefreshCw
 } from 'react-icons/fi';
 
-//   filter 
+//  statuses
 const FILTER_STATUSES = {
   ALL: 'all',
   WAITING: 'venter',
@@ -20,7 +18,6 @@ const FILTER_STATUSES = {
   EXPIRED: 'utløpt'
 };
 
-// Helper functions
 const formatDateNorwegian = (dateString) => {
   if (!dateString) return null;
   const date = new Date(dateString);
@@ -45,10 +42,15 @@ const calculateDaysBetween = (startDate, endDate) => {
 
 function ReserveringDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentTab = location.pathname.includes('/innstillinger') 
+    ? 'innstillinger' 
+    : location.pathname.includes('/aktive') 
+      ? 'aktive' 
+      : 'oversikt';
   
-  // UI 
-  const [showStatistics, setShowStatistics] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  // UI states
+  const [showStatistics, setShowStatistics] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [statisticsView, setStatisticsView] = useState('weekly');
   const [columnMenuOpen, setColumnMenuOpen] = useState(false);
@@ -91,7 +93,7 @@ function ReserveringDashboard() {
     actions: false
   });
 
-  //  toast notification
+  // Toast notification
   const showToast = (message, type = 'success') => {
     setToast({ visible: true, message, type });
     setTimeout(() => setToast({ visible: false, message: '', type: 'success' }), 3000);
@@ -115,60 +117,53 @@ function ReserveringDashboard() {
     return formatDateNorwegian(date);
   }, [pickupTimeLimit]);
 
-const checkAndSendAutomaticReminders = useCallback((reservations) => {
-  const today = new Date();
-  
-  const remindersToSend = reservations
-    .filter(res => {
-      if (res.status !== 'Venter' || res.pickedUpDate) return false;
-      
-      const readyDate = parseNorwegianDate(res.readyDate);
-      if (!readyDate) return false;
-      
-      const expiryDate = new Date(readyDate);
-      expiryDate.setDate(readyDate.getDate() + pickupTimeLimit);
-      
-      const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-      return daysUntilExpiry === reminderDays && !sentAutomaticReminders.includes(res.id);
-    })
-    .map(res => ({
-      id: `rem-${res.id}`,
-      reservationId: res.id,
-      title: res.title,
-      author: res.author,
-      borrowerId: res.borrowerId,
-      borrowerName: res.borrowerName,
-      readyDate: res.readyDate,
-      expiryDate: res.expiryDate,
-      reminderSentDate: formatDateNorwegian(today),
-      status: 'Sendt automatisk'
-    }));
+  const checkAndSendAutomaticReminders = useCallback((reservations) => {
+    const today = new Date();
+    
+    const remindersToSend = reservations
+      .filter(res => {
+        if (res.status !== 'Venter' || res.pickedUpDate) return false;
+        
+        const readyDate = parseNorwegianDate(res.readyDate);
+        if (!readyDate) return false;
+        
+        const expiryDate = new Date(readyDate);
+        expiryDate.setDate(readyDate.getDate() + pickupTimeLimit);
+        
+        const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+        return daysUntilExpiry === reminderDays && !sentAutomaticReminders.includes(res.id);
+      })
+      .map(res => ({
+        id: `rem-${res.id}`,
+        reservationId: res.id,
+        title: res.title,
+        author: res.author,
+        borrowerId: res.borrowerId,
+        borrowerName: res.borrowerName,
+        readyDate: res.readyDate,
+        expiryDate: res.expiryDate,
+        reminderSentDate: formatDateNorwegian(today),
+        status: 'Sendt automatisk'
+      }));
+    
+    if (remindersToSend.length > 0) {
+      setReminderLogs(prevLogs => [...prevLogs, ...remindersToSend]);
+      setSentAutomaticReminders(prev => [...prev, ...remindersToSend.map(r => r.reservationId)]);
+    }
+  }, [pickupTimeLimit, reminderDays, sentAutomaticReminders]);
 
-  
-  if (remindersToSend.length > 0) {
-    setReminderLogs(prevLogs => [...prevLogs, ...remindersToSend]);
-    setSentAutomaticReminders(prev => [...prev, ...remindersToSend.map(r => r.reservationId)]);
-   
-  }
-  
-  
-}, [pickupTimeLimit, reminderDays, sentAutomaticReminders]);
-
-
-useEffect(() => {
-  const savedPickupTimeLimit = localStorage.getItem('pickupTimeLimit');
-  const savedReminderDays = localStorage.getItem('reminderDays');
-  
-  if (savedPickupTimeLimit) {
-    setPickupTimeLimit(parseInt(savedPickupTimeLimit));
-  }
-  
-  if (savedReminderDays) {
-    setReminderDays(parseInt(savedReminderDays));
-  }
-}, []);
-
-
+  useEffect(() => {
+    const savedPickupTimeLimit = localStorage.getItem('pickupTimeLimit');
+    const savedReminderDays = localStorage.getItem('reminderDays');
+    
+    if (savedPickupTimeLimit) {
+      setPickupTimeLimit(parseInt(savedPickupTimeLimit));
+    }
+    
+    if (savedReminderDays) {
+      setReminderDays(parseInt(savedReminderDays));
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -340,7 +335,7 @@ useEffect(() => {
     }
   };
 
-  // Export  data to CSV
+  // Export data to CSV
   const exportChartData = () => {
     // Create CSV 
     const csvRows = [];
@@ -366,7 +361,7 @@ useEffect(() => {
     }
     csvRows.push('');
     
-    // Section 3:  reservation info
+    // Section 3: reservation info
     csvRows.push('# DETALJERT RESERVASJONSINFORMASJON');
     if (materialData.length > 0) {
       csvRows.push('ID,Tittel,Forfatter,Lånernummer,Reservert dato,Klar dato,Hentefrist,Hentet dato,Status,Dager på hylle,Hentenummer');
@@ -423,35 +418,35 @@ useEffect(() => {
     showToast('Eksport fullført. Filen er lastet ned.', 'success');
   };
 
-  const updatePickupTimeLimit = () => {
-    const newLimit = window.prompt("Endre hentefrist (antall dager):", pickupTimeLimit);
-    if (newLimit && !isNaN(newLimit) && parseInt(newLimit) > 0) {
-      const newLimitValue = parseInt(newLimit);
-      setPickupTimeLimit(newLimitValue);
+  const saveSettings = () => {
+    if (tempSettings) {
+      // Validate the values before saving
+      const newPickupTimeLimit = typeof tempSettings.pickupTimeLimit === 'number' ? 
+        tempSettings.pickupTimeLimit : pickupTimeLimit;
       
-      // Update the expiry dates for all items
-      setMaterialData(prevData => 
-        prevData.map(item => ({
-          ...item,
-          expiryDate: calculateExpiryDate(item.readyDate)
-        }))
-      );
+      const newReminderDays = typeof tempSettings.reminderDays === 'number' ? 
+        tempSettings.reminderDays : reminderDays;
       
-      showToast(`Hentefrist er endret til ${newLimitValue} dager.`, 'success');
-    }
-  };
-
-  // Update reminder days
-  const updateReminderDays = () => {
-    const newDays = window.prompt("Endre påminnelse (antall dager før hentefrist):", reminderDays);
-    if (newDays && !isNaN(newDays)) {
-      const newDaysValue = parseInt(newDays);
-      if (newDaysValue > 0 && newDaysValue < pickupTimeLimit) {
-        setReminderDays(newDaysValue);
-        showToast(`Påminnelse vil nå sendes ${newDaysValue} dager før hentefrist.`, 'success');
-      } else if (newDaysValue >= pickupTimeLimit) {
-        showToast(`Påminnelsesdager må være mindre enn hentefristen (${pickupTimeLimit} dager).`, 'error');
+      // Save to localStorage for persistence
+      localStorage.setItem('pickupTimeLimit', newPickupTimeLimit);
+      localStorage.setItem('reminderDays', newReminderDays);
+      
+      // Update state
+      setPickupTimeLimit(newPickupTimeLimit);
+      setReminderDays(newReminderDays);
+      
+      // Update expiry dates for all items if pickup time limit changed
+      if (newPickupTimeLimit !== pickupTimeLimit) {
+        setMaterialData(prevData => 
+          prevData.map(item => ({
+            ...item,
+            expiryDate: calculateExpiryDate(item.readyDate)
+          }))
+        );
       }
+      
+      setTempSettings(null);
+      showToast('Innstillinger er lagret', 'success');
     }
   };
 
@@ -551,756 +546,849 @@ useEffect(() => {
     );
   };
 
-  return (
-<div className="dashboard-wrapper">
-  <div className="page-header">
-    <div className="header-content">
-      <div className="header-actions">
-       
-        <button 
-          className="btn-settings"
-          onClick={() => setShowSettings(!showSettings)}
-          aria-expanded={showSettings}
-          aria-controls="settings-panel"
-        >
-          <FiSettings className="icon" />
-          <span>Innstillinger</span>
-        </button>
-      </div>
-    </div>
-  </div>
-  
-      
-      {toast.visible && (
-        <div className={`toast toast-${toast.type}`} role="alert">
-          <div className="toast-content">
-            <span className="toast-icon">
-              {toast.type === 'success' ? <FiCheckCircle /> : 
-               toast.type === 'error' ? <FiX /> : <FiInfo />}
-            </span>
-            <p>{toast.message}</p>
-          </div>
-        </div>
-      )}
-      
-      {isLoading ? (
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Laster inn reservasjonsdata...</p>
-          <button className="btn-text" onClick={() => setIsLoading(false)}>
-            Avbryt lasting
-          </button>
-        </div>
-      ) : (
-        <main className="dashboard-main">
-
-<section className="stats-section">
-  <div className="stats-grid">
-    {/* Average Pickup Time Card */}
-    <div className="stat-card">
-      <div className="stat-header">
-        <div className="stat-icon time-icon">
-          <FiClock />
-        </div>
-        <button 
-          className="info-button" 
-          onClick={() => setActiveExplanation(activeExplanation === 'pickup-time' ? null : 'pickup-time')}
-          aria-label="Vis info om gjennomsnittlig hentetid"
-          aria-expanded={activeExplanation === 'pickup-time'}
-        >
-          <FiInfo />
-        </button>
-      </div>
-      <div className="stat-content">
-        <h3>Gjennomsnittlig hentetid</h3>
-        <div className="stat-value-container">
-          <p className="stat-value">{averagePickupTime}<span>dager</span></p>
-        </div>
-        
-        {activeExplanation === 'pickup-time' && (
-          <div className="stat-explanation">
-            <div className="explanation-header">
-              <h4>Om gjennomsnittlig hentetid</h4>
-              <button 
-                onClick={() => setActiveExplanation(null)}
-                aria-label="Lukk forklaring"
-                className="close-explanation"
-              >
-                <FiX />
-              </button>
-            </div>
-            <p>Tiden det tar fra en reservasjon er klar til den blir hentet.</p>
-            <ul>
-              <li>Beregnes kun for materiale som faktisk er hentet</li>
-              <li>Lavere verdi indikerer mer effektiv materialsirkulasjon</li>
-              <li>Påvirkes av hentefristen ({pickupTimeLimit} dager)</li>
-            </ul>
-            <div className="chart-reference">
-              <div className="color-indicator" style={{backgroundColor: "#8884d8"}}></div>
-              <span>Vises som lilla søyler i statistikken</span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-    
-    {/* Not Picked Up Rate Card */}
-    <div className="stat-card">
-      <div className="stat-header">
-        <div className="stat-icon pickup-icon">
-          <FiAlertCircle />
-        </div>
-        <button 
-          className="info-button" 
-          onClick={() => setActiveExplanation(activeExplanation === 'not-picked' ? null : 'not-picked')}
-          aria-label="Vis info om ikke-hentet materiale"
-          aria-expanded={activeExplanation === 'not-picked'}
-        >
-          <FiInfo />
-        </button>
-      </div>
-      <div className="stat-content">
-        <h3>Ikke-hentet materiale</h3>
-        <div className="stat-value-container">
-          <p className="stat-value">{notPickedUpRate}<span>%</span></p>
-        </div>
-        
-        {activeExplanation === 'not-picked' && (
-          <div className="stat-explanation">
-            <div className="explanation-header">
-              <h4>Om ikke-hentet materiale</h4>
-              <button 
-                onClick={() => setActiveExplanation(null)}
-                aria-label="Lukk forklaring" 
-                className="close-explanation"
-              >
-                <FiX />
-              </button>
-            </div>
-            <p>Andel reservasjoner som aldri blir hentet av låner.</p>
-            <ul>
-              <li>Beregnes som antall utløpte reservasjoner delt på totalt antall</li>
-              <li>Høy verdi kan indikere behov for bedre påminnelsesrutiner</li>
-              <li>Påvirkes av hvor populære titlene er</li>
-            </ul>
-            <div className="chart-reference">
-              <div className="color-indicator" style={{backgroundColor: "#82ca9d"}}></div>
-              <span>Vises som grønne søyler i statistikken</span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-    
-  
-       
-     
-   
-  </div>
- 
-  
- {/* hentefrist/påminnelse setting */}
-{showSettings && (
-  <>
-    <div className="settings-backdrop" onClick={() => setShowSettings(false)}></div>
-    <div className="settings-drawer">
-      <div className="settings-drawer-header">
-        <h3>Innstillinger</h3>
-        <button 
-          className="btn-close-drawer"
-          onClick={() => setShowSettings(false)}
-          aria-label="Lukk innstillinger"
-        >
-          <FiX />
-        </button>
-      </div>
-      
-      <div className="settings-drawer-content">
-        <div className="settings-group">
-          <h4>Hentefrist og påminnelser</h4>
-          
-          <div className="setting-item">
-            <div className="setting-info">
-              <label htmlFor="pickup-time-limit">Hentefrist</label>
-              <p className="setting-description">
-                Antall dager en reservasjon kan vente på hentehyllen
-              </p>
-            </div>
-            <div className="setting-control">
-              <div className="number-input-group">
-                <input 
-                  type="number" 
-                  id="pickup-time-limit"
-                  min="1" 
-                  max="30"
-                  value={tempSettings?.pickupTimeLimit || pickupTimeLimit}
-                  onChange={(e) => {
-                    const value = e.target.value === '' ? '' : parseInt(e.target.value);
-                    setTempSettings(prev => ({
-                      ...prev,
-                      pickupTimeLimit: value
-                    }));
-                  }}
-                />
-                <span className="input-suffix">dager</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="setting-item">
-            <div className="setting-info">
-              <label htmlFor="reminder-days">Påminnelse før frist</label>
-              <p className="setting-description">
-                Antall dager før hentefrist som påminnelse sendes
-              </p>
-            </div>
-            <div className="setting-control">
-              <div className="number-input-group">
-                <input 
-                  type="number" 
-                  id="reminder-days"
-                  min="1" 
-                  max={tempSettings?.pickupTimeLimit ? tempSettings.pickupTimeLimit - 1 : pickupTimeLimit - 1}
-                  value={tempSettings?.reminderDays || reminderDays}
-                  onChange={(e) => {
-                    const value = e.target.value === '' ? '' : parseInt(e.target.value);
-                    setTempSettings(prev => ({
-                      ...prev,
-                      reminderDays: value
-                    }));
-                  }}
-                />
-                <span className="input-suffix">dager</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="settings-actions">
-          <button 
-            className="btn-cancel-settings"
-            onClick={() => {
-              setTempSettings(null);
-              setShowSettings(false);
-            }}
-          >
-            Avbryt
-          </button>
-          <button 
-            className="btn-apply-settings"
-            onClick={() => {
-              if (tempSettings) {
-                // Validate the values before saving
-                const newPickupTimeLimit = typeof tempSettings.pickupTimeLimit === 'number' ? 
-                  tempSettings.pickupTimeLimit : pickupTimeLimit;
-                
-                const newReminderDays = typeof tempSettings.reminderDays === 'number' ? 
-                  tempSettings.reminderDays : reminderDays;
-                
-                // Save to localStorage for persistence
-                localStorage.setItem('pickupTimeLimit', newPickupTimeLimit);
-                localStorage.setItem('reminderDays', newReminderDays);
-                
-                // Update state
-                setPickupTimeLimit(newPickupTimeLimit);
-                setReminderDays(newReminderDays);
-                
-                // Update expiry dates for all items if pickup time limit changed
-                if (newPickupTimeLimit !== pickupTimeLimit) {
-                  setMaterialData(prevData => 
-                    prevData.map(item => ({
-                      ...item,
-                      expiryDate: calculateExpiryDate(item.readyDate)
-                    }))
-                  );
-                }
-                
-                setTempSettings(null);
-                showToast('Innstillinger er lagret', 'success');
-              }
-              setShowSettings(false);
-            }}
-          >
-            Lagre innstillinger
-          </button>
-        </div>
-      </div>
-    </div>
-  </>
-)}
-</section>
-          
-          {/* Statistics visualization */}
-          <section className="visualization-section">
-  <div className="section-header">
-    <div className="title-group">
-      <h2>Statistikk og trender</h2>
-      <div className="toggle-container">
-        <label className="toggle-label" htmlFor="showStatistics">
-          Vis statistikk
-        </label>
-        <div 
-          className="toggle-switch"
-          onClick={() => setShowStatistics(!showStatistics)}
-        >
-          <input
-            type="checkbox"
-            id="showStatistics"
-            checked={showStatistics}
-            onChange={() => setShowStatistics(!showStatistics)}
-          />
-          <span className="toggle-slider"></span>
-        </div>
-      </div>
-    </div>
-    
-    <button className="btn-export" onClick={exportChartData}>
-      <FiDownload className="icon" />
-      Eksporter data
-    </button>
-  </div>
-  
-  {showStatistics && (
-    <div className="chart-container">
-      <div className="chart-header">
-        <h3>Hentetid statistikk</h3>
-        <div className="chart-tabs">
-          <button 
-            className={statisticsView === 'weekly' ? 'active' : ''} 
-            onClick={() => setStatisticsView('weekly')}
-          >
-            Ukentlig
-          </button>
-          <button 
-            className={statisticsView === 'monthly' ? 'active' : ''} 
-            onClick={() => setStatisticsView('monthly')}
-          >
-            Månedlig
-          </button>
-          <button 
-            className={statisticsView === 'yearly' ? 'active' : ''} 
-            onClick={() => setStatisticsView('yearly')}
-          >
-            Årlig
-          </button>
-        </div>
-      </div>
-      
-      <div className="chart-visualization">
-        <ReportChart data={generateChartData()} />
-      </div>
-    </div>
-  )}
-</section>
-          
-          {/* Reservations data section */}
-          <section className="reservations-section">
-            <div className="section-header">
-              <div className="title-group">
-                <h2>Aktive reserveringer</h2>
-                <span className="item-count">{filteredAndSortedData.length} reserveringer</span>
-              </div>
-              
-              <div className="view-controls">
-                <button 
-                  className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
-                  onClick={() => setViewMode('table')}
-                  aria-label="Vis som tabell"
-                  title="Tabellvisning"
-                >
-                  <FiList className="icon" />
-                </button>
-                <button 
-                  className={`view-btn ${viewMode === 'card' ? 'active' : ''}`}
-                  onClick={() => setViewMode('card')}
-                  aria-label="Vis som kort"
-                  title="Kortvisning"
-                >
-                  <FiGrid className="icon" />
-                </button>
-              </div>
-            </div>
-            
-            <div className="filter-bar">
-              <div className="search-wrapper">
-                <FiSearch className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Søk etter tittel, forfatter, lånernummer..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                  aria-label="Søk i reserveringer"
-                />
-                {searchTerm && (
-                  <button 
-                    className="clear-search" 
-                    onClick={() => setSearchTerm('')}
-                    aria-label="Tøm søk"
+    // Render the table view for reservations
+    const renderReservationsTable = () => {
+      return (
+        <div className="data-table-container">
+          <table className="data-table" aria-label="Reserveringer">
+            <thead>
+              <tr>
+                {visibleColumns.title && (
+                  <th 
+                    onClick={() => requestSort('title')} 
+                    className="sortable"
+                    aria-sort={sortConfig.key === 'title' ? sortConfig.direction : 'none'}
                   >
-                    <FiX />
-                  </button>
+                    Tittel {renderSortIndicator('title')}
+                  </th>
                 )}
-              </div>
-              
-              <div className="filter-dropdown">
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="filter-select"
-                  aria-label="Filtrer etter status"
+                {visibleColumns.author && (
+                  <th 
+                    onClick={() => requestSort('author')} 
+                    className="sortable"
+                    aria-sort={sortConfig.key === 'author' ? sortConfig.direction : 'none'}
+                  >
+                    Forfatter {renderSortIndicator('author')}
+                  </th>
+                )}
+                {visibleColumns.borrowerId && (
+                  <th 
+                    onClick={() => requestSort('borrowerId')} 
+                    className="sortable"
+                    aria-sort={sortConfig.key === 'borrowerId' ? sortConfig.direction : 'none'}
+                  >
+                    Låner {renderSortIndicator('borrowerId')}
+                  </th>
+                )}
+                {visibleColumns.readyDate && (
+                  <th 
+                    onClick={() => requestSort('readyDate')} 
+                    className="sortable"
+                    aria-sort={sortConfig.key === 'readyDate' ? sortConfig.direction : 'none'}
+                  >
+                    Klar dato {renderSortIndicator('readyDate')}
+                  </th>
+                )}
+                {visibleColumns.expiryDate && (
+                  <th 
+                    onClick={() => requestSort('expiryDate')} 
+                    className="sortable"
+                    aria-sort={sortConfig.key === 'expiryDate' ? sortConfig.direction : 'none'}
+                  >
+                    Hentefrist {renderSortIndicator('expiryDate')}
+                  </th>
+                )}
+                {visibleColumns.pickedUpDate && (
+                  <th 
+                    onClick={() => requestSort('pickedUpDate')} 
+                    className="sortable"
+                    aria-sort={sortConfig.key === 'pickedUpDate' ? sortConfig.direction : 'none'}
+                  >
+                    Hentet dato {renderSortIndicator('pickedUpDate')}
+                  </th>
+                )}
+                {visibleColumns.status && (
+                  <th 
+                    onClick={() => requestSort('status')} 
+                    className="sortable"
+                    aria-sort={sortConfig.key === 'status' ? sortConfig.direction : 'none'}
+                  >
+                    Status {renderSortIndicator('status')}
+                  </th>
+                )}
+                {visibleColumns.daysOnShelf && (
+                  <th 
+                    onClick={() => requestSort('daysOnShelf')} 
+                    className="sortable"
+                    aria-sort={sortConfig.key === 'daysOnShelf' ? sortConfig.direction : 'none'}
+                  >
+                    Dager {renderSortIndicator('daysOnShelf')}
+                  </th>
+                )}
+                {visibleColumns.pickupNumber && (
+                  <th 
+                    onClick={() => requestSort('pickupNumber')} 
+                    className="sortable"
+                    aria-sort={sortConfig.key === 'pickupNumber' ? sortConfig.direction : 'none'}
+                  >
+                    Hentenr. {renderSortIndicator('pickupNumber')}
+                  </th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAndSortedData.map(item => (
+                <tr 
+                  key={item.id} 
+                  className={`status-${item.status.toLowerCase()}-row`}
                 >
-                  <option value={FILTER_STATUSES.ALL}>Alle statuser</option>
-                  <option value={FILTER_STATUSES.WAITING}>Venter</option>
-                  <option value={FILTER_STATUSES.PICKED_UP}>Hentet</option>
-                  <option value={FILTER_STATUSES.EXPIRED}>Utløpt</option>
-                </select>
-                <FiFilter className="filter-icon" />
-              </div>
-              
-              <div className="column-manager-dropdown">
-                <button 
-                  className="column-manager-toggle"
-                  onClick={() => setColumnMenuOpen(!columnMenuOpen)}
-                  aria-expanded={columnMenuOpen}
-                  aria-haspopup="true"
-                >
-                  {columnMenuOpen ? <FiEyeOff className="icon" /> : <FiEye className="icon" />}
-                  Kolonner
-                  <span className="dropdown-icon">
-                    {columnMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
-                  </span>
-                </button>
-                
-                {columnMenuOpen && (
-                  <div className="column-options" role="menu">
-                    {Object.entries({
-                      title: 'Tittel',
-                      author: 'Forfatter',
-                      borrowerId: 'Lånernummer',
-                      reservedDate: 'Reservert dato',
-                      readyDate: 'Klar dato',
-                      expiryDate: 'Hentefrist',
-                      pickedUpDate: 'Hentet dato',
-                      status: 'Status',
-                      daysOnShelf: 'Dager på hylle',
-                      pickupNumber: 'Hentenummer'
-                    }).map(([key, label]) => (
-                      <label key={key} className="column-option">
-                        <input 
-                          type="checkbox" 
-                          checked={visibleColumns[key]} 
-                          onChange={() => toggleColumnVisibility(key)}
-                          aria-label={`Vis ${label} kolonne`}
-                        />
-                        <span>{label}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {filteredAndSortedData.length > 0 ? (
-              <>
-                {/* Table View */}
-                {viewMode === 'table' && (
-                  <div className="data-table-container">
-                    <table className="data-table" aria-label="Reserveringer">
-                      <thead>
-                        <tr>
-                          {visibleColumns.title && (
-                            <th 
-                              onClick={() => requestSort('title')} 
-                              className="sortable"
-                              aria-sort={sortConfig.key === 'title' ? sortConfig.direction : 'none'}
-                            >
-                              Tittel {renderSortIndicator('title')}
-                            </th>
-                          )}
-                          {visibleColumns.author && (
-                            <th 
-                              onClick={() => requestSort('author')} 
-                              className="sortable"
-                              aria-sort={sortConfig.key === 'author' ? sortConfig.direction : 'none'}
-                            >
-                              Forfatter {renderSortIndicator('author')}
-                            </th>
-                          )}
-                          {visibleColumns.borrowerId && (
-                            <th 
-                              onClick={() => requestSort('borrowerId')} 
-                              className="sortable"
-                              aria-sort={sortConfig.key === 'borrowerId' ? sortConfig.direction : 'none'}
-                            >
-                              Låner {renderSortIndicator('borrowerId')}
-                            </th>
-                          )}
-                          {visibleColumns.readyDate && (
-                            <th 
-                              onClick={() => requestSort('readyDate')} 
-                              className="sortable"
-                              aria-sort={sortConfig.key === 'readyDate' ? sortConfig.direction : 'none'}
-                            >
-                              Klar dato {renderSortIndicator('readyDate')}
-                            </th>
-                          )}
-                          {visibleColumns.expiryDate && (
-                            <th 
-                              onClick={() => requestSort('expiryDate')} 
-                              className="sortable"
-                              aria-sort={sortConfig.key === 'expiryDate' ? sortConfig.direction : 'none'}
-                            >
-                              Hentefrist {renderSortIndicator('expiryDate')}
-                            </th>
-                          )}
-                          {visibleColumns.pickedUpDate && (
-                            <th 
-                              onClick={() => requestSort('pickedUpDate')} 
-                              className="sortable"
-                              aria-sort={sortConfig.key === 'pickedUpDate' ? sortConfig.direction : 'none'}
-                            >
-                              Hentet dato {renderSortIndicator('pickedUpDate')}
-                            </th>
-                          )}
-                          {visibleColumns.status && (
-                            <th 
-                              onClick={() => requestSort('status')} 
-                              className="sortable"
-                              aria-sort={sortConfig.key === 'status' ? sortConfig.direction : 'none'}
-                            >
-                              Status {renderSortIndicator('status')}
-                            </th>
-                          )}
-                          {visibleColumns.daysOnShelf && (
-                            <th 
-                              onClick={() => requestSort('daysOnShelf')} 
-                              className="sortable"
-                              aria-sort={sortConfig.key === 'daysOnShelf' ? sortConfig.direction : 'none'}
-                            >
-                              Dager {renderSortIndicator('daysOnShelf')}
-                            </th>
-                          )}
-                          {visibleColumns.pickupNumber && (
-                            <th 
-                              onClick={() => requestSort('pickupNumber')} 
-                              className="sortable"
-                              aria-sort={sortConfig.key === 'pickupNumber' ? sortConfig.direction : 'none'}
-                            >
-                              Hentenr. {renderSortIndicator('pickupNumber')}
-                            </th>
-                          )}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredAndSortedData.map(item => (
-                          <tr 
-                            key={item.id} 
-                            className={`status-${item.status.toLowerCase()}-row`}
-                          >
-                            {visibleColumns.title && (
-                              <td className="title-cell" title={item.title}>
-                                {item.title}
-                              </td>
-                            )}
-                            {visibleColumns.author && (
-                              <td title={item.author}>{item.author}</td>
-                            )}
-                            {visibleColumns.borrowerId && (
-                              <td>
-                                <button 
-                                  className="borrower-link"
-                                  onClick={() => handleBorrowerClick(item.borrowerId)}
-                                  title={`Vis lånerdetaljer for ${item.borrowerName || item.borrowerId}`}
-                                >
-                                  <FiUser className="borrower-icon" />
-                                  <span>{item.borrowerId}</span>
-                                </button>
-                              </td>
-                            )}
-                            {visibleColumns.readyDate && (
-                              <td>
-                                <div className="date-cell">
-                                  <FiCalendar className="date-icon" />
-                                  <span>{item.readyDate}</span>
-                                </div>
-                              </td>
-                            )}
-                            {visibleColumns.expiryDate && (
-                              <td className={
-                                parseNorwegianDate(item.expiryDate) < new Date() && 
-                                item.status !== 'Hentet' ? 'expired-date' : ''
-                              }>
-                                <div className="date-cell">
-                                  <FiClock className="date-icon" />
-                                  <span>{item.expiryDate}</span>
-                                </div>
-                              </td>
-                            )}
-                            {visibleColumns.pickedUpDate && (
-                              <td>
-                                {item.pickedUpDate ? (
-                                  <div className="date-cell">
-                                    <FiCheckCircle className="date-icon success" />
-                                    <span>{item.pickedUpDate}</span>
-                                  </div>
-                                ) : (
-                                  <span className="empty-cell">—</span>
-                                )}
-                              </td>
-                            )}
-                            {visibleColumns.status && (
-                              <td>
-                                <span className={`status-badge status-${item.status.toLowerCase()}`}>
-                                  {item.status}
-                                </span>
-                              </td>
-                            )}
-                            {visibleColumns.daysOnShelf && (
-                              <td className="days-cell">
-                                {item.daysOnShelf !== null ? (
-                                  <span className="days-value">{item.daysOnShelf}</span>
-                                ) : (
-                                  <span className="empty-cell">—</span>
-                                )}
-                              </td>
-                            )}
-                            {visibleColumns.pickupNumber && (
-                              <td className="pickup-number">{item.pickupNumber}</td>
-                            )}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-                
-                {/* Card View */}
-                {viewMode === 'card' && (
-                  <div className="card-grid">
-                    {filteredAndSortedData.map(item => (
-                      <div 
-                        key={item.id} 
-                        className={`reservation-card status-${item.status.toLowerCase()}-card`}
+                  {visibleColumns.title && (
+                    <td className="title-cell" title={item.title}>
+                      {item.title}
+                    </td>
+                  )}
+                  {visibleColumns.author && (
+                    <td title={item.author}>{item.author}</td>
+                  )}
+                  {visibleColumns.borrowerId && (
+                    <td>
+                      <button 
+                        className="borrower-link"
+                        onClick={() => handleBorrowerClick(item.borrowerId)}
+                        title={`Vis lånerdetaljer for ${item.borrowerName || item.borrowerId}`}
                       >
-                        <div className="card-header">
-                          <div className="card-status">
-                            <span className={`status-badge status-${item.status.toLowerCase()}`}>
-                              {item.status}
-                            </span>
-                          </div>
-                          <div className="card-pickup-number">
-                            <span className="pickup-label">Hentenr.</span>
-                            <span className="pickup-number">{item.pickupNumber}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="card-content">
-                          <h3 className="book-title" title={item.title}>{item.title}</h3>
-                          <p className="book-author" title={item.author}>{item.author}</p>
-                          
-                          <div className="card-details">
-                            <div className="detail-row">
-                              <span className="detail-label">
-                                <FiUser className="detail-icon" />
-                                Låner:
-                              </span>
-                              <button 
-                                className="borrower-link"
-                                onClick={() => handleBorrowerClick(item.borrowerId)}
-                                title={`Vis lånerdetaljer for ${item.borrowerName || item.borrowerId}`}
-                              >
-                                {item.borrowerName || item.borrowerId}
-                              </button>
-                            </div>
-                            
-                            <div className="detail-row">
-                              <span className="detail-label">
-                                <FiCalendar className="detail-icon" />
-                                Klar dato:
-                              </span>
-                              <span>{item.readyDate}</span>
-                            </div>
-                            
-                            <div className="detail-row">
-                              <span className="detail-label">
-                                <FiClock className="detail-icon" />
-                                Hentefrist:
-                              </span>
-                              <span className={
-                                parseNorwegianDate(item.expiryDate) < new Date() && 
-                                item.status !== 'Hentet' ? 'expired-date' : ''
-                              }>{item.expiryDate}</span>
-                            </div>
-                            
-                            {item.pickedUpDate && (
-                              <div className="detail-row">
-                                <span className="detail-label">
-                                  <FiCheckCircle className="detail-icon success" />
-                                  Hentet:
-                                </span>
-                                <span>{item.pickedUpDate}</span>
-                              </div>
-                            )}
-                            
-                            {item.daysOnShelf !== null && (
-                              <div className="detail-row">
-                                <span className="detail-label">
-                                  <FiInfo className="detail-icon" />
-                                  Dager på hylle:
-                                </span>
-                                <span className="days-value">{item.daysOnShelf}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <div className="card-footer">
-                          <div className="card-metadata">
-                            <span className="metadata-item">
-                              ID: {item.id}
-                            </span>
-                            {item.reservedDate && (
-                              <span className="metadata-item">
-                                Reservert: {item.reservedDate}
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                        <FiUser className="borrower-icon" />
+                        <span>{item.borrowerId}</span>
+                      </button>
+                    </td>
+                  )}
+                  {visibleColumns.readyDate && (
+                    <td>
+                      <div className="date-cell">
+                        <FiCalendar className="date-icon" />
+                        <span>{item.readyDate}</span>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="no-results">
-                <div className="no-results-icon">
-                  <FiBook />
+                    </td>
+                  )}
+                  {visibleColumns.expiryDate && (
+                    <td className={
+                      parseNorwegianDate(item.expiryDate) < new Date() && 
+                      item.status !== 'Hentet' ? 'expired-date' : ''
+                    }>
+                      <div className="date-cell">
+                        <FiClock className="date-icon" />
+                        <span>{item.expiryDate}</span>
+                      </div>
+                    </td>
+                  )}
+                  {visibleColumns.pickedUpDate && (
+                    <td>
+                      {item.pickedUpDate ? (
+                        <div className="date-cell">
+                          <FiCheckCircle className="date-icon success" />
+                          <span>{item.pickedUpDate}</span>
+                        </div>
+                      ) : (
+                        <span className="empty-cell">—</span>
+                      )}
+                    </td>
+                  )}
+                  {visibleColumns.status && (
+                    <td>
+                      <span className={`status-badge status-${item.status.toLowerCase()}`}>
+                        {item.status}
+                      </span>
+                    </td>
+                  )}
+                  {visibleColumns.daysOnShelf && (
+                    <td className="days-cell">
+                      {item.daysOnShelf !== null ? (
+                        <span className="days-value">{item.daysOnShelf}</span>
+                      ) : (
+                        <span className="empty-cell">—</span>
+                      )}
+                    </td>
+                  )}
+                  {visibleColumns.pickupNumber && (
+                    <td className="pickup-number">{item.pickupNumber}</td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    };
+  
+    // Render the card view for reservations
+    const renderReservationsCards = () => {
+      return (
+        <div className="card-grid">
+          {filteredAndSortedData.map(item => (
+            <div 
+              key={item.id} 
+              className={`reservation-card status-${item.status.toLowerCase()}-card`}
+            >
+              <div className="card-header">
+                <div className="card-status">
+                  <span className={`status-badge status-${item.status.toLowerCase()}`}>
+                    {item.status}
+                  </span>
                 </div>
-                <h3>Ingen reserveringer funnet</h3>
-                <p>
-                  {searchTerm || filterStatus !== FILTER_STATUSES.ALL 
-                    ? 'Prøv å endre søkekriteriene dine' 
-                    : 'Det er ingen aktive reserveringer for øyeblikket'}
-                </p>
-                {(searchTerm || filterStatus !== FILTER_STATUSES.ALL) && (
-                  <button 
-                    className="btn-reset-filters"
-                    onClick={() => {
-                      setSearchTerm('');
-                      setFilterStatus(FILTER_STATUSES.ALL);
-                    }}
-                  >
-                    Tilbakestill filtre
-                  </button>
-                )}
+                <div className="card-pickup-number">
+                  <span className="pickup-label">Hentenr.</span>
+                  <span className="pickup-number">{item.pickupNumber}</span>
+                </div>
               </div>
-            )}
-          </section>
-        </main>
-      )}
+              
+              <div className="card-content">
+                <h3 className="book-title" title={item.title}>{item.title}</h3>
+                <p className="book-author" title={item.author}>{item.author}</p>
+                
+                <div className="card-details">
+                  <div className="detail-row">
+                    <span className="detail-label">
+                      <FiUser className="detail-icon" />
+                      Låner:
+                    </span>
+                    <button 
+                      className="borrower-link"
+                      onClick={() => handleBorrowerClick(item.borrowerId)}
+                      title={`Vis lånerdetaljer for ${item.borrowerName || item.borrowerId}`}
+                    >
+                      {item.borrowerName || item.borrowerId}
+                    </button>
+                  </div>
+                  
+                  <div className="detail-row">
+                    <span className="detail-label">
+                      <FiCalendar className="detail-icon" />
+                      Klar dato:
+                    </span>
+                    <span>{item.readyDate}</span>
+                  </div>
+                  
+                  <div className="detail-row">
+                    <span className="detail-label">
+                      <FiClock className="detail-icon" />
+                      Hentefrist:
+                    </span>
+                    <span className={
+                      parseNorwegianDate(item.expiryDate) < new Date() && 
+                      item.status !== 'Hentet' ? 'expired-date' : ''
+                    }>{item.expiryDate}</span>
+                  </div>
+                  
+                  {item.pickedUpDate && (
+                    <div className="detail-row">
+                      <span className="detail-label">
+                        <FiCheckCircle className="detail-icon success" />
+                        Hentet:
+                      </span>
+                      <span>{item.pickedUpDate}</span>
+                    </div>
+                  )}
+                  
+                  {item.daysOnShelf !== null && (
+                    <div className="detail-row">
+                      <span className="detail-label">
+                        <FiInfo className="detail-icon" />
+                        Dager på hylle:
+                      </span>
+                      <span className="days-value">{item.daysOnShelf}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="card-footer">
+                <div className="card-metadata">
+                  <span className="metadata-item">
+                    ID: {item.id}
+                  </span>
+                  {item.reservedDate && (
+                    <span className="metadata-item">
+                      Reservert: {item.reservedDate}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    };
+  
+  // Render the settings page
+const renderSettingsPage = () => {
+  return (
+    <div className="settings-page">
+      <div className="settings-container">
+        <section className="settings-section">
+          <div className="settings-header">
+            <h2>Hentefrist og påminnelser</h2>
+            <p className="settings-description">
+              Konfigurer når reservasjoner utløper og når påminnelser skal sendes
+            </p>
+          </div>
+          <div className="settings-content">
+            <div className="setting-card">
+              <div className="setting-card-header">
+                <div className="setting-icon">
+                  <FiClock />
+                </div>
+                <h3>Hentefrist</h3>
+              </div>
+              <div className="setting-card-content">
+                <p>Antall dager en reservasjon kan vente på hentehyllen før den utløper</p>
+                <div className="setting-input-group">
+                  <div className="number-input-group setting-value">
+                    <input 
+                      type="number" 
+                      id="pickup-time-limit"
+                      min="1" 
+                      max="30"
+                      value={tempSettings?.pickupTimeLimit !== undefined ? tempSettings.pickupTimeLimit : pickupTimeLimit}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                        setTempSettings(prev => ({
+                          ...prev || {},
+                          pickupTimeLimit: value
+                        }));
+                      }}
+                    />
+                    <span className="input-suffix">dager</span>
+                  </div>
+                </div>
+              </div>
+              <div className="setting-card-footer">
+                <p className="setting-info">
+                  Nåværende innstilling: <strong>{pickupTimeLimit} dager</strong>
+                </p>
+              </div>
+            </div>
+
+            <div className="setting-card">
+              <div className="setting-card-header">
+                <div className="setting-icon">
+                  <FiMail />
+                </div>
+                <h3>Påminnelse</h3>
+              </div>
+              <div className="setting-card-content">
+                <p>Antall dager før hentefrist som påminnelse sendes automatisk til låner</p>
+                <div className="setting-input-group">
+                  <div className="number-input-group setting-value">
+                    <input 
+                      type="number" 
+                      id="reminder-days"
+                      min="1" 
+                      max={(tempSettings?.pickupTimeLimit || pickupTimeLimit) - 1}
+                      value={tempSettings?.reminderDays !== undefined ? tempSettings.reminderDays : reminderDays}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                        setTempSettings(prev => ({
+                          ...prev || {},
+                          reminderDays: value
+                        }));
+                      }}
+                    />
+                    <span className="input-suffix">dager</span>
+                  </div>
+                </div>
+              </div>
+              <div className="setting-card-footer">
+                <p className="setting-info">
+                  Nåværende innstilling: <strong>{reminderDays} dager</strong> før utløp
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="settings-actions">
+            <button 
+              className="btn-secondary"
+              onClick={() => {
+                setTempSettings(null);
+                showToast('Endringer avbrutt', 'info');
+              }}
+              disabled={!tempSettings}
+            >
+              <FiX className="icon" />
+              Avbryt endringer
+            </button>
+            
+            <button 
+              className="btn-primary"
+              onClick={saveSettings}
+              disabled={!tempSettings}
+            >
+              <FiSave className="icon" />
+              Lagre innstillinger
+            </button>
+          </div>
+        </section>
+        
+        <section className="settings-section">
+          <div className="settings-header">
+            <h2>Automatiske påminnelser</h2>
+            <p className="settings-description">
+              Systemet sender automatisk påminnelser til lånere når reservasjoner nærmer seg utløp
+            </p>
+          </div>
+          <div className="auto-reminder-info">
+            <div className="info-card">
+              <div className="info-icon">
+                <FiMail />
+              </div>
+              <div className="info-content">
+                <h3>Om automatiske påminnelser</h3>
+                <p>
+                  Påminnelser sendes automatisk til lånere <strong>{reminderDays} dager</strong> før hentefristen 
+                  utløper. Dette hjelper lånere å huske å hente reservert materiale i tide.
+                </p>
+                <p>
+                  Påminnelser sendes via e-post og/eller SMS, avhengig av lånerens kontaktpreferanser.
+                  Ingen manuell håndtering er nødvendig.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
-}
-
-export default ReserveringDashboard;
+};
+   
+  // Render the overview page with stats and visualization
+const renderOverviewPage = () => {
+  return (
+    <>
+      <section className="stats-section">
+        <div className="stats-dashboard">
+          {/* Stats Header */}
+          <div className="stats-header">
+            <h2>Reservasjonsnøkkeltall</h2>
+            <div className="stats-period">
+              <span className="period-label">Periode:</span>
+              <div className="period-selector">
+                <span className="selected-period">Siste 30 dager</span>
+                <FiChevronDown className="period-icon" />
+              </div>
+            </div>
+          </div>
+          
+          {/* Stats Cards */}
+          <div className="stats-metrics">
+            {/* Average Pickup Time Card */}
+            <div className="metric-card">
+              <div className="metric-header">
+                <h3>Gjennomsnittlig hentetid</h3>
+                <button 
+                  className="info-button" 
+                  onClick={() => setActiveExplanation(activeExplanation === 'pickup-time' ? null : 'pickup-time')}
+                  aria-label="Vis info om gjennomsnittlig hentetid"
+                >
+                  <FiInfo />
+                </button>
+              </div>
+              
+              <div className="metric-value-container">
+                <div className="metric-icon time-icon">
+                  <FiClock />
+                </div>
+                <div className="metric-details">
+                  <p className="metric-value">{averagePickupTime}</p>
+                  <p className="metric-unit">dager</p>
+                </div>
+              </div>
+              
+              <div className="metric-trend positive">
+                <FiArrowDown className="trend-icon" />
+                <span className="trend-value">12% lavere</span>
+                <span className="trend-period">enn forrige periode</span>
+              </div>
+              
+              {activeExplanation === 'pickup-time' && (
+                <div className="metric-explanation">
+                  <div className="explanation-header">
+                    <h4>Om gjennomsnittlig hentetid</h4>
+                    <button 
+                      onClick={() => setActiveExplanation(null)}
+                      aria-label="Lukk forklaring"
+                      className="close-explanation"
+                    >
+                      <FiX />
+                    </button>
+                  </div>
+                  <p>Tiden det tar fra en reservasjon er klar til den blir hentet.</p>
+                  <ul>
+                    <li>Beregnes kun for materiale som faktisk er hentet</li>
+                    <li>Lavere verdi indikerer mer effektiv materialsirkulasjon</li>
+                    <li>Påvirkes av hentefristen ({pickupTimeLimit} dager)</li>
+                  </ul>
+                </div>
+              )}
+            </div>
+            
+            {/* Not Picked Up Rate Card */}
+            <div className="metric-card">
+              <div className="metric-header">
+                <h3>Ikke-hentet materiale</h3>
+                <button 
+                  className="info-button" 
+                  onClick={() => setActiveExplanation(activeExplanation === 'not-picked' ? null : 'not-picked')}
+                  aria-label="Vis info om ikke-hentet materiale"
+                >
+                  <FiInfo />
+                </button>
+              </div>
+              
+              <div className="metric-value-container">
+                <div className="metric-icon pickup-icon">
+                  <FiAlertCircle />
+                </div>
+                <div className="metric-details">
+                  <p className="metric-value">{notPickedUpRate}</p>
+                  <p className="metric-unit">prosent</p>
+                </div>
+              </div>
+              
+              <div className="metric-trend negative">
+                <FiArrowUp className="trend-icon" />
+                <span className="trend-value">3% høyere</span>
+                <span className="trend-period">enn forrige periode</span>
+              </div>
+              
+              {activeExplanation === 'not-picked' && (
+                <div className="metric-explanation">
+                  <div className="explanation-header">
+                    <h4>Om ikke-hentet materiale</h4>
+                    <button 
+                      onClick={() => setActiveExplanation(null)}
+                      aria-label="Lukk forklaring" 
+                      className="close-explanation"
+                    >
+                      <FiX />
+                    </button>
+                  </div>
+                  <p>Andel reservasjoner som aldri blir hentet av låner.</p>
+                  <ul>
+                    <li>Beregnes som antall utløpte reservasjoner delt på totalt antall</li>
+                    <li>Høy verdi kan indikere behov for bedre påminnelsesrutiner</li>
+                    <li>Påvirkes av hvor populære titlene er</li>
+                  </ul>
+                </div>
+              )}
+            </div>
+            
+            {/* Active Reservations Card */}
+            <div className="metric-card">
+              <div className="metric-header">
+                <h3>Aktive reservasjoner</h3>
+                <button 
+                  className="info-button" 
+                  onClick={() => setActiveExplanation(activeExplanation === 'active-res' ? null : 'active-res')}
+                  aria-label="Vis info om aktive reservasjoner"
+                >
+                  <FiInfo />
+                </button>
+              </div>
+              
+              <div className="metric-value-container">
+                <div className="metric-icon active-icon">
+                  <FiBook />
+                </div>
+                <div className="metric-details">
+                  <p className="metric-value">{materialData.filter(item => item.status === 'Venter').length}</p>
+                  <p className="metric-unit">venter på henting</p>
+                </div>
+              </div>
+              
+              <div className="metric-trend neutral">
+                <span className="trend-value">Totalt {materialData.length} reservasjoner</span>
+                <span className="trend-period">i systemet</span>
+              </div>
+              
+              {activeExplanation === 'active-res' && (
+                <div className="metric-explanation">
+                  <div className="explanation-header">
+                    <h4>Om aktive reservasjoner</h4>
+                    <button 
+                      onClick={() => setActiveExplanation(null)}
+                      aria-label="Lukk forklaring" 
+                      className="close-explanation"
+                    >
+                      <FiX />
+                    </button>
+                  </div>
+                  <p>Antall reservasjoner som er klare for henting.</p>
+                  <ul>
+                    <li>Materialet er satt på hentehylle og venter på låner</li>
+                    <li>Automatiske påminnelser sendes {reminderDays} dager før utløp</li>
+                    <li>Materialet returneres til samling hvis ikke hentet innen {pickupTimeLimit} dager</li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Statistics visualization */}
+      <section className="visualization-section">
+        <div className="section-header">
+          <div className="title-group">
+            <h2>Statistikk og trender</h2>
+            <div className="toggle-container">
+              <label className="toggle-label" htmlFor="showStatistics">
+                Vis statistikk
+              </label>
+              <div 
+                className="toggle-switch"
+                onClick={() => setShowStatistics(!showStatistics)}
+              >
+                <input
+                  type="checkbox"
+                  id="showStatistics"
+                  checked={showStatistics}
+                  onChange={() => setShowStatistics(!showStatistics)}
+                />
+                <span className="toggle-slider"></span>
+              </div>
+            </div>
+          </div>
+          
+          <button className="btn-export" onClick={exportChartData}>
+            <FiDownload className="icon" />
+            Eksporter data
+          </button>
+        </div>
+        
+        {showStatistics && (
+          <div className="chart-container">
+            <div className="chart-header">
+              <h3>Hentetid og ikke-hentet materiale</h3>
+              <div className="chart-tabs">
+                <button 
+                  className={statisticsView === 'weekly' ? 'active' : ''} 
+                  onClick={() => setStatisticsView('weekly')}
+                >
+                  Ukentlig
+                </button>
+                <button 
+                  className={statisticsView === 'monthly' ? 'active' : ''} 
+                  onClick={() => setStatisticsView('monthly')}
+                >
+                  Månedlig
+                </button>
+                <button 
+                  className={statisticsView === 'yearly' ? 'active' : ''} 
+                  onClick={() => setStatisticsView('yearly')}
+                >
+                  Årlig
+                </button>
+              </div>
+            </div>
+            
+            <div className="chart-visualization">
+              <ReportChart data={generateChartData()} />
+            </div>
+            
+            <div className="chart-legend">
+              <div className="legend-item">
+                <div className="legend-color" style={{backgroundColor: "#8884d8"}}></div>
+                <span className="legend-label">Gjennomsnittlig hentetid (dager)</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-color" style={{backgroundColor: "#82ca9d"}}></div>
+                <span className="legend-label">Antall ikke-hentet materiale</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+    </>
+  );
+};
+    // Render the active reservations page
+    const renderActiveReservationsPage = () => {
+      return (
+        <section className="reservations-section">
+          <div className="section-header">
+            <div className="title-group">
+              <h2>Aktive reserveringer</h2>
+              <span className="item-count">{filteredAndSortedData.length} reserveringer</span>
+            </div>
+            
+            <div className="view-controls">
+              <button 
+                className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
+                onClick={() => setViewMode('table')}
+                aria-label="Vis som tabell"
+                title="Tabellvisning"
+              >
+                <FiList className="icon" />
+              </button>
+              <button 
+                className={`view-btn ${viewMode === 'card' ? 'active' : ''}`}
+                onClick={() => setViewMode('card')}
+                aria-label="Vis som kort"
+                title="Kortvisning"
+              >
+                <FiGrid className="icon" />
+              </button>
+            </div>
+          </div>
+          
+          <div className="filter-bar">
+            <div className="search-wrapper">
+              <FiSearch className="search-icon" />
+              <input
+                type="text"
+                placeholder="Søk etter tittel, forfatter, lånernummer..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+                aria-label="Søk i reserveringer"
+              />
+              {searchTerm && (
+                <button 
+                  className="clear-search" 
+                  onClick={() => setSearchTerm('')}
+                  aria-label="Tøm søk"
+                >
+                  <FiX />
+                </button>
+              )}
+            </div>
+            
+            <div className="filter-dropdown">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="filter-select"
+                aria-label="Filtrer etter status"
+              >
+                <option value={FILTER_STATUSES.ALL}>Alle statuser</option>
+                <option value={FILTER_STATUSES.WAITING}>Venter</option>
+                <option value={FILTER_STATUSES.PICKED_UP}>Hentet</option>
+                <option value={FILTER_STATUSES.EXPIRED}>Utløpt</option>
+              </select>
+              <FiFilter className="filter-icon" />
+            </div>
+            
+            <div className="column-manager-dropdown">
+              <button 
+                className="column-manager-toggle"
+                onClick={() => setColumnMenuOpen(!columnMenuOpen)}
+                aria-expanded={columnMenuOpen}
+                aria-haspopup="true"
+              >
+                {columnMenuOpen ? <FiEyeOff className="icon" /> : <FiEye className="icon" />}
+                Kolonner
+                <span className="dropdown-icon">
+                  {columnMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+                </span>
+              </button>
+              
+              {columnMenuOpen && (
+                <div className="column-options" role="menu">
+                  {Object.entries({
+                    title: 'Tittel',
+                    author: 'Forfatter',
+                    borrowerId: 'Lånernummer',
+                    reservedDate: 'Reservert dato',
+                    readyDate: 'Klar dato',
+                    expiryDate: 'Hentefrist',
+                    pickedUpDate: 'Hentet dato',
+                    status: 'Status',
+                    daysOnShelf: 'Dager på hylle',
+                    pickupNumber: 'Hentenummer'
+                  }).map(([key, label]) => (
+                    <label key={key} className="column-option">
+                      <input 
+                        type="checkbox" 
+                        checked={visibleColumns[key]} 
+                        onChange={() => toggleColumnVisibility(key)}
+                        aria-label={`Vis ${label} kolonne`}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {filteredAndSortedData.length > 0 ? (
+            <>
+              {/* Table View */}
+              {viewMode === 'table' && renderReservationsTable()}
+              
+              {/* Card View */}
+              {viewMode === 'card' && renderReservationsCards()}
+            </>
+          ) : (
+            <div className="no-results">
+              <div className="no-results-icon">
+                <FiBook />
+              </div>
+              <h3>Ingen reserveringer funnet</h3>
+              <p>
+                {searchTerm || filterStatus !== FILTER_STATUSES.ALL 
+                  ? 'Prøv å endre søkekriteriene dine' 
+                  : 'Det er ingen aktive reserveringer for øyeblikket'}
+              </p>
+              {(searchTerm || filterStatus !== FILTER_STATUSES.ALL) && (
+                <button 
+                  className="btn-reset-filters"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setFilterStatus(FILTER_STATUSES.ALL);
+                  }}
+                >
+                  Tilbakestill filtre
+                </button>
+              )}
+            </div>
+          )}
+        </section>
+      );
+    };
+  
+    return (
+      <div className="dashboard-wrapper">
+        {toast.visible && (
+          <div className={`toast toast-${toast.type}`} role="alert">
+            <div className="toast-content">
+              <span className="toast-icon">
+                {toast.type === 'success' ? <FiCheckCircle /> : 
+                 toast.type === 'error' ? <FiX /> : <FiInfo />}
+              </span>
+              <p>{toast.message}</p>
+            </div>
+          </div>
+        )}
+        
+        {isLoading ? (
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Laster inn reservasjonsdata...</p>
+            <button className="btn-text" onClick={() => setIsLoading(false)}>
+              Avbryt lasting
+            </button>
+          </div>
+        ) : (
+          <main className="dashboard-main">
+            {/* Render the appropriate page based on the current tab */}
+            {currentTab === 'oversikt' && renderOverviewPage()}
+            {currentTab === 'aktive' && renderActiveReservationsPage()}
+            {currentTab === 'innstillinger' && renderSettingsPage()}
+          </main>
+        )}
+      </div>
+    );
+  }
+  
+  export default ReserveringDashboard;

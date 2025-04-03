@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import './Header.css';
 
 const Header = () => {
   const location = useLocation();
   const [pageTitle, setPageTitle] = useState('');
-  const [activeTab, setActiveTab] = useState('RAPPORT');
+  const [activeTab, setActiveTab] = useState('oversikt');
   
-  // Map routes to their corresponding titles
   const routeTitles = {
     '/': 'Hjem',
     '/låner': 'Låner',
@@ -20,35 +19,70 @@ const Header = () => {
     '/oppsett': 'Oppsett'
   };
   
-  // Update the page title based on the current route
   useEffect(() => {
     const path = location.pathname;
     
-    // Handle borrower detail pages
     if (path.startsWith('/låner/')) {
       const borrowerId = path.split('/').pop();
       setPageTitle(`Låner: ${borrowerId}`);
     } else {
-      // Use the mapped title or default to the first part of the path
       const baseRoute = '/' + path.split('/')[1];
       setPageTitle(routeTitles[baseRoute] || 'Biblioteksystem');
     }
+
+    if (path.startsWith('/reservering')) {
+      if (path.includes('/aktive')) {
+        setActiveTab('aktive');
+      } else if (path.includes('/innstillinger')) {
+        setActiveTab('innstillinger');
+      } else {
+        setActiveTab('oversikt');
+      }
+    }
   }, [location]);
+
+  const showReservationTabs = location.pathname.startsWith('/reservering');
 
   return (
     <>
-      <header className="app-header">
+      <header className="app-header library-header">
         <div className="header-content">
-          <div className="page-title-container">
-            <h1 className="page-title">{pageTitle}</h1>
+          <div className="page-title-wrapper">
+            <h1 className="page-title" style={{ marginLeft: '10px', color: '#6b7280' }}>
+              {pageTitle}
+            </h1>
           </div>
           <div className="header-actions">
+            {}
           </div>
         </div>
+        
+        {showReservationTabs && (
+          <div className="nav-tabs">
+            <Link 
+              to="/reservering" 
+              className={`nav-tab ${activeTab === 'oversikt' ? 'active' : ''}`}
+              onClick={() => setActiveTab('oversikt')}
+            >
+              Oversikt
+            </Link>
+            <Link 
+              to="/reservering/aktive" 
+              className={`nav-tab ${activeTab === 'aktive' ? 'active' : ''}`}
+              onClick={() => setActiveTab('aktive')}
+            >
+              Aktive reserveringer
+            </Link>
+            <Link 
+              to="/reservering/innstillinger" 
+              className={`nav-tab ${activeTab === 'innstillinger' ? 'active' : ''}`}
+              onClick={() => setActiveTab('innstillinger')}
+            >
+              Innstillinger
+            </Link>
+          </div>
+        )} 
       </header>
-      
-      
-      
     </>
   );
 };

@@ -42,7 +42,8 @@ function App() {
             <Route path="/låner" element={<BorrowerDashboard />} />
             <Route path="/låner/:borrowerId" element={<BorrowerDashboard />} />
             <Route path="/reservering" element={<ReserveringDashboard />} />
-            {/* Add other routes as needed */}
+            <Route path="/reservering/aktive" element={<ReserveringDashboard />} />
+            <Route path="/reservering/innstillinger" element={<ReserveringDashboard />} />
           </Routes>
         </div>
       </div>

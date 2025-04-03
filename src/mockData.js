@@ -1,16 +1,13 @@
 // mockData.js
 export const generateMockData = () => {
-    // Get current date to make realistic dates
     const today = new Date();
     
-    // Helper to create dates relative to today
     const getRelativeDate = (daysDiff) => {
       const date = new Date(today);
       date.setDate(date.getDate() + daysDiff);
       return date.toISOString();
     };
     
-    // Mock data structured similar to what Prisma would return
     return [
       { 
         id: 1, 
