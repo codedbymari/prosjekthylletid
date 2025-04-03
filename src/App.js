@@ -27,6 +27,7 @@ function App() {
   }, []);
 
   return (
+<<<<<<< HEAD
     <div className="app-container">
       {/* Header component */}
       <Header onMenuClick={toggleSidebar} />
@@ -45,9 +46,25 @@ function App() {
             <Route path="/reservering" element={<Reservations />}/>
             {/* Add other routes as needed */}
           </Routes>
+=======
+    
+      <div className="app-container">
+        <Header onMenuClick={toggleSidebar} />
+        <div className="main-content">
+          <Sidebar className={sidebarOpen ? 'open' : ''} />
+          <div className="content-area">
+            <Routes>
+              <Route path="/" element={<div>Home Dashboard</div>} />
+              <Route path="/låner" element={<BorrowerDashboard />} />
+              <Route path="/låner/:borrowerId" element={<BorrowerDashboard />} />
+              <Route path="/reservering" element={<ReserveringDashboard />} />
+              {/* Add other routes as needed */}
+            </Routes>
+          </div>
+>>>>>>> 873cd1b (endret lånere side og gjort så man kan trykke på lånernummer fra reserveringssiden)
         </div>
       </div>
-    </div>
+    
   );
 }
 
