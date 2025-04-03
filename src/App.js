@@ -5,13 +5,9 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import BorrowerDashboard from './components/BorrowerDashboard';
 import ReserveringDashboard from './components/ReserveringDashboard';
-<<<<<<< HEAD
-import Reservations from './Backend/Reservations'
-import './layout.css'; // Import the global layout styles
-=======
 import './layout.css';
->>>>>>> ab4352aee1cd2b16f3f917632cc53a3a8517471d
 import './App.css';
+import reservations from './Backend/backend/Reservations';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
