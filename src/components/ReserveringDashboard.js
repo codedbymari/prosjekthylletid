@@ -1,10 +1,18 @@
-// src/components/ReserveringDashboard.js
+//src/components/ReserveringDashboard.js
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './ReserveringDashboard.css';
 import ReportChart from './Reportchart';
+import { generateMockData } from '../mockData';
+import { 
+  FiSettings, FiDownload, FiSearch, FiFilter, FiChevronDown, 
+  FiChevronUp, FiX, FiUser, FiBook, FiCalendar, FiClock, 
+  FiCheckCircle, FiAlertCircle, FiGrid, FiList, FiEye, FiEyeOff,
+  FiArrowUp, FiArrowDown, FiInfo, FiMail
+} from 'react-icons/fi';
 
-// Constants for filter values
+//   filter 
 const FILTER_STATUSES = {
   ALL: 'all',
   WAITING: 'venter',
@@ -12,7 +20,7 @@ const FILTER_STATUSES = {
   EXPIRED: 'utløpt'
 };
 
-// Helper functions moved outside component to avoid recreating on each render
+// Helper functions
 const formatDateNorwegian = (dateString) => {
   if (!dateString) return null;
   const date = new Date(dateString);
@@ -23,7 +31,6 @@ const parseNorwegianDate = (dateString) => {
   if (!dateString) return null;
   const parts = dateString.split('.');
   if (parts.length !== 3) return null;
-  // Convert from DD.MM.YYYY to YYYY-MM-DD for Date constructor
   return new Date(parts[2], parts[1] - 1, parts[0]);
 };
 
@@ -39,34 +46,37 @@ const calculateDaysBetween = (startDate, endDate) => {
 function ReserveringDashboard() {
   const navigate = useNavigate();
   
-  // UI state
+  // UI 
   const [showStatistics, setShowStatistics] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [statisticsView, setStatisticsView] = useState('weekly');
   const [columnMenuOpen, setColumnMenuOpen] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
+  const [viewMode, setViewMode] = useState('table');
+  const [tempSettings, setTempSettings] = useState(null);
   
-  // Settings state
+  // Settings 
   const [pickupTimeLimit, setPickupTimeLimit] = useState(7);
   const [reminderDays, setReminderDays] = useState(2);
   
-  // Data state
+  // Data 
   const [materialData, setMaterialData] = useState([]);
   const [reminderLogs, setReminderLogs] = useState([]);
   const [sentAutomaticReminders, setSentAutomaticReminders] = useState([]);
   
-  // Statistics state
+  // Statistics 
   const [pendingReminders, setPendingReminders] = useState(0);
   const [averagePickupTime, setAveragePickupTime] = useState(0);
   const [notPickedUpRate, setNotPickedUpRate] = useState(0);
+  const [activeExplanation, setActiveExplanation] = useState(null);
   
-  // Filtering and sorting state
+  // Filtering and sorting 
   const [filterStatus, setFilterStatus] = useState(FILTER_STATUSES.ALL);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'readyDate', direction: 'desc' });
   
-  // Column visibility state
+  // Column visibility 
   const [visibleColumns, setVisibleColumns] = useState({
     title: true,
     author: true,
@@ -81,26 +91,21 @@ function ReserveringDashboard() {
     actions: false
   });
 
-  // Show toast notification
+  //  toast notification
   const showToast = (message, type = 'success') => {
     setToast({ visible: true, message, type });
     setTimeout(() => setToast({ visible: false, message: '', type: 'success' }), 3000);
   };
 
-  // Safety timeout to prevent stuck loading state
   useEffect(() => {
     if (isLoading) {
-      console.log("Loading safety timeout started");
       const safetyTimer = setTimeout(() => {
-        console.log("Safety timeout triggered - forcing loading to false");
         setIsLoading(false);
-      }, 5000); // 5 second safety timeout
-      
+      }, 5000);
       return () => clearTimeout(safetyTimer);
     }
   }, [isLoading]);
 
-  // Calculate expiry date based on ready date and pickup time limit
   const calculateExpiryDate = useCallback((readyDate) => {
     if (!readyDate) return null;
     const date = parseNorwegianDate(readyDate);
@@ -110,282 +115,80 @@ function ReserveringDashboard() {
     return formatDateNorwegian(date);
   }, [pickupTimeLimit]);
 
-  // Check and send automatic reminders
-  const checkAndSendAutomaticReminders = useCallback((reservations) => {
-    console.log("Running reminder check");
-    const today = new Date();
-    
-    // Find reservations that need reminders
-    const remindersToSend = reservations
-      .filter(res => {
-        if (res.status !== 'Venter' || res.pickedUpDate) return false;
-        
-        const readyDate = parseNorwegianDate(res.readyDate);
-        if (!readyDate) return false;
-        
-        const expiryDate = new Date(readyDate);
-        expiryDate.setDate(readyDate.getDate() + pickupTimeLimit);
-        
-        const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-        return daysUntilExpiry === reminderDays && !sentAutomaticReminders.includes(res.id);
-      })
-      .map(res => ({
-        id: `rem-${res.id}`,
-        reservationId: res.id,
-        title: res.title,
-        author: res.author,
-        borrowerId: res.borrowerId,
-        borrowerName: res.borrowerName,
-        readyDate: res.readyDate,
-        expiryDate: res.expiryDate,
-        reminderSentDate: formatDateNorwegian(today),
-        status: 'Sendt automatisk'
-      }));
+const checkAndSendAutomaticReminders = useCallback((reservations) => {
+  const today = new Date();
+  
+  const remindersToSend = reservations
+    .filter(res => {
+      if (res.status !== 'Venter' || res.pickedUpDate) return false;
+      
+      const readyDate = parseNorwegianDate(res.readyDate);
+      if (!readyDate) return false;
+      
+      const expiryDate = new Date(readyDate);
+      expiryDate.setDate(readyDate.getDate() + pickupTimeLimit);
+      
+      const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+      return daysUntilExpiry === reminderDays && !sentAutomaticReminders.includes(res.id);
+    })
+    .map(res => ({
+      id: `rem-${res.id}`,
+      reservationId: res.id,
+      title: res.title,
+      author: res.author,
+      borrowerId: res.borrowerId,
+      borrowerName: res.borrowerName,
+      readyDate: res.readyDate,
+      expiryDate: res.expiryDate,
+      reminderSentDate: formatDateNorwegian(today),
+      status: 'Sendt automatisk'
+    }));
 
-    // Update state if reminders were sent
-    if (remindersToSend.length > 0) {
-      console.log("Automatiske påminnelser sendt:", remindersToSend);
-      setReminderLogs(prevLogs => [...prevLogs, ...remindersToSend]);
-      setSentAutomaticReminders(prev => [...prev, ...remindersToSend.map(r => r.reservationId)]);
-      showToast(`${remindersToSend.length} automatiske påminnelser har blitt sendt.`, 'info');
-    }
-    
-    // Calculate pending reminders for tomorrow
-    const pendingCount = reservations
-      .filter(res => {
-        if (res.status !== 'Venter' || res.pickedUpDate) return false;
-        
-        const readyDate = parseNorwegianDate(res.readyDate);
-        if (!readyDate) return false;
-        
-        const expiryDate = new Date(readyDate);
-        expiryDate.setDate(readyDate.getDate() + pickupTimeLimit);
-        
-        const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-        return daysUntilExpiry === reminderDays + 1 && !sentAutomaticReminders.includes(res.id);
-      }).length;
-    
-    setPendingReminders(pendingCount);
-  }, [pickupTimeLimit, reminderDays, sentAutomaticReminders]);
+  
+  if (remindersToSend.length > 0) {
+    setReminderLogs(prevLogs => [...prevLogs, ...remindersToSend]);
+    setSentAutomaticReminders(prev => [...prev, ...remindersToSend.map(r => r.reservationId)]);
+   
+  }
+  
+  
+}, [pickupTimeLimit, reminderDays, sentAutomaticReminders]);
 
-  // Load reservation data - only run once on mount
+
+useEffect(() => {
+  const savedPickupTimeLimit = localStorage.getItem('pickupTimeLimit');
+  const savedReminderDays = localStorage.getItem('reminderDays');
+  
+  if (savedPickupTimeLimit) {
+    setPickupTimeLimit(parseInt(savedPickupTimeLimit));
+  }
+  
+  if (savedReminderDays) {
+    setReminderDays(parseInt(savedReminderDays));
+  }
+}, []);
+
+
+
   useEffect(() => {
-    console.log("Data loading effect running");
-    let isMounted = true; // For cleanup/preventing state updates after unmount
+    let isMounted = true;
     
     const fetchData = async () => {
       setIsLoading(true);
       
       try {
-        // Simulate API call with a delay
         await new Promise(resolve => setTimeout(resolve, 800));
         
-        // Get current date to make realistic dates
-        const today = new Date();
-        
-        // Helper to create dates relative to today
-        const getRelativeDate = (daysDiff) => {
-          const date = new Date(today);
-          date.setDate(date.getDate() + daysDiff);
-          return date.toISOString();
-        };
-        
-        // Mock data that's structured similar to what Prisma would return
-        const mockReservations = [
-          { 
-            id: 1, 
-            title: 'Sjøfareren', 
-            author: 'Erika Fatland', 
-            borrower: {
-              id: 'N00123456',
-              name: 'Ole Nordmann',
-              email: 'ole.nordmann@example.com',
-              phone: '91234567'
-            },
-            reservedDate: getRelativeDate(-5),
-            readyDate: getRelativeDate(-4),
-            pickedUpDate: getRelativeDate(-2),
-            status: 'HENTET',
-            pickupNumber: 'A-123',
-            createdAt: getRelativeDate(-6),
-            updatedAt: getRelativeDate(-2)
-          },
-          { 
-            id: 2, 
-            title: 'Lur familiemat', 
-            author: 'Ida Gran-Jansen', 
-            borrower: {
-              id: 'N00234567',
-              name: 'Kari Nordmann',
-              email: 'kari.nordmann@example.com',
-              phone: '92345678'
-            },
-            reservedDate: getRelativeDate(-7),
-            readyDate: getRelativeDate(-6),
-            pickedUpDate: getRelativeDate(-3),
-            status: 'HENTET',
-            pickupNumber: 'A-124',
-            createdAt: getRelativeDate(-8),
-            updatedAt: getRelativeDate(-3)
-          },
-          { 
-            id: 3, 
-            title: 'Råsterk på et år', 
-            author: 'Jørgine Massa Vasstrand', 
-            borrower: {
-              id: 'N00345678',
-              name: 'Petter Hansen',
-              email: 'petter.hansen@example.com',
-              phone: '93456789'
-            },
-            reservedDate: getRelativeDate(-3),
-            readyDate: getRelativeDate(-2),
-            pickedUpDate: null,
-            status: 'VENTER',
-            pickupNumber: 'A-125',
-            createdAt: getRelativeDate(-4),
-            updatedAt: getRelativeDate(-2)
-          },
-          { 
-            id: 4, 
-            title: 'Tørt land', 
-            author: 'Jørn Lier Horst', 
-            borrower: {
-              id: 'N00456789',
-              name: 'Marte Kirkerud',
-              email: 'marte.kirkerud@example.com',
-              phone: '94567890'
-            },
-            reservedDate: getRelativeDate(-5),
-            readyDate: getRelativeDate(-4),
-            pickedUpDate: getRelativeDate(-3),
-            status: 'HENTET',
-            pickupNumber: 'A-126',
-            createdAt: getRelativeDate(-6),
-            updatedAt: getRelativeDate(-3)
-          },
-          { 
-            id: 5, 
-            title: 'Kongen av Os', 
-            author: 'Jo Nesbø', 
-            borrower: {
-              id: 'N00567890',
-              name: 'Lars Holm',
-              email: 'lars.holm@example.com',
-              phone: '95678901'
-            },
-            reservedDate: getRelativeDate(-3),
-            readyDate: getRelativeDate(-2),
-            pickedUpDate: null,
-            status: 'VENTER',
-            pickupNumber: 'A-127',
-            createdAt: getRelativeDate(-4),
-            updatedAt: getRelativeDate(-2)
-          },
-          { 
-            id: 6, 
-            title: '23 meter offside (Pondus)', 
-            author: 'Frode Øverli', 
-            borrower: {
-              id: 'N00678901',
-              name: 'Sofia Berg',
-              email: 'sofia.berg@example.com',
-              phone: '96789012'
-            },
-            reservedDate: getRelativeDate(-8),
-            readyDate: getRelativeDate(-7),
-            pickedUpDate: getRelativeDate(-6),
-            status: 'HENTET',
-            pickupNumber: 'A-128',
-            createdAt: getRelativeDate(-9),
-            updatedAt: getRelativeDate(-6)
-          },
-          { 
-            id: 7, 
-            title: 'Felix har følelser', 
-            author: 'Charlotte Mjelde', 
-            borrower: {
-              id: 'N00789012',
-              name: 'Erik Lund',
-              email: 'erik.lund@example.com',
-              phone: '97890123'
-            },
-            reservedDate: getRelativeDate(-1),
-            readyDate: getRelativeDate(0), // Today
-            pickedUpDate: null,
-            status: 'VENTER',
-            pickupNumber: 'A-129',
-            createdAt: getRelativeDate(-2),
-            updatedAt: getRelativeDate(0)
-          },
-          { 
-            id: 8, 
-            title: 'Skriket', 
-            author: 'Jørn Lier Horst og Jan-Erik Fjell', 
-            borrower: {
-              id: 'N00890123',
-              name: 'Anna Dahl',
-              email: 'anna.dahl@example.com',
-              phone: '98901234'
-            },
-            reservedDate: getRelativeDate(-6),
-            readyDate: getRelativeDate(-5),
-            pickedUpDate: getRelativeDate(-4),
-            status: 'HENTET',
-            pickupNumber: 'A-130',
-            createdAt: getRelativeDate(-7),
-            updatedAt: getRelativeDate(-4)
-          },
-          { 
-            id: 9, 
-            title: 'Juleroser', 
-            author: 'Herborg Kråkevik', 
-            borrower: {
-              id: 'N00901234',
-              name: 'Thomas Olsen',
-              email: 'thomas.olsen@example.com',
-              phone: '99012345'
-            },
-            reservedDate: getRelativeDate(-10),
-            readyDate: getRelativeDate(-9),
-            pickedUpDate: null,
-            status: 'UTLØPT',
-            pickupNumber: 'A-131',
-            createdAt: getRelativeDate(-11),
-            updatedAt: getRelativeDate(-1)
-          },
-          { 
-            id: 10, 
-            title: 'Søvngjengeren', 
-            author: 'Lars Kepler', 
-            borrower: {
-              id: 'N00012345',
-              name: 'Maria Johansen',
-              email: 'maria.johansen@example.com',
-              phone: '90123456'
-            },
-            reservedDate: getRelativeDate(-4),
-            readyDate: getRelativeDate(-3),
-            pickedUpDate: null,
-            status: 'VENTER',
-            pickupNumber: 'A-132',
-            createdAt: getRelativeDate(-5),
-            updatedAt: getRelativeDate(-3)
-          },
-        ];
+        const mockReservations = generateMockData();
 
-        // Process the reservation data
         const processedReservations = mockReservations.map(item => {
-          // Format dates in Norwegian format
           const readyDateFormatted = formatDateNorwegian(item.readyDate);
           const pickedUpDateFormatted = item.pickedUpDate ? formatDateNorwegian(item.pickedUpDate) : null;
           const reservedDateFormatted = formatDateNorwegian(item.reservedDate);
           
-          // Calculate days on shelf (for picked up items)
           const daysOnShelf = item.pickedUpDate ? 
             calculateDaysBetween(readyDateFormatted, pickedUpDateFormatted) : null;
           
-          // Calculate expiry date (hentefrist)
           const expiryDate = calculateExpiryDate(readyDateFormatted);
           
           return {
@@ -406,11 +209,9 @@ function ReserveringDashboard() {
           };
         });
         
-        // Only update state if component is still mounted
         if (isMounted) {
           setMaterialData(processedReservations);
           
-          // Calculate statistics
           const pickedUpItems = processedReservations.filter(res => res.pickedUpDate);
           const avgDays = pickedUpItems.reduce((sum, item) => sum + item.daysOnShelf, 0) / pickedUpItems.length || 0;
           setAveragePickupTime(avgDays.toFixed(1));
@@ -419,7 +220,6 @@ function ReserveringDashboard() {
           const notPickedRate = (expiredItems.length / processedReservations.length) * 100;
           setNotPickedUpRate(notPickedRate.toFixed(1));
           
-          // Initial reminder logs
           const initialReminderLogs = [
             {
               id: 'rem-history-1',
@@ -430,13 +230,13 @@ function ReserveringDashboard() {
               borrowerName: 'Petter Hansen',
               readyDate: processedReservations.find(r => r.id === 3).readyDate,
               expiryDate: processedReservations.find(r => r.id === 3).expiryDate,
-              reminderSentDate: formatDateNorwegian(getRelativeDate(-1)),
+              reminderSentDate: formatDateNorwegian(new Date(Date.now() - 86400000)), 
               status: 'Sendt automatisk'
             }
           ];
           
           setReminderLogs(initialReminderLogs);
-          setSentAutomaticReminders([3]); // Mark that we've sent a reminder for item #3
+          setSentAutomaticReminders([3]); 
           setIsLoading(false);
         }
       } catch (error) {
@@ -450,37 +250,25 @@ function ReserveringDashboard() {
 
     fetchData();
     
-    // Cleanup function
     return () => {
       isMounted = false;
-      console.log("Data loading effect cleanup");
     };
-  }, []); // Empty dependency array - only run once on mount
+  }, [calculateExpiryDate]);
 
-  // Separate effect for checking reminders
   useEffect(() => {
-    // Only run this effect when data is loaded and we're not in loading state
     if (!isLoading && materialData.length > 0) {
-      console.log("Reminder check effect running");
-      
-      // Check reminders once
       checkAndSendAutomaticReminders(materialData);
       
-      // Set up interval for periodic checks
       const checkTimer = setInterval(() => {
-        console.log("Periodic reminder check");
         checkAndSendAutomaticReminders(materialData);
-      }, 30000); // Check every 30 seconds instead of every second
+      }, 30000);
       
-      // Cleanup
       return () => {
         clearInterval(checkTimer);
-        console.log("Reminder check effect cleanup");
       };
     }
-  }, [isLoading, materialData.length, checkAndSendAutomaticReminders]); 
+  }, [isLoading, materialData, checkAndSendAutomaticReminders]);
 
-  // Send reminders manually
   const sendAutomaticReminders = () => {
     const today = new Date();
     const remindersToSend = materialData
@@ -519,7 +307,6 @@ function ReserveringDashboard() {
     }
   };
 
-  // Generate chart data based on selected statistics view
   const generateChartData = () => {
     switch (statisticsView) {
       case 'weekly':
@@ -553,9 +340,9 @@ function ReserveringDashboard() {
     }
   };
 
-  // Export chart data to CSV
+  // Export  data to CSV
   const exportChartData = () => {
-    // Create CSV content
+    // Create CSV 
     const csvRows = [];
     
     // Section 1: Summary statistics
@@ -579,7 +366,7 @@ function ReserveringDashboard() {
     }
     csvRows.push('');
     
-    // Section 3: Detailed reservation information
+    // Section 3:  reservation info
     csvRows.push('# DETALJERT RESERVASJONSINFORMASJON');
     if (materialData.length > 0) {
       csvRows.push('ID,Tittel,Forfatter,Lånernummer,Reservert dato,Klar dato,Hentefrist,Hentet dato,Status,Dager på hylle,Hentenummer');
@@ -636,7 +423,6 @@ function ReserveringDashboard() {
     showToast('Eksport fullført. Filen er lastet ned.', 'success');
   };
 
-  // Update pickup time limit
   const updatePickupTimeLimit = () => {
     const newLimit = window.prompt("Endre hentefrist (antall dager):", pickupTimeLimit);
     if (newLimit && !isNaN(newLimit) && parseInt(newLimit) > 0) {
@@ -751,443 +537,766 @@ function ReserveringDashboard() {
 
   // Navigate to borrower details
   const handleBorrowerClick = (borrowerId) => {
-    // In a real application, this would navigate to the borrower detail page
     navigate(`/låner/${borrowerId}`);
-    // For demo purposes, show an toast
     showToast(`Navigerer til lånerdetaljer for: ${borrowerId}`, 'info');
-  };
-
-  // Mark item as picked up
-  const handleMarkAsPickedUp = (id) => {
-    const today = formatDateNorwegian(new Date());
-    
-    setMaterialData(prevData => 
-      prevData.map(item => 
-        item.id === id 
-          ? { 
-              ...item, 
-              status: 'Hentet', 
-              pickedUpDate: today,
-              daysOnShelf: calculateDaysBetween(item.readyDate, today)
-            } 
-          : item
-      )
-    );
-    
-    // For demo: Show a confirmation message
-    const item = materialData.find(item => item.id === id);
-    showToast(`"${item.title}" er nå markert som hentet av ${item.borrowerName} (${item.borrowerId})`, 'success');
   };
 
   // Render sort indicator
   const renderSortIndicator = (key) => {
     if (sortConfig.key !== key) return null;
-    return <span className="sort-indicator">{sortConfig.direction === 'asc' ? '▲' : '▼'}</span>;
+    return (
+      <span className="sort-indicator">
+        {sortConfig.direction === 'asc' ? <FiArrowUp /> : <FiArrowDown />}
+      </span>
+    );
   };
 
-  // Column management dropdown component
-  const ColumnManager = () => (
-    <div className="column-manager">
-      <button 
-        className="btn-column-manager"
-        aria-haspopup="true"
-        aria-expanded={columnMenuOpen}
-        onClick={() => setColumnMenuOpen(!columnMenuOpen)}
-        onBlur={(e) => {
-          // Close menu when focus leaves unless it's going to a child element
-          if (!e.currentTarget.contains(e.relatedTarget)) {
-            setColumnMenuOpen(false);
-          }
-        }}
-      >
-        Velg kolonner <span className="dropdown-icon" aria-hidden="true">▼</span>
-      </button>
-      {columnMenuOpen && (
-        <div className="column-dropdown" role="menu">
-          <div className="column-options">
-            {Object.entries({
-              title: 'Tittel',
-              author: 'Forfatter',
-              borrowerId: 'Lånernummer',
-              reservedDate: 'Reservert dato',
-              readyDate: 'Klar dato',
-              expiryDate: 'Hentefrist',
-              pickedUpDate: 'Hentet dato',
-              status: 'Status',
-              daysOnShelf: 'Dager på hylle',
-              pickupNumber: 'Hentenummer'
-            }).map(([key, label]) => (
-              <label key={key}>
-                <input 
-                  type="checkbox" 
-                  checked={visibleColumns[key]} 
-                  onChange={() => toggleColumnVisibility(key)}
-                  aria-label={`Vis ${label} kolonne`}
-                />
-                {label}
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
   return (
-    <div className="dashboard-wrapper">
-      
-      <div className="page-header">
-        <h1>Reserveringer Dashboard</h1>
+<div className="dashboard-wrapper">
+  <div className="page-header">
+    <div className="header-content">
+      <div className="header-actions">
+       
+        <button 
+          className="btn-settings"
+          onClick={() => setShowSettings(!showSettings)}
+          aria-expanded={showSettings}
+          aria-controls="settings-panel"
+        >
+          <FiSettings className="icon" />
+          <span>Innstillinger</span>
+        </button>
       </div>
+    </div>
+  </div>
+  
       
       {toast.visible && (
         <div className={`toast toast-${toast.type}`} role="alert">
-          {toast.message}
+          <div className="toast-content">
+            <span className="toast-icon">
+              {toast.type === 'success' ? <FiCheckCircle /> : 
+               toast.type === 'error' ? <FiX /> : <FiInfo />}
+            </span>
+            <p>{toast.message}</p>
+          </div>
         </div>
       )}
       
       {isLoading ? (
-        <div className="loading-indicator" aria-live="polite">
-          <div className="spinner" aria-hidden="true"></div>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
           <p>Laster inn reservasjonsdata...</p>
-          <button 
-            className="btn-small" 
-            onClick={() => setIsLoading(false)}
-            style={{ marginTop: '1rem' }}
-          >
+          <button className="btn-text" onClick={() => setIsLoading(false)}>
             Avbryt lasting
           </button>
         </div>
       ) : (
-        <main id="main-content">
-          <div className="dashboard-summary">
-            <div className="stats-card" role="region" aria-label="Statistikk">
-              <h3>Gjennomsnittlig hentetid</h3>
-              <div className="stats-value">{averagePickupTime} dager</div>
-            </div>
-            <div className="stats-card" role="region" aria-label="Statistikk">
-              <h3>Ikke hentet (%)</h3>
-              <div className="stats-value">{notPickedUpRate}%</div>
-            </div>
-            <div className="settings-container">
+        <main className="dashboard-main">
+
+<section className="stats-section">
+  <div className="stats-grid">
+    {/* Average Pickup Time Card */}
+    <div className="stat-card">
+      <div className="stat-header">
+        <div className="stat-icon time-icon">
+          <FiClock />
+        </div>
+        <button 
+          className="info-button" 
+          onClick={() => setActiveExplanation(activeExplanation === 'pickup-time' ? null : 'pickup-time')}
+          aria-label="Vis info om gjennomsnittlig hentetid"
+          aria-expanded={activeExplanation === 'pickup-time'}
+        >
+          <FiInfo />
+        </button>
+      </div>
+      <div className="stat-content">
+        <h3>Gjennomsnittlig hentetid</h3>
+        <div className="stat-value-container">
+          <p className="stat-value">{averagePickupTime}<span>dager</span></p>
+        </div>
+        
+        {activeExplanation === 'pickup-time' && (
+          <div className="stat-explanation">
+            <div className="explanation-header">
+              <h4>Om gjennomsnittlig hentetid</h4>
               <button 
-                className="settings-toggle-btn"
-                onClick={() => setShowSettings(!showSettings)}
-                aria-expanded={showSettings}
-                aria-controls="settings-panel"
+                onClick={() => setActiveExplanation(null)}
+                aria-label="Lukk forklaring"
+                className="close-explanation"
               >
-                <span className="settings-icon" aria-hidden="true">⚙️</span>
-                {showSettings ? 'Skjul innstillinger' : 'Vis innstillinger'}
+                <FiX />
               </button>
-              
-              {showSettings && (
-                <div id="settings-panel" className="settings-panel">
-                  <div className="settings-card">
-                    <h3>Hentefrist</h3>
-                    <div className="stats-value">{pickupTimeLimit} dager</div>
-                    <button 
-                      className="btn-small" 
-                      onClick={updatePickupTimeLimit}
-                      aria-label="Endre hentefrist"
-                    >
-                      Endre
-                    </button>
-                  </div>
-                  <div className="settings-card">
-                    <h3>Påminnelse før frist</h3>
-                    <div className="stats-value">{reminderDays} dager</div>
-                    <button 
-                      className="btn-small" 
-                      onClick={updateReminderDays}
-                      aria-label="Endre påminnelsesdager"
-                    >
-                      Endre
-                    </button>
-                  </div>
-                </div>
-              )}
+            </div>
+            <p>Tiden det tar fra en reservasjon er klar til den blir hentet.</p>
+            <ul>
+              <li>Beregnes kun for materiale som faktisk er hentet</li>
+              <li>Lavere verdi indikerer mer effektiv materialsirkulasjon</li>
+              <li>Påvirkes av hentefristen ({pickupTimeLimit} dager)</li>
+            </ul>
+            <div className="chart-reference">
+              <div className="color-indicator" style={{backgroundColor: "#8884d8"}}></div>
+              <span>Vises som lilla søyler i statistikken</span>
             </div>
           </div>
-
-          {/* Statistics controls */}
-          <div className="statistics-controls">
-            <div className="controls-container">
-              <div className="select-wrapper">
-                <label htmlFor="showStatistics">Vis statistikk for hentetid: </label>
-                <select
-                  id="showStatistics"
-                  value={showStatistics ? 'show' : 'hide'}
-                  onChange={(e) => setShowStatistics(e.target.value === 'show')}
-                  className="styled-select"
-                >
-                  <option value="show">Vis</option>
-                  <option value="hide">Skjul</option>
-                </select>
-              </div>
+        )}
+      </div>
+    </div>
+    
+    {/* Not Picked Up Rate Card */}
+    <div className="stat-card">
+      <div className="stat-header">
+        <div className="stat-icon pickup-icon">
+          <FiAlertCircle />
+        </div>
+        <button 
+          className="info-button" 
+          onClick={() => setActiveExplanation(activeExplanation === 'not-picked' ? null : 'not-picked')}
+          aria-label="Vis info om ikke-hentet materiale"
+          aria-expanded={activeExplanation === 'not-picked'}
+        >
+          <FiInfo />
+        </button>
+      </div>
+      <div className="stat-content">
+        <h3>Ikke-hentet materiale</h3>
+        <div className="stat-value-container">
+          <p className="stat-value">{notPickedUpRate}<span>%</span></p>
+        </div>
+        
+        {activeExplanation === 'not-picked' && (
+          <div className="stat-explanation">
+            <div className="explanation-header">
+              <h4>Om ikke-hentet materiale</h4>
               <button 
-                className="btn-export" 
-                onClick={exportChartData}
-                aria-label="Eksporter statistikkdata til CSV"
+                onClick={() => setActiveExplanation(null)}
+                aria-label="Lukk forklaring" 
+                className="close-explanation"
               >
-                <span className="export-icon" aria-hidden="true">⬇</span>
-                Eksporter data
+                <FiX />
               </button>
+            </div>
+            <p>Andel reservasjoner som aldri blir hentet av låner.</p>
+            <ul>
+              <li>Beregnes som antall utløpte reservasjoner delt på totalt antall</li>
+              <li>Høy verdi kan indikere behov for bedre påminnelsesrutiner</li>
+              <li>Påvirkes av hvor populære titlene er</li>
+            </ul>
+            <div className="chart-reference">
+              <div className="color-indicator" style={{backgroundColor: "#82ca9d"}}></div>
+              <span>Vises som grønne søyler i statistikken</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+    
+  
+       
+     
+   
+  </div>
+ 
+  
+ {/* hentefrist/påminnelse setting */}
+{showSettings && (
+  <>
+    <div className="settings-backdrop" onClick={() => setShowSettings(false)}></div>
+    <div className="settings-drawer">
+      <div className="settings-drawer-header">
+        <h3>Innstillinger</h3>
+        <button 
+          className="btn-close-drawer"
+          onClick={() => setShowSettings(false)}
+          aria-label="Lukk innstillinger"
+        >
+          <FiX />
+        </button>
+      </div>
+      
+      <div className="settings-drawer-content">
+        <div className="settings-group">
+          <h4>Hentefrist og påminnelser</h4>
+          
+          <div className="setting-item">
+            <div className="setting-info">
+              <label htmlFor="pickup-time-limit">Hentefrist</label>
+              <p className="setting-description">
+                Antall dager en reservasjon kan vente på hentehyllen
+              </p>
+            </div>
+            <div className="setting-control">
+              <div className="number-input-group">
+                <input 
+                  type="number" 
+                  id="pickup-time-limit"
+                  min="1" 
+                  max="30"
+                  value={tempSettings?.pickupTimeLimit || pickupTimeLimit}
+                  onChange={(e) => {
+                    const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                    setTempSettings(prev => ({
+                      ...prev,
+                      pickupTimeLimit: value
+                    }));
+                  }}
+                />
+                <span className="input-suffix">dager</span>
+              </div>
             </div>
           </div>
           
-          {/* Conditionally render chart section */}
-          {showStatistics && (
-            <div className="dashboard-charts" role="region" aria-label="Statistikkgrafer">
-              <div className="chart-controls">
-                <h2>Statistikk for hentetid</h2>
-                <div className="view-buttons" role="tablist">
-                  <button 
-                    role="tab"
-                    aria-selected={statisticsView === 'weekly'}
-                    className={statisticsView === 'weekly' ? 'active' : ''} 
-                    onClick={() => setStatisticsView('weekly')}
-                  >
-                    Ukentlig
-                  </button>
-                  <button 
-                    role="tab"
-                    aria-selected={statisticsView === 'monthly'}
-                    className={statisticsView === 'monthly' ? 'active' : ''} 
-                    onClick={() => setStatisticsView('monthly')}
-                  >
-                    Månedlig
-                  </button>
-                  <button 
-                    role="tab"
-                    aria-selected={statisticsView === 'yearly'}
-                    className={statisticsView === 'yearly' ? 'active' : ''} 
-                    onClick={() => setStatisticsView('yearly')}
-                  >
-                    Årlig
-                  </button>
-                </div>
-              </div>
-              
-              <div className="chart-container" role="tabpanel">
-                <ReportChart data={generateChartData()} />
+          <div className="setting-item">
+            <div className="setting-info">
+              <label htmlFor="reminder-days">Påminnelse før frist</label>
+              <p className="setting-description">
+                Antall dager før hentefrist som påminnelse sendes
+              </p>
+            </div>
+            <div className="setting-control">
+              <div className="number-input-group">
+                <input 
+                  type="number" 
+                  id="reminder-days"
+                  min="1" 
+                  max={tempSettings?.pickupTimeLimit ? tempSettings.pickupTimeLimit - 1 : pickupTimeLimit - 1}
+                  value={tempSettings?.reminderDays || reminderDays}
+                  onChange={(e) => {
+                    const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                    setTempSettings(prev => ({
+                      ...prev,
+                      reminderDays: value
+                    }));
+                  }}
+                />
+                <span className="input-suffix">dager</span>
               </div>
             </div>
-          )}
+          </div>
+        </div>
         
-          <div className="reservations-section">
+        <div className="settings-actions">
+          <button 
+            className="btn-cancel-settings"
+            onClick={() => {
+              setTempSettings(null);
+              setShowSettings(false);
+            }}
+          >
+            Avbryt
+          </button>
+          <button 
+            className="btn-apply-settings"
+            onClick={() => {
+              if (tempSettings) {
+                // Validate the values before saving
+                const newPickupTimeLimit = typeof tempSettings.pickupTimeLimit === 'number' ? 
+                  tempSettings.pickupTimeLimit : pickupTimeLimit;
+                
+                const newReminderDays = typeof tempSettings.reminderDays === 'number' ? 
+                  tempSettings.reminderDays : reminderDays;
+                
+                // Save to localStorage for persistence
+                localStorage.setItem('pickupTimeLimit', newPickupTimeLimit);
+                localStorage.setItem('reminderDays', newReminderDays);
+                
+                // Update state
+                setPickupTimeLimit(newPickupTimeLimit);
+                setReminderDays(newReminderDays);
+                
+                // Update expiry dates for all items if pickup time limit changed
+                if (newPickupTimeLimit !== pickupTimeLimit) {
+                  setMaterialData(prevData => 
+                    prevData.map(item => ({
+                      ...item,
+                      expiryDate: calculateExpiryDate(item.readyDate)
+                    }))
+                  );
+                }
+                
+                setTempSettings(null);
+                showToast('Innstillinger er lagret', 'success');
+              }
+              setShowSettings(false);
+            }}
+          >
+            Lagre innstillinger
+          </button>
+        </div>
+      </div>
+    </div>
+  </>
+)}
+</section>
+          
+          {/* Statistics visualization */}
+          <section className="visualization-section">
+  <div className="section-header">
+    <div className="title-group">
+      <h2>Statistikk og trender</h2>
+      <div className="toggle-container">
+        <label className="toggle-label" htmlFor="showStatistics">
+          Vis statistikk
+        </label>
+        <div 
+          className="toggle-switch"
+          onClick={() => setShowStatistics(!showStatistics)}
+        >
+          <input
+            type="checkbox"
+            id="showStatistics"
+            checked={showStatistics}
+            onChange={() => setShowStatistics(!showStatistics)}
+          />
+          <span className="toggle-slider"></span>
+        </div>
+      </div>
+    </div>
+    
+    <button className="btn-export" onClick={exportChartData}>
+      <FiDownload className="icon" />
+      Eksporter data
+    </button>
+  </div>
+  
+  {showStatistics && (
+    <div className="chart-container">
+      <div className="chart-header">
+        <h3>Hentetid statistikk</h3>
+        <div className="chart-tabs">
+          <button 
+            className={statisticsView === 'weekly' ? 'active' : ''} 
+            onClick={() => setStatisticsView('weekly')}
+          >
+            Ukentlig
+          </button>
+          <button 
+            className={statisticsView === 'monthly' ? 'active' : ''} 
+            onClick={() => setStatisticsView('monthly')}
+          >
+            Månedlig
+          </button>
+          <button 
+            className={statisticsView === 'yearly' ? 'active' : ''} 
+            onClick={() => setStatisticsView('yearly')}
+          >
+            Årlig
+          </button>
+        </div>
+      </div>
+      
+      <div className="chart-visualization">
+        <ReportChart data={generateChartData()} />
+      </div>
+    </div>
+  )}
+</section>
+          
+          {/* Reservations data section */}
+          <section className="reservations-section">
             <div className="section-header">
-              <h2>Aktive reserveringer</h2>
-              <div className="action-buttons">
-                {pendingReminders > 0 && (
-                  <button 
-                    className="btn-primary" 
-                    onClick={sendAutomaticReminders}
-                    aria-label={`Send ${pendingReminders} ventende påminnelser`}
-                  >
-                    Send påminnelser
-                    <span className="reminder-badge">{pendingReminders}</span>
-                  </button>
-                )}
+              <div className="title-group">
+                <h2>Aktive reserveringer</h2>
+                <span className="item-count">{filteredAndSortedData.length} reserveringer</span>
+              </div>
+              
+              <div className="view-controls">
                 <button 
-                  className="btn-primary" 
-                  onClick={() => showToast("Funksjon for å legge til ny reservering", "info")}
-                  aria-label="Legg til ny reservering"
+                  className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
+                  onClick={() => setViewMode('table')}
+                  aria-label="Vis som tabell"
+                  title="Tabellvisning"
                 >
-                  Ny reservering
+                  <FiList className="icon" />
                 </button>
-                <ColumnManager />
+                <button 
+                  className={`view-btn ${viewMode === 'card' ? 'active' : ''}`}
+                  onClick={() => setViewMode('card')}
+                  aria-label="Vis som kort"
+                  title="Kortvisning"
+                >
+                  <FiGrid className="icon" />
+                </button>
               </div>
             </div>
             
-            <div className="filter-controls">
-              <div className="search-container">
+            <div className="filter-bar">
+              <div className="search-wrapper">
+                <FiSearch className="search-icon" />
                 <input
                   type="text"
-                  placeholder="Søk etter tittel, forfatter, lånernummer, låner eller hentenummer"
+                  placeholder="Søk etter tittel, forfatter, lånernummer..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="search-input"
                   aria-label="Søk i reserveringer"
                 />
+                {searchTerm && (
+                  <button 
+                    className="clear-search" 
+                    onClick={() => setSearchTerm('')}
+                    aria-label="Tøm søk"
+                  >
+                    <FiX />
+                  </button>
+                )}
               </div>
               
-              <div className="filter-container">
-                <label htmlFor="statusFilter">Status:</label>
+              <div className="filter-dropdown">
                 <select
-                  id="statusFilter"
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="styled-select"
+                  className="filter-select"
                   aria-label="Filtrer etter status"
                 >
-                  <option value={FILTER_STATUSES.ALL}>Alle</option>
+                  <option value={FILTER_STATUSES.ALL}>Alle statuser</option>
                   <option value={FILTER_STATUSES.WAITING}>Venter</option>
                   <option value={FILTER_STATUSES.PICKED_UP}>Hentet</option>
                   <option value={FILTER_STATUSES.EXPIRED}>Utløpt</option>
                 </select>
+                <FiFilter className="filter-icon" />
+              </div>
+              
+              <div className="column-manager-dropdown">
+                <button 
+                  className="column-manager-toggle"
+                  onClick={() => setColumnMenuOpen(!columnMenuOpen)}
+                  aria-expanded={columnMenuOpen}
+                  aria-haspopup="true"
+                >
+                  {columnMenuOpen ? <FiEyeOff className="icon" /> : <FiEye className="icon" />}
+                  Kolonner
+                  <span className="dropdown-icon">
+                    {columnMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+                  </span>
+                </button>
+                
+                {columnMenuOpen && (
+                  <div className="column-options" role="menu">
+                    {Object.entries({
+                      title: 'Tittel',
+                      author: 'Forfatter',
+                      borrowerId: 'Lånernummer',
+                      reservedDate: 'Reservert dato',
+                      readyDate: 'Klar dato',
+                      expiryDate: 'Hentefrist',
+                      pickedUpDate: 'Hentet dato',
+                      status: 'Status',
+                      daysOnShelf: 'Dager på hylle',
+                      pickupNumber: 'Hentenummer'
+                    }).map(([key, label]) => (
+                      <label key={key} className="column-option">
+                        <input 
+                          type="checkbox" 
+                          checked={visibleColumns[key]} 
+                          onChange={() => toggleColumnVisibility(key)}
+                          aria-label={`Vis ${label} kolonne`}
+                        />
+                        <span>{label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             
             {filteredAndSortedData.length > 0 ? (
-              <div className="table-responsive">
-                <table className="reservations-table" aria-label="Reserveringer">
-                  <thead>
-                    <tr>
-                      {visibleColumns.title && (
-                        <th 
-                          onClick={() => requestSort('title')} 
-                          className="sortable-header"
-                          aria-sort={sortConfig.key === 'title' ? sortConfig.direction : 'none'}
-                        >
-                          Tittel {renderSortIndicator('title')}
-                        </th>
-                      )}
-                      {visibleColumns.author && (
-                        <th 
-                          onClick={() => requestSort('author')} 
-                          className="sortable-header"
-                          aria-sort={sortConfig.key === 'author' ? sortConfig.direction : 'none'}
-                        >
-                          Forfatter {renderSortIndicator('author')}
-                        </th>
-                      )}
-                      {visibleColumns.borrowerId && (
-                        <th 
-                          onClick={() => requestSort('borrowerId')} 
-                          className="sortable-header"
-                          aria-sort={sortConfig.key === 'borrowerId' ? sortConfig.direction : 'none'}
-                        >
-                          Lånernummer {renderSortIndicator('borrowerId')}
-                        </th>
-                      )}
-                      {visibleColumns.reservedDate && (
-                        <th 
-                          onClick={() => requestSort('reservedDate')} 
-                          className="sortable-header"
-                          aria-sort={sortConfig.key === 'reservedDate' ? sortConfig.direction : 'none'}
-                        >
-                          Reservert dato {renderSortIndicator('reservedDate')}
-                        </th>
-                      )}
-                      {visibleColumns.readyDate && (
-                        <th 
-                          onClick={() => requestSort('readyDate')} 
-                          className="sortable-header"
-                          aria-sort={sortConfig.key === 'readyDate' ? sortConfig.direction : 'none'}
-                        >
-                          Klar dato {renderSortIndicator('readyDate')}
-                        </th>
-                      )}
-                      {visibleColumns.expiryDate && (
-                        <th 
-                          onClick={() => requestSort('expiryDate')} 
-                          className="sortable-header"
-                          aria-sort={sortConfig.key === 'expiryDate' ? sortConfig.direction : 'none'}
-                          data-tooltip="Siste dato materialet kan hentes"
-                        >
-                          Hentefrist {renderSortIndicator('expiryDate')}
-                        </th>
-                      )}
-                      {visibleColumns.pickedUpDate && (
-                        <th 
-                          onClick={() => requestSort('pickedUpDate')} 
-                          className="sortable-header"
-                          aria-sort={sortConfig.key === 'pickedUpDate' ? sortConfig.direction : 'none'}
-                        >
-                          Hentet dato {renderSortIndicator('pickedUpDate')}
-                        </th>
-                      )}
-                      {visibleColumns.status && (
-                        <th 
-                          onClick={() => requestSort('status')} 
-                          className="sortable-header"
-                          aria-sort={sortConfig.key === 'status' ? sortConfig.direction : 'none'}
-                        >
-                          Status {renderSortIndicator('status')}
-                        </th>
-                      )}
-                      {visibleColumns.daysOnShelf && (
-                        <th 
-                          onClick={() => requestSort('daysOnShelf')} 
-                          className="sortable-header"
-                          aria-sort={sortConfig.key === 'daysOnShelf' ? sortConfig.direction : 'none'}
-                          data-tooltip="Antall dager materialet har ventet på henting"
-                        >
-                          Dager på hylle {renderSortIndicator('daysOnShelf')}
-                        </th>
-                      )}
-                      {visibleColumns.pickupNumber && (
-                        <th 
-                          onClick={() => requestSort('pickupNumber')} 
-                          className="sortable-header"
-                          aria-sort={sortConfig.key === 'pickupNumber' ? sortConfig.direction : 'none'}
-                        >
-                          Hentenummer {renderSortIndicator('pickupNumber')}
-                        </th>
-                      )}
-                      
-                  
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAndSortedData.map(item => (
-                      <tr 
-                        key={item.id} 
-                        className={item.status === 'Utløpt' ? 'expired-row' : ''}
-                      >
-                        {visibleColumns.title && <td>{item.title}</td>}
-                        {visibleColumns.author && <td>{item.author}</td>}
-                        {visibleColumns.borrowerId && (
-                          <td>
-                            <button 
-                              className="link-button"
-                              onClick={() => handleBorrowerClick(item.borrowerId)}
-                              aria-label={`Vis låner ${item.borrowerId}`}
+              <>
+                {/* Table View */}
+                {viewMode === 'table' && (
+                  <div className="data-table-container">
+                    <table className="data-table" aria-label="Reserveringer">
+                      <thead>
+                        <tr>
+                          {visibleColumns.title && (
+                            <th 
+                              onClick={() => requestSort('title')} 
+                              className="sortable"
+                              aria-sort={sortConfig.key === 'title' ? sortConfig.direction : 'none'}
                             >
-                              {item.borrowerId}
-                            </button>
-                          </td>
-                        )}
-                        {visibleColumns.reservedDate && <td>{item.reservedDate}</td>}
-                        {visibleColumns.readyDate && <td>{item.readyDate}</td>}
-                        {visibleColumns.expiryDate && (
-                          <td className={
-                            parseNorwegianDate(item.expiryDate) < new Date() && 
-                            item.status !== 'Hentet' ? 'expired-date' : ''
-                          }>
-                            {item.expiryDate}
-                          </td>
-                        )}
-                        {visibleColumns.pickedUpDate && <td>{item.pickedUpDate || '-'}</td>}
-                        {visibleColumns.status && (
-                          <td className={`status-${item.status.toLowerCase()}`}>
-                            <span className="status-indicator"></span>
-                            {item.status}
-                          </td>
-                        )}
-                        {visibleColumns.daysOnShelf && (
-                          <td>{item.daysOnShelf !== null ? item.daysOnShelf : '-'}</td>
-                        )}
-                        {visibleColumns.pickupNumber && (
-                          <td className="pickup-number">{item.pickupNumber}</td>
-                        )}
+                              Tittel {renderSortIndicator('title')}
+                            </th>
+                          )}
+                          {visibleColumns.author && (
+                            <th 
+                              onClick={() => requestSort('author')} 
+                              className="sortable"
+                              aria-sort={sortConfig.key === 'author' ? sortConfig.direction : 'none'}
+                            >
+                              Forfatter {renderSortIndicator('author')}
+                            </th>
+                          )}
+                          {visibleColumns.borrowerId && (
+                            <th 
+                              onClick={() => requestSort('borrowerId')} 
+                              className="sortable"
+                              aria-sort={sortConfig.key === 'borrowerId' ? sortConfig.direction : 'none'}
+                            >
+                              Låner {renderSortIndicator('borrowerId')}
+                            </th>
+                          )}
+                          {visibleColumns.readyDate && (
+                            <th 
+                              onClick={() => requestSort('readyDate')} 
+                              className="sortable"
+                              aria-sort={sortConfig.key === 'readyDate' ? sortConfig.direction : 'none'}
+                            >
+                              Klar dato {renderSortIndicator('readyDate')}
+                            </th>
+                          )}
+                          {visibleColumns.expiryDate && (
+                            <th 
+                              onClick={() => requestSort('expiryDate')} 
+                              className="sortable"
+                              aria-sort={sortConfig.key === 'expiryDate' ? sortConfig.direction : 'none'}
+                            >
+                              Hentefrist {renderSortIndicator('expiryDate')}
+                            </th>
+                          )}
+                          {visibleColumns.pickedUpDate && (
+                            <th 
+                              onClick={() => requestSort('pickedUpDate')} 
+                              className="sortable"
+                              aria-sort={sortConfig.key === 'pickedUpDate' ? sortConfig.direction : 'none'}
+                            >
+                              Hentet dato {renderSortIndicator('pickedUpDate')}
+                            </th>
+                          )}
+                          {visibleColumns.status && (
+                            <th 
+                              onClick={() => requestSort('status')} 
+                              className="sortable"
+                              aria-sort={sortConfig.key === 'status' ? sortConfig.direction : 'none'}
+                            >
+                              Status {renderSortIndicator('status')}
+                            </th>
+                          )}
+                          {visibleColumns.daysOnShelf && (
+                            <th 
+                              onClick={() => requestSort('daysOnShelf')} 
+                              className="sortable"
+                              aria-sort={sortConfig.key === 'daysOnShelf' ? sortConfig.direction : 'none'}
+                            >
+                              Dager {renderSortIndicator('daysOnShelf')}
+                            </th>
+                          )}
+                          {visibleColumns.pickupNumber && (
+                            <th 
+                              onClick={() => requestSort('pickupNumber')} 
+                              className="sortable"
+                              aria-sort={sortConfig.key === 'pickupNumber' ? sortConfig.direction : 'none'}
+                            >
+                              Hentenr. {renderSortIndicator('pickupNumber')}
+                            </th>
+                          )}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredAndSortedData.map(item => (
+                          <tr 
+                            key={item.id} 
+                            className={`status-${item.status.toLowerCase()}-row`}
+                          >
+                            {visibleColumns.title && (
+                              <td className="title-cell" title={item.title}>
+                                {item.title}
+                              </td>
+                            )}
+                            {visibleColumns.author && (
+                              <td title={item.author}>{item.author}</td>
+                            )}
+                            {visibleColumns.borrowerId && (
+                              <td>
+                                <button 
+                                  className="borrower-link"
+                                  onClick={() => handleBorrowerClick(item.borrowerId)}
+                                  title={`Vis lånerdetaljer for ${item.borrowerName || item.borrowerId}`}
+                                >
+                                  <FiUser className="borrower-icon" />
+                                  <span>{item.borrowerId}</span>
+                                </button>
+                              </td>
+                            )}
+                            {visibleColumns.readyDate && (
+                              <td>
+                                <div className="date-cell">
+                                  <FiCalendar className="date-icon" />
+                                  <span>{item.readyDate}</span>
+                                </div>
+                              </td>
+                            )}
+                            {visibleColumns.expiryDate && (
+                              <td className={
+                                parseNorwegianDate(item.expiryDate) < new Date() && 
+                                item.status !== 'Hentet' ? 'expired-date' : ''
+                              }>
+                                <div className="date-cell">
+                                  <FiClock className="date-icon" />
+                                  <span>{item.expiryDate}</span>
+                                </div>
+                              </td>
+                            )}
+                            {visibleColumns.pickedUpDate && (
+                              <td>
+                                {item.pickedUpDate ? (
+                                  <div className="date-cell">
+                                    <FiCheckCircle className="date-icon success" />
+                                    <span>{item.pickedUpDate}</span>
+                                  </div>
+                                ) : (
+                                  <span className="empty-cell">—</span>
+                                )}
+                              </td>
+                            )}
+                            {visibleColumns.status && (
+                              <td>
+                                <span className={`status-badge status-${item.status.toLowerCase()}`}>
+                                  {item.status}
+                                </span>
+                              </td>
+                            )}
+                            {visibleColumns.daysOnShelf && (
+                              <td className="days-cell">
+                                {item.daysOnShelf !== null ? (
+                                  <span className="days-value">{item.daysOnShelf}</span>
+                                ) : (
+                                  <span className="empty-cell">—</span>
+                                )}
+                              </td>
+                            )}
+                            {visibleColumns.pickupNumber && (
+                              <td className="pickup-number">{item.pickupNumber}</td>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                
+                {/* Card View */}
+                {viewMode === 'card' && (
+                  <div className="card-grid">
+                    {filteredAndSortedData.map(item => (
+                      <div 
+                        key={item.id} 
+                        className={`reservation-card status-${item.status.toLowerCase()}-card`}
+                      >
+                        <div className="card-header">
+                          <div className="card-status">
+                            <span className={`status-badge status-${item.status.toLowerCase()}`}>
+                              {item.status}
+                            </span>
+                          </div>
+                          <div className="card-pickup-number">
+                            <span className="pickup-label">Hentenr.</span>
+                            <span className="pickup-number">{item.pickupNumber}</span>
+                          </div>
+                        </div>
                         
+                        <div className="card-content">
+                          <h3 className="book-title" title={item.title}>{item.title}</h3>
+                          <p className="book-author" title={item.author}>{item.author}</p>
                           
-                         
+                          <div className="card-details">
+                            <div className="detail-row">
+                              <span className="detail-label">
+                                <FiUser className="detail-icon" />
+                                Låner:
+                              </span>
+                              <button 
+                                className="borrower-link"
+                                onClick={() => handleBorrowerClick(item.borrowerId)}
+                                title={`Vis lånerdetaljer for ${item.borrowerName || item.borrowerId}`}
+                              >
+                                {item.borrowerName || item.borrowerId}
+                              </button>
+                            </div>
+                            
+                            <div className="detail-row">
+                              <span className="detail-label">
+                                <FiCalendar className="detail-icon" />
+                                Klar dato:
+                              </span>
+                              <span>{item.readyDate}</span>
+                            </div>
+                            
+                            <div className="detail-row">
+                              <span className="detail-label">
+                                <FiClock className="detail-icon" />
+                                Hentefrist:
+                              </span>
+                              <span className={
+                                parseNorwegianDate(item.expiryDate) < new Date() && 
+                                item.status !== 'Hentet' ? 'expired-date' : ''
+                              }>{item.expiryDate}</span>
+                            </div>
+                            
+                            {item.pickedUpDate && (
+                              <div className="detail-row">
+                                <span className="detail-label">
+                                  <FiCheckCircle className="detail-icon success" />
+                                  Hentet:
+                                </span>
+                                <span>{item.pickedUpDate}</span>
+                              </div>
+                            )}
+                            
+                            {item.daysOnShelf !== null && (
+                              <div className="detail-row">
+                                <span className="detail-label">
+                                  <FiInfo className="detail-icon" />
+                                  Dager på hylle:
+                                </span>
+                                <span className="days-value">{item.daysOnShelf}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                         
-                      </tr>
+                        <div className="card-footer">
+                          <div className="card-metadata">
+                            <span className="metadata-item">
+                              ID: {item.id}
+                            </span>
+                            {item.reservedDate && (
+                              <span className="metadata-item">
+                                Reservert: {item.reservedDate}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
-              </div>
+                  </div>
+                )}
+              </>
             ) : (
-              <div className="no-data-message" role="status">
-                {searchTerm || filterStatus !== FILTER_STATUSES.ALL 
-                  ? 'Ingen reserveringer matcher søkekriteriene' 
-                  : 'Ingen aktive reserveringer'}
+              <div className="no-results">
+                <div className="no-results-icon">
+                  <FiBook />
+                </div>
+                <h3>Ingen reserveringer funnet</h3>
+                <p>
+                  {searchTerm || filterStatus !== FILTER_STATUSES.ALL 
+                    ? 'Prøv å endre søkekriteriene dine' 
+                    : 'Det er ingen aktive reserveringer for øyeblikket'}
+                </p>
+                {(searchTerm || filterStatus !== FILTER_STATUSES.ALL) && (
+                  <button 
+                    className="btn-reset-filters"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setFilterStatus(FILTER_STATUSES.ALL);
+                    }}
+                  >
+                    Tilbakestill filtre
+                  </button>
+                )}
               </div>
             )}
-          </div>
+          </section>
         </main>
       )}
     </div>
