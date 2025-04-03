@@ -80,7 +80,6 @@ function Sidebar() {
   
   const handleLogout = () => {
     alert('Logger deg ut...');
- 
   };
 
   return (
@@ -110,10 +109,9 @@ function Sidebar() {
               </svg>
             </div>
           </div>
-          <div className="user-name">Jens Christian Strandos</div>
+          <div className="user-name">Jas Simonsen</div>
           <div className="user-meta">
             <span className="user-branch">{selectedBranch}</span>
-            <span className="user-role">Leder</span>
           </div>
           
           <div className={`user-dropdown ${userMenuOpen ? 'open' : ''}`} aria-hidden={!userMenuOpen}>
