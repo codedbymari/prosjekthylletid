@@ -106,8 +106,18 @@
   flex-wrap: wrap;
 }
 
+.borrower-info-content.two-columns {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.info-column {
+  flex: 1;
+  min-width: 300px;
+}
+
 .info-item {
-  margin-right: 40px;
   margin-bottom: 12px;
   min-width: 200px;
 }
@@ -132,6 +142,124 @@
   border-radius: 4px;
   font-weight: 500;
   font-size: 13px;
+}
+
+.library-badge {
+  display: inline-block;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Favorite Author Section */
+.favorite-author-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  border: 1px solid #eaedf3;
+  overflow: hidden;
+}
+
+.favorite-author-header {
+  background-color: #f8f9fa;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eaedf3;
+}
+
+.favorite-author-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.favorite-author-content {
+  padding: 20px;
+}
+
+.authors-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+}
+
+.author-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2c3e50;
+  padding: 6px 12px;
+  background-color: #f0f0f0;
+  border-radius: 20px;
+  display: inline-block;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.author-name:hover {
+  background-color: #e0e0e0;
+}
+
+/* Favorite Genres Section */
+.favorite-genres-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  border: 1px solid #eaedf3;
+  overflow: hidden;
+}
+
+.favorite-genres-header {
+  background-color: #f8f9fa;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eaedf3;
+}
+
+.favorite-genres-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.favorite-genres-content {
+  padding: 20px;
+}
+
+.genres-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.genre-info {
+  display: flex;
+  align-items: center;
+}
+
+.genre-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2c3e50;
+  padding: 6px 12px;
+  background-color: #f0f0f0;
+  border-radius: 20px;
+  display: inline-block;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.genre-name:hover {
+  background-color: #e0e0e0;
 }
 
 /* Tab navigation */
