@@ -20,6 +20,22 @@ const calculateDaysBetween = (startDate, endDate) => {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
+// Hjelpefunksjon for å generere tilfeldige favorittsjangere
+const generateRandomGenres = () => {
+  const allGenres = [
+    'Krim', 'Roman', 'Biografi', 'Fantasy', 'Science Fiction', 
+    'Historisk', 'Drama', 'Thriller', 'Ungdom', 'Barn', 
+    'Poesi', 'Reise', 'Kokebok', 'Selvhjelp', 'Faglitteratur'
+  ];
+  
+  // Velg tilfeldig antall sjangere (2 eller 3)
+  const numGenres = Math.random() < 0.5 ? 2 : 3;
+  
+  // Bland arrayen og velg de første numGenres elementene
+  const shuffled = [...allGenres].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, numGenres);
+};
+
 function BorrowerDashboard() {
   // Hent borrowerId fra URL-parameteren
   const { borrowerId } = useParams();
@@ -61,9 +77,16 @@ function BorrowerDashboard() {
           const firstItem = borrowerItems[0];
           setBorrowerInfo({
             name: firstItem.borrower.name,
-            membership: 'Aktiv', // Dette er ikke i mock-dataen, så vi setter en standardverdi
+            membership: 'Aktiv',
             contact: firstItem.borrower.email,
-            mobil: firstItem.borrower.phone
+            mobil: firstItem.borrower.phone,
+            address: firstItem.borrower.address,
+            birthDate: formatDate(firstItem.borrower.birthDate),
+            totalBooks: firstItem.borrower.totalBooks,
+            averageRentalTime: `${firstItem.borrower.averageRentalTime} dager`,
+            libraryAffiliation: firstItem.borrower.libraryAffiliation,
+            favoriteAuthors: firstItem.borrower.favoriteAuthors,
+            favoriteGenres: generateRandomGenres()
           });
           
           // Organiser data for de ulike fanene
@@ -190,7 +213,7 @@ function BorrowerDashboard() {
         ) : (
           <>
             <div className="page-header">
-              <h1>Låner: {borrowerId}</h1>
+              <h1>Låner: {borrowerInfo.name}</h1>
             </div>
             
             {/* Borrower Info Section */}
@@ -198,22 +221,78 @@ function BorrowerDashboard() {
               <div className="borrower-info-header">
                 <h2>Lånerinformasjon</h2>
               </div>
-              <div className="borrower-info-content">
-                <div className="info-item">
-                  <span className="info-label">Navn:</span>
-                  <span className="info-value">{borrowerInfo.name}</span>
+              <div className="borrower-info-content two-columns">
+                <div className="info-column">
+                  <div className="info-item">
+                    <span className="info-label">Lånernummer:</span>
+                    <span className="info-value">{borrowerId}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Epost:</span>
+                    <span className="info-value">{borrowerInfo.contact}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Mobil:</span>
+                    <span className="info-value">{borrowerInfo.mobil}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Adresse:</span>
+                    <span className="info-value">{borrowerInfo.address}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Fødselsdato:</span>
+                    <span className="info-value">{borrowerInfo.birthDate}</span>
+                  </div>
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Medlemskap:</span>
-                  <span className="info-value membership-badge">{borrowerInfo.membership}</span>
+                <div className="info-column">
+                  <div className="info-item">
+                    <span className="info-label">Totalt antall bøker:</span>
+                    <span className="info-value">{borrowerInfo.totalBooks}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Gjennomsnittlig utlånstid:</span>
+                    <span className="info-value">{borrowerInfo.averageRentalTime}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Medlemskap:</span>
+                    <span className="info-value membership-badge">{borrowerInfo.membership}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Bibliotek:</span>
+                    <span className="info-value library-badge">{borrowerInfo.libraryAffiliation}</span>
+                  </div>
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Epost:</span>
-                  <span className="info-value">{borrowerInfo.contact}</span>
+              </div>
+            </div>
+
+            {/* Favorite Author Section */}
+            <div className="favorite-author-card">
+              <div className="favorite-author-header">
+                <h2>Favorittforfattere</h2>
+              </div>
+              <div className="favorite-author-content">
+                <div className="authors-list">
+                  {borrowerInfo.favoriteAuthors && borrowerInfo.favoriteAuthors.map((author, index) => (
+                    <div key={index} className="author-info">
+                      <span className="author-name">{author}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Mobil:</span>
-                  <span className="info-value">{borrowerInfo.mobil}</span>
+              </div>
+            </div>
+
+            {/* Favorite Genres Section */}
+            <div className="favorite-genres-card">
+              <div className="favorite-genres-header">
+                <h2>Favorittsjangere</h2>
+              </div>
+              <div className="favorite-genres-content">
+                <div className="genres-list">
+                  {borrowerInfo.favoriteGenres && borrowerInfo.favoriteGenres.map((genre, index) => (
+                    <div key={index} className="genre-info">
+                      <span className="genre-name">{genre}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
