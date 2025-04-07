@@ -1,10 +1,11 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Sidebar from './components/Sidebar';
+import Header from './components/layout/Header';
+import Sidebar from './components/layout/Sidebar';
+import HomeDashboard from './components/HomeDashboard';
 import BorrowerDashboard from './components/BorrowerDashboard';
-import ReserveringDashboard from './components/ReserveringDashboard';
+// Fix the import path to point to the new location
+import ReserveringDashboard from './components/reservation/ReserveringDashboard';
 import './layout.css';
 import './App.css';
 
@@ -36,10 +37,11 @@ function App() {
         {/* Content area */}
         <div className="content-area">
           <Routes>
-            <Route path="/" element={<div>Home Dashboard</div>} />
+            <Route path="/" element={<HomeDashboard />} />
             <Route path="/låner" element={<BorrowerDashboard />} />
             <Route path="/låner/:borrowerId" element={<BorrowerDashboard />} />
-            <Route path="/reservering" element={<reservations />} />
+            <Route path="/reservering" element={<ReserveringDashboard />} />
+            <Route path="/reservering/oversikt" element={<ReserveringDashboard />} />
             <Route path="/reservering/aktive" element={<ReserveringDashboard />} />
             <Route path="/reservering/innstillinger" element={<ReserveringDashboard />} />
           </Routes>
