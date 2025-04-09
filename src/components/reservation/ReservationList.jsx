@@ -30,16 +30,16 @@ function ReservationList({
   calculateExpiryDate,
   showToast
 }) {
-  // Filter and sort data
+  // Filter and sortering av data
   const filteredAndSortedData = useMemo(() => {
-    // First filter the data
+    // først filter  dataen
     const filteredData = materialData.filter(item => {
-      // Filter by status
+      // Filter status
       if (filterStatus !== FILTER_STATUSES.ALL && item.status.toLowerCase() !== filterStatus) {
         return false;
       }
       
-      // Filter by search term
+      // Filter med søk 
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();
         return (
@@ -54,20 +54,18 @@ function ReservationList({
       return true;
     });
     
-    // Then sort the filtered data
+    // sorter filtert data
     if (sortConfig.key) {
       return [...filteredData].sort((a, b) => {
-        // Handle null values
+        // null values
         if (a[sortConfig.key] === null) return 1;
         if (b[sortConfig.key] === null) return -1;
         if (a[sortConfig.key] === b[sortConfig.key]) return 0;
         
-        // Sort by numeric or string value
+        // Sorter med nummersik eller string value
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
         
-// src/components/reservation/ReservationList.jsx (continued)
-        // For dates, convert to Date objects
         if (sortConfig.key.includes('Date')) {
             const parseNorwegianDate = (dateString) => {
               if (!dateString) return null;
@@ -84,7 +82,7 @@ function ReservationList({
               : dateB - dateA;
           }
           
-          // For numeric values like daysOnShelf
+          //  numeric values like daysOnShelf
           if (sortConfig.key === 'daysOnShelf' && aValue !== null && bValue !== null) {
             return sortConfig.direction === 'asc'
               ? aValue - bValue
@@ -101,7 +99,7 @@ function ReservationList({
       return filteredData;
     }, [materialData, filterStatus, searchTerm, sortConfig]);
   
-    // Sort handler for table columns
+    // Sorter handler for table columns
     const requestSort = (key) => {
       let direction = 'asc';
       if (sortConfig.key === key && sortConfig.direction === 'asc') {

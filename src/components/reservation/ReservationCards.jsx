@@ -5,7 +5,6 @@ import { FiUser, FiCalendar, FiClock, FiCheckCircle, FiInfo } from 'react-icons/
 import StatusBadge from '../common/StatusBadge';
 
 function ReservationCards({ data, handleBorrowerClick }) {
-  // Check if date is expired
   const isDateExpired = (dateString) => {
     if (!dateString) return false;
     

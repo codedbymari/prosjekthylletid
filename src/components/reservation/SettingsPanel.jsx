@@ -129,10 +129,6 @@ function SettingsPanel({
         
         <section className="settings-section">
           <div className="settings-header">
-            <h2>Automatiske påminnelser</h2>
-            <p className="settings-description">
-              Systemet sender automatisk påminnelser til lånere når reservasjoner nærmer seg utløp
-            </p>
           </div>
           <div className="auto-reminder-info">
             <div className="info-card">
@@ -140,22 +136,15 @@ function SettingsPanel({
                 <FiMail />
               </div>
               <div className="info-content">
-                <h3>Om automatiske påminnelser</h3>
                 <p>
                   Påminnelser sendes automatisk til lånere <strong>{reminderDays} dager</strong> før hentefristen 
                   utløper. Dette hjelper lånere å huske å hente reservert materiale i tide.
                 </p>
                 <p>
                   Påminnelser sendes via e-post og/eller SMS, avhengig av lånerens kontaktpreferanser.
-                  Ingen manuell håndtering er nødvendig.
+                
                 </p>
-                <button 
-                  className="btn-primary"
-                  onClick={sendAutomaticReminders}
-                >
-                  <FiMail className="icon" />
-                  Send påminnelser manuelt
-                </button>
+                
               </div>
             </div>
           </div>

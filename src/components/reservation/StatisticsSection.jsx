@@ -57,9 +57,9 @@ function StatisticsSection({ statistics, pickupTimeLimit, reminderDays, material
   return (
     <section className="statistics-section">
       <div className="statistics-container">
-        {/* Stats Header */}
+        {/* nøkkeltall  */}
         <header className="statistics-header">
-          <h2 className="statistics-title">Nøkkeltall</h2>
+          <h2 className="statistics-title">Reservasjonsoversikt</h2>
           <div className="period-selector-container">
             <span className="period-label">Periode:</span>
             <div className="dropdown-container">
@@ -95,7 +95,7 @@ function StatisticsSection({ statistics, pickupTimeLimit, reminderDays, material
         </header>
 
         
-        {/* Stats Cards */}
+        {/* nøkkeltall bokser */}
         <div className="statistics-cards">
           <div className="stat-card">
             <div className="stat-card-header">
@@ -185,7 +185,7 @@ function StatisticsSection({ statistics, pickupTimeLimit, reminderDays, material
             )}
           </div>
           
-          {/* Aktiv Reservasjon  */}
+          {/* Aktiv Reservasjoner  */}
           <div className="stat-card">
             <div className="stat-card-header">
               <h3 className="stat-title">Aktive reservasjoner</h3>

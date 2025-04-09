@@ -1,332 +1,339 @@
 // src/components/reservation/ExportMenu.jsx
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { FiDownload, FiChevronDown, FiPrinter } from 'react-icons/fi';
-import * as XLSX from 'xlsx';
+import { 
+  FiDownload, 
+  FiFilePlus, 
+  FiPrinter, 
+  FiFileText, 
+  FiChevronDown, 
+  FiCheck, 
+  FiX,
+  FiSliders,
+  FiCalendar
+} from 'react-icons/fi';
+import './ExportMenu.css';
 
-function ExportMenu({ 
+const ExportMenu = ({ 
   materialData, 
   reminderLogs, 
   statisticsView, 
-  chartData,
+  chartData, 
   pickupTimeLimit,
   reminderDays,
-  showToast
-}) {
-  const [printMenuOpen, setPrintMenuOpen] = useState(false);
-
-  // Print functionality
-  const preparePrintView = (reportType) => {
-    document.body.setAttribute('data-print-report', reportType);
-    window.print();
-    setTimeout(() => {
-      document.body.removeAttribute('data-print-report');
-    }, 1000);
-  };
+  showToast 
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [showExportOptions, setShowExportOptions] = useState(false);
+  const [exportOptions, setExportOptions] = useState({
+    includeReservations: true,
+    includeReminders: true,
+    includeStatistics: true,
+    dateFormat: 'norwegian', 
+    dateRange: 'all' 
+  });
+  const [customDateRange, setCustomDateRange] = useState({
+    from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    to: new Date().toISOString().split('T')[0]
+  });
   
-  const printReservationReport = () => {
-    preparePrintView('reservations');
-    setPrintMenuOpen(false);
-  };
+  const menuRef = useRef(null);
   
-  const printStatisticsReport = () => {
-    preparePrintView('statistics');
-    setPrintMenuOpen(false);
-  };
-  
-  const printReminderReport = () => {
-    preparePrintView('reminders');
-    setPrintMenuOpen(false);
-  };
-
-  // Export data to CSV
-  const exportChartData = () => {
-    // Create CSV with better organization
-    const csvRows = [];
-    
-    // Add a title and timestamp
-    csvRows.push('BIBLIOTEK RESERVASJONSDATA');
-    csvRows.push(`Eksportert: ${new Date().toLocaleDateString('no-NO', { 
-      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-    })}`);
-    csvRows.push(''); // Empty row for spacing
-    
-    // Section 1: Summary statistics with clear section header
-    csvRows.push('=== OPPSUMMERENDE STATISTIKK ===');
-    csvRows.push('Nøkkeltall,Verdi,Enhet,Merknad');
-    
-    const averagePickupTime = materialData
-      .filter(item => item.daysOnShelf !== null)
-      .reduce((sum, item) => sum + item.daysOnShelf, 0) / 
-      materialData.filter(item => item.daysOnShelf !== null).length || 0;
-    
-    const notPickedUpRate = (materialData.filter(item => item.status === 'Utløpt').length / materialData.length) * 100;
-    
-    csvRows.push(`Gjennomsnittlig hentetid,${averagePickupTime.toFixed(1)},dager,"Gjennomsnitt for alle hentede reservasjoner"`);
-    csvRows.push(`Andel ikke-hentet materiale,${notPickedUpRate.toFixed(1)},prosent,"Prosent av reservasjoner som utløper uten å bli hentet"`);
-    csvRows.push(`Hentefrist,${pickupTimeLimit},dager,"Antall dager en reservasjon kan vente på hentehyllen"`);
-    csvRows.push(`Påminnelse sendes,${reminderDays},dager,"Antall dager før utløp når påminnelse sendes"`);
-    csvRows.push(''); // Empty row for spacing
-    
-    // Section 2: Chart data with better headers
-    csvRows.push('=== AGGREGERT STATISTIKK ===');
-    csvRows.push(`Periode: ${statisticsView === 'weekly' ? 'Ukentlig' : statisticsView === 'monthly' ? 'Månedlig' : 'Årlig'}`);
-    
-    if (chartData.length > 0) {
-      // More descriptive headers
-      csvRows.push('Periode,Gjennomsnittlig hentetid (dager),Antall ikke-hentet materiale');
-      chartData.forEach(row => {
-        csvRows.push(`${row.periode},${row.antallDager},${row.antallIkkeHentet}`);
-      });
-    }
-    csvRows.push(''); // Empty row for spacing
-    
-    // Section 3: Reservation info with better formatting
-    csvRows.push('=== DETALJERT RESERVASJONSINFORMASJON ===');
-    if (materialData.length > 0) {
-      csvRows.push('ID,Tittel,Forfatter,Lånernummer,Låner navn,Reservert dato,Klar dato,Hentefrist,Hentet dato,Status,Dager på hylle,Hentenummer');
-      materialData.forEach(item => {
-        csvRows.push([
-          item.id,
-          `"${item.title}"`,
-          `"${item.author}"`,
-          item.borrowerId,
-          `"${item.borrowerName || ''}"`,
-          item.reservedDate || '',
-          item.readyDate || '',
-          item.expiryDate || '',
-          item.pickedUpDate || '',
-          item.status,
-          item.daysOnShelf !== null ? item.daysOnShelf : '',
-          item.pickupNumber
-        ].join(','));
-      });
-    }
-    csvRows.push(''); // Empty row for spacing
-    
-    // Section 4: Reminder logs with better organization
-    csvRows.push('=== PÅMINNELSESLOGG ===');
-    if (reminderLogs.length > 0) {
-      csvRows.push('ID,Tittel,Forfatter,Lånernummer,Låner navn,Klar dato,Utløpsdato,Påminnelse sendt,Status');
-      reminderLogs.forEach(log => {
-        csvRows.push([
-          log.id,
-          `"${log.title}"`,
-          `"${log.author}"`,
-          log.borrowerId,
-          `"${log.borrowerName || ''}"`,
-          log.readyDate || '',
-          log.expiryDate || '',
-          log.reminderSentDate || '',
-          log.status
-        ].join(','));
-      });
-    } else {
-      csvRows.push('Ingen påminnelser er sendt ennå.');
-    }
-    
-    // Add explanatory notes at the end
-    csvRows.push('');
-    csvRows.push('=== FORKLARINGER ===');
-    csvRows.push('"Status","Forklaring"');
-    csvRows.push('"Venter","Reservasjonen er klar for henting og venter på låner"');
-    csvRows.push('"Hentet","Reservasjonen er hentet av låner"');
-    csvRows.push('"Utløpt","Reservasjonen ble ikke hentet innen fristen"');
-    csvRows.push('');
-    csvRows.push('"Dager på hylle","Antall dager fra reservasjonen var klar til den ble hentet"');
-    
-    // Create and download CSV file
-    const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', `bibliotek-reservasjonsdata-${timestamp}.csv`);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-    
-    showToast('Eksport fullført. CSV-filen er lastet ned.', 'success');
-    setPrintMenuOpen(false);
-  };
-
- // src/components/reservation/ExportMenu.jsx (continued)
-  // Export data to Excel
-  const exportExcelData = () => {
-    // Create workbook
-    const wb = XLSX.utils.book_new();
-    
-    // Add a summary sheet
-    const summaryData = [
-      ['BIBLIOTEK RESERVASJONSDATA'],
-      [`Eksportert: ${new Date().toLocaleDateString('no-NO', { 
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-      })}`],
-      [''],
-      ['OPPSUMMERENDE STATISTIKK'],
-      ['Nøkkeltall', 'Verdi', 'Enhet', 'Merknad'],
-      ['Gjennomsnittlig hentetid', 
-        materialData.filter(item => item.daysOnShelf !== null).reduce((sum, item) => sum + item.daysOnShelf, 0) / 
-        materialData.filter(item => item.daysOnShelf !== null).length || 0, 
-        'dager', 'Gjennomsnitt for alle hentede reservasjoner'],
-      ['Andel ikke-hentet materiale', 
-        (materialData.filter(item => item.status === 'Utløpt').length / materialData.length) * 100, 
-        'prosent', 'Prosent av reservasjoner som utløper uten å bli hentet'],
-      ['Hentefrist', pickupTimeLimit, 'dager', 'Antall dager en reservasjon kan vente på hentehyllen'],
-      ['Påminnelse sendes', reminderDays, 'dager', 'Antall dager før utløp når påminnelse sendes']
-    ];
-    
-    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(wb, summarySheet, 'Sammendrag');
-    
-    // Add a statistics sheet
-    const statsData = [
-      [`STATISTIKK (${statisticsView === 'weekly' ? 'Ukentlig' : statisticsView === 'monthly' ? 'Månedlig' : 'Årlig'})`],
-      [''],
-      ['Periode', 'Gjennomsnittlig hentetid (dager)', 'Antall ikke-hentet materiale']
-    ];
-    
-    chartData.forEach(row => {
-      statsData.push([row.periode, row.antallDager, row.antallIkkeHentet]);
-    });
-    
-    const statsSheet = XLSX.utils.aoa_to_sheet(statsData);
-    XLSX.utils.book_append_sheet(wb, statsSheet, 'Statistikk');
-    
-    // Add a reservations sheet
-    const reservationsData = [
-      ['DETALJERT RESERVASJONSINFORMASJON'],
-      [''],
-      ['ID', 'Tittel', 'Forfatter', 'Lånernummer', 'Låner navn', 'Reservert dato', 'Klar dato', 'Hentefrist', 'Hentet dato', 'Status', 'Dager på hylle', 'Hentenummer']
-    ];
-    
-    materialData.forEach(item => {
-      reservationsData.push([
-        item.id,
-        item.title,
-        item.author,
-        item.borrowerId,
-        item.borrowerName || '',
-        item.reservedDate || '',
-        item.readyDate || '',
-        item.expiryDate || '',
-        item.pickedUpDate || '',
-        item.status,
-        item.daysOnShelf !== null ? item.daysOnShelf : '',
-        item.pickupNumber
-      ]);
-    });
-    
-    const reservationsSheet = XLSX.utils.aoa_to_sheet(reservationsData);
-    XLSX.utils.book_append_sheet(wb, reservationsSheet, 'Reservasjoner');
-    
-    // Add a reminders sheet
-    const remindersData = [
-      ['PÅMINNELSESLOGG'],
-      [''],
-      ['ID', 'Tittel', 'Forfatter', 'Lånernummer', 'Låner navn', 'Klar dato', 'Utløpsdato', 'Påminnelse sendt', 'Status']
-    ];
-    
-    if (reminderLogs.length > 0) {
-      reminderLogs.forEach(log => {
-        remindersData.push([
-          log.id,
-          log.title,
-          log.author,
-          log.borrowerId,
-          log.borrowerName || '',
-          log.readyDate || '',
-          log.expiryDate || '',
-          log.reminderSentDate || '',
-          log.status
-        ]);
-      });
-    } else {
-      remindersData.push(['Ingen påminnelser er sendt ennå.', '', '', '', '', '', '', '']);
-    }
-    
-    const remindersSheet = XLSX.utils.aoa_to_sheet(remindersData);
-    XLSX.utils.book_append_sheet(wb, remindersSheet, 'Påminnelser');
-    
-    // Add a help sheet with explanations
-    const helpData = [
-      ['FORKLARINGER OG HJELP'],
-      [''],
-      ['Status', 'Forklaring'],
-      ['Venter', 'Reservasjonen er klar for henting og venter på låner'],
-      ['Hentet', 'Reservasjonen er hentet av låner'],
-      ['Utløpt', 'Reservasjonen ble ikke hentet innen fristen'],
-      [''],
-      ['Felt', 'Forklaring'],
-      ['Dager på hylle', 'Antall dager fra reservasjonen var klar til den ble hentet'],
-      ['Hentenummer', 'Unikt nummer som identifiserer reservasjonen på hentehyllen']
-    ];
-    
-    const helpSheet = XLSX.utils.aoa_to_sheet(helpData);
-    XLSX.utils.book_append_sheet(wb, helpSheet, 'Hjelp');
-    
-    // Apply some basic styling (column widths)
-    const setColumnWidth = (sheet, cols) => {
-      const colWidth = [];
-      for (const col in cols) {
-        colWidth.push({ wch: cols[col] });
+  // lukke meny når du klikker utsiden av menyen 
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsOpen(false);
+        setShowExportOptions(false);
       }
-      sheet['!cols'] = colWidth;
     };
     
-    setColumnWidth(reservationsSheet, [10, 30, 20, 15, 20, 15, 15, 15, 15, 15, 15, 15]);
-    
-    // Generate Excel file
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
-    XLSX.writeFile(wb, `bibliotek-reservasjonsdata-${timestamp}.xlsx`);
-    
-    showToast('Eksport fullført. Excel-filen er lastet ned.', 'success');
-    setPrintMenuOpen(false);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen) {
+      setShowExportOptions(false);
+    }
   };
-
+  
+  const toggleOptions = (e) => {
+    e.stopPropagation();
+    setShowExportOptions(!showExportOptions);
+  };
+  
+  const updateExportOption = (option, value) => {
+    setExportOptions(prev => ({
+      ...prev,
+      [option]: value
+    }));
+  };
+  
+  const getTimestamp = () => {
+    const now = new Date();
+    return now.toISOString()
+      .replace(/[-:]/g, '')
+      .replace('T', '_')
+      .split('.')[0];
+  };
+  
+  const handleExport = () => {
+    if (!exportOptions.includeReservations && !exportOptions.includeReminders && !exportOptions.includeStatistics) {
+      showToast('Velg minst én datatype å eksportere', 'warning');
+      return;
+    }
+    
+    
+    const timestamp = getTimestamp();
+    let csvContent = '';
+    
+    if (exportOptions.includeReservations) {
+      csvContent += 'RESERVASJONER\n';
+      csvContent += 'Tittel,Forfatter,Låner-ID,Klar dato,Hentefrist,Hentet dato,Status,Dager på hylla,Hentenummer\n';
+      
+      materialData.forEach(item => {
+        csvContent += `"${item.title}","${item.author}","${item.borrowerId}","${item.readyDate}","${item.expiryDate}","${item.pickedUpDate || ''}","${item.status}","${item.daysOnShelf !== null ? item.daysOnShelf : ''}","${item.pickupNumber}"\n`;
+      });
+      
+      csvContent += '\n\n';
+    }
+    
+    if (exportOptions.includeReminders) {
+      csvContent += 'PÅMINNELSER\n';
+      csvContent += 'Tittel,Forfatter,Låner-ID,Klar dato,Hentefrist,Påminnelse sendt,Status\n';
+      
+      reminderLogs.forEach(log => {
+        csvContent += `"${log.title}","${log.author}","${log.borrowerId}","${log.readyDate}","${log.expiryDate}","${log.reminderSentDate}","${log.status}"\n`;
+      });
+      
+      csvContent += '\n\n';
+    }
+    
+    if (exportOptions.includeStatistics) {
+      csvContent += 'STATISTIKK\n';
+      csvContent += 'Periode,Gjennomsnittlig hentetid (dager),Antall ikke hentet\n';
+      
+      chartData.forEach(item => {
+        csvContent += `"${item.periode}","${item.antallDager}","${item.antallIkkeHentet}"\n`;
+      });
+    }
+    
+    // laste ned
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bibliotek_data_${timestamp}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast('Data eksportert til CSV-fil', 'success');
+    setIsOpen(false);
+    setShowExportOptions(false);
+  };
+  
+  const handlePrint = () => {
+    window.print();
+    showToast('Utskriftsvindu åpnet', 'info');
+    setIsOpen(false);
+  };
+  
   return (
-    <div className="print-export-menu">
+    <div className="export-menu-container" ref={menuRef}>
       <button 
-        className="btn-export" 
-        onClick={() => setPrintMenuOpen(!printMenuOpen)}
-        aria-expanded={printMenuOpen}
+        className="export-menu-button" 
+        onClick={toggleMenu}
+        aria-haspopup="true"
+        aria-expanded={isOpen}
       >
-        <FiDownload className="icon" />
-        Eksporter/Skriv ut
-        <FiChevronDown className={`dropdown-icon ${printMenuOpen ? 'open' : ''}`} />
+        <FiDownload className="button-icon" />
+        <span className="button-text">Eksporter</span>
       </button>
       
-      {printMenuOpen && (
-        <div className="print-options">
-          <button className="btn-print" onClick={exportChartData}>
-            <FiDownload className="icon" />
-            Eksporter til CSV
-          </button>
-          <button className="btn-print" onClick={exportExcelData}>
-            <FiDownload className="icon" />
-            Eksporter til Excel
-          </button>
-          <div className="print-options-divider"></div>
-          <button className="btn-print" onClick={printStatisticsReport}>
-            <FiPrinter className="icon" />
-            Skriv ut statistikk
-          </button>
-          <button className="btn-print" onClick={printReservationReport}>
-            <FiPrinter className="icon" />
-            Skriv ut reservasjonsliste
-          </button>
-          <button className="btn-print" onClick={printReminderReport}>
-            <FiPrinter className="icon" />
-            Skriv ut påminnelseslogg
-          </button>
+      {isOpen && (
+        <div className="export-menu-dropdown">
+          <div className="export-menu-header">
+            <h3>Eksporter data</h3>
+            <button 
+              className="export-options-button" 
+              onClick={toggleOptions}
+              aria-expanded={showExportOptions}
+            >
+              <FiSliders />
+              <span>Alternativer</span>
+            </button>
+          </div>
+          
+          {showExportOptions ? (
+            <div className="export-options-panel">
+              <h4>Innhold</h4>
+              <div className="export-option-group">
+                <label className="export-option-checkbox">
+                  <input 
+                    type="checkbox" 
+                    checked={exportOptions.includeReservations} 
+                    onChange={() => updateExportOption('includeReservations', !exportOptions.includeReservations)}
+                  />
+                  <span className="checkbox-label">Reservasjoner</span>
+                </label>
+                
+                <label className="export-option-checkbox">
+                  <input 
+                    type="checkbox" 
+                    checked={exportOptions.includeReminders} 
+                    onChange={() => updateExportOption('includeReminders', !exportOptions.includeReminders)}
+                  />
+                  <span className="checkbox-label">Påminnelser</span>
+                </label>
+                
+                <label className="export-option-checkbox">
+                  <input 
+                    type="checkbox" 
+                    checked={exportOptions.includeStatistics} 
+                    onChange={() => updateExportOption('includeStatistics', !exportOptions.includeStatistics)}
+                  />
+                  <span className="checkbox-label">Statistikk</span>
+                </label>
+              </div>
+              
+              <h4>Datoformat</h4>
+              <div className="export-option-group export-option-radio-group">
+                <label className="export-option-radio">
+                  <input 
+                    type="radio" 
+                    name="dateFormat" 
+                    value="norwegian" 
+                    checked={exportOptions.dateFormat === 'norwegian'} 
+                    onChange={() => updateExportOption('dateFormat', 'norwegian')}
+                  />
+                  <span className="radio-label">Norsk (DD.MM.YYYY)</span>
+                </label>
+                
+                <label className="export-option-radio">
+                  <input 
+                    type="radio" 
+                    name="dateFormat" 
+                    value="iso" 
+                    checked={exportOptions.dateFormat === 'iso'} 
+                    onChange={() => updateExportOption('dateFormat', 'iso')}
+                  />
+                  <span className="radio-label">ISO (YYYY-MM-DD)</span>
+                </label>
+              </div>
+              
+              <h4>Tidsperiode</h4>
+              <div className="export-option-group export-option-radio-group">
+                <label className="export-option-radio">
+                  <input 
+                    type="radio" 
+                    name="dateRange" 
+                    value="all" 
+                    checked={exportOptions.dateRange === 'all'} 
+                    onChange={() => updateExportOption('dateRange', 'all')}
+                  />
+                  <span className="radio-label">Alle data</span>
+                </label>
+                
+                <label className="export-option-radio">
+                  <input 
+                    type="radio" 
+                    name="dateRange" 
+                    value="recent" 
+                    checked={exportOptions.dateRange === 'recent'} 
+                    onChange={() => updateExportOption('dateRange', 'recent')}
+                  />
+                  <span className="radio-label">Siste 30 dager</span>
+                </label>
+                
+                <label className="export-option-radio">
+                  <input 
+                    type="radio" 
+                    name="dateRange" 
+                    value="custom" 
+                    checked={exportOptions.dateRange === 'custom'} 
+                    onChange={() => updateExportOption('dateRange', 'custom')}
+                  />
+                  <span className="radio-label">Egendefinert periode</span>
+                </label>
+              </div>
+              
+              {exportOptions.dateRange === 'custom' && (
+                <div className="custom-date-range">
+                  <div className="date-range-field">
+                    <label htmlFor="fromDate">Fra:</label>
+                    <div className="date-input-wrapper">
+                      <FiCalendar className="date-icon" />
+                      <input 
+                        type="date" 
+                        id="fromDate"
+                        value={customDateRange.from}
+                        onChange={(e) => setCustomDateRange({...customDateRange, from: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="date-range-field">
+                    <label htmlFor="toDate">Til:</label>
+                    <div className="date-input-wrapper">
+                      <FiCalendar className="date-icon" />
+                      <input 
+                        type="date" 
+                        id="toDate"
+                        value={customDateRange.to}
+                        onChange={(e) => setCustomDateRange({...customDateRange, to: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div className="export-options-actions">
+                <button 
+                  className="cancel-options-button" 
+                  onClick={() => setShowExportOptions(false)}
+                >
+                  <FiX />
+                  <span>Avbryt</span>
+                </button>
+                <button 
+                  className="apply-options-button" 
+                  onClick={() => setShowExportOptions(false)}
+                >
+                  <FiCheck />
+                  <span>Bruk innstillinger</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="export-menu-options">
+              <button 
+                className="export-menu-item" 
+                onClick={handleExport}
+              >
+                <FiFileText className="menu-icon" />
+                <span className="menu-text">Eksporter til CSV</span>
+              </button>
+              
+              <button 
+                className="export-menu-item" 
+                onClick={handlePrint}
+              >
+                <FiPrinter className="menu-icon" />
+                <span className="menu-text">Skriv ut rapport</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
-}
+};
 
 ExportMenu.propTypes = {
   materialData: PropTypes.array.isRequired,

@@ -2,7 +2,17 @@
 import React from 'react';
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
 import './BarChart.css';
+const primaryBurgundy = "#7d203a";
+const primaryGreen = "#4a7c59";
 
+const palette = {
+  // farger
+  burgundy: {
+    main: "#7d203a",
+    light: "#9d405a",
+    dark: "#5d0020"
+  }
+};
 const BarChart = ({ 
   data, 
   containerWidth = 600, 
@@ -14,14 +24,12 @@ const BarChart = ({
   xAxisDataKey = "periode",
   leftBarName = "Gjennomsnittlig hentetid (dager)",
   rightBarName = "Antall ikke hentet",
-  leftBarColor = "#8884d8",
-  rightBarColor = "#82ca9d"
+  leftBarColor = "#7d203a", 
+  rightBarColor = "#4a7c59" 
 }) => {
-  // Calculate appropriate margins based on container dimensions
   const getMargins = () => {
     const baseMargin = { top: 20, bottom: 60 };
     
-    // Responsive adjustments
     if (containerWidth < 500) {
       return { ...baseMargin, left: 40, right: 40 };
     } else if (containerWidth < 768) {
@@ -30,7 +38,6 @@ const BarChart = ({
     return { ...baseMargin, left: 60, right: 60 };
   };
   
-  // Custom tooltip component
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (

@@ -19,7 +19,6 @@
     justify-content: center;
   }
   
-  /* Critical fixes for Recharts rendering */
   :global(.recharts-wrapper) {
     overflow: visible !important;
   }
@@ -61,7 +60,6 @@
     stroke-dasharray: 3 3;
   }
   
-  /* Ensure proper focus styles for accessibility */
   :global(.recharts-legend-item:focus), 
   :global(.recharts-legend-item:focus-visible) {
     outline: 2px solid var(--primary);

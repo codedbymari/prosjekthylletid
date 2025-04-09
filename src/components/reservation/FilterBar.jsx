@@ -20,7 +20,6 @@ function FilterBar({
 }) {
   const [columnMenuOpen, setColumnMenuOpen] = useState(false);
 
-  // Toggle column visibility
   const toggleColumnVisibility = (column) => {
     setVisibleColumns(prev => ({
       ...prev,

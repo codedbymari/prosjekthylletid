@@ -1,19 +1,21 @@
 // src/components/reservation/PrintableReports.jsx
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
+import './PrintableReports.css';
 
 function PrintableReports({ materialData, reminderLogs, statistics, pickupTimeLimit, reminderDays }) {
   const printContentRef = useRef(null);
+  const currentDate = new Date().toLocaleDateString('no-NO', { 
+    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+  });
 
   return (
     <div className="printable-content" ref={printContentRef}>
-      {/* Reservation Report */}
+      {/* Reservasjonsrapport*/}
       <div className="print-only print-report reservation-report">
         <div className="print-header">
           <h1>Reservasjonsrapport</h1>
-          <p className="print-date">Generert: {new Date().toLocaleDateString('no-NO', { 
-            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-          })}</p>
+          <p className="print-date">Generert: {currentDate}</p>
         </div>
         
         <div className="print-summary">
@@ -67,13 +69,11 @@ function PrintableReports({ materialData, reminderLogs, statistics, pickupTimeLi
         </table>
       </div>
       
-      {/* Statistics Report */}
+      {/* Statistikkrapport */}
       <div className="print-only print-report statistics-report">
         <div className="print-header">
           <h1>Statistikkrapport</h1>
-          <p className="print-date">Generert: {new Date().toLocaleDateString('no-NO', { 
-            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-          })}</p>
+          <p className="print-date">Generert: {currentDate}</p>
         </div>
         
         <div className="print-summary">
@@ -97,17 +97,15 @@ function PrintableReports({ materialData, reminderLogs, statistics, pickupTimeLi
         
         <div className="print-chart-data">
           <h2>Detaljert statistikk</h2>
-          <p>For detaljert statistikk, se eksportert Excel- eller CSV-fil.</p>
+          <p>For detaljert statistikk, se eksportert CSV-fil.</p>
         </div>
       </div>
       
-      {/* Reminder Report */}
+      {/* Påminnelseslogg */}
       <div className="print-only print-report reminder-report">
         <div className="print-header">
           <h1>Påminnelseslogg</h1>
-          <p className="print-date">Generert: {new Date().toLocaleDateString('no-NO', { 
-            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-          })}</p>
+          <p className="print-date">Generert: {currentDate}</p>
         </div>
         
         <div className="print-summary">
