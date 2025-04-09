@@ -11,7 +11,6 @@ function ReservationTable({
   requestSort,
   handleBorrowerClick
 }) {
-  // Render sort indicator
   const renderSortIndicator = (key) => {
     if (sortConfig.key !== key) return null;
     return (
@@ -21,7 +20,6 @@ function ReservationTable({
     );
   };
 
-  // Check if date is expired
   const isDateExpired = (dateString) => {
     if (!dateString) return false;
     

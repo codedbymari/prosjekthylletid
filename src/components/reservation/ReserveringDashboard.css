@@ -58,8 +58,8 @@
   padding: 20px;
   box-sizing: border-box;
   width: 100%;
-  max-width: 100vw; /* Ensure it doesn't exceed viewport width */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  max-width: 100vw; 
+  overflow-x: hidden; 
 }
 
 .dashboard-main {
@@ -190,12 +190,12 @@ button {
   color: var(--text-dark);
 }
 
-/* Icons in buttons */
+/* ikon i buttons */
 button .icon {
   font-size: 18px;
 }
 
-/* Loading spinner */
+/* Loading  */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -220,7 +220,7 @@ button .icon {
   100% { transform: rotate(360deg); }
 }
 
-/* Toast notifications */
+/* Toast notifikasjon */
 .toast {
   position: fixed;
   top: 20px;
@@ -283,7 +283,7 @@ button .icon {
   color: var(--info);
 }
 
-/* Stats Section */
+/* Nøkkeltall bokser */
 .stats-section {
   margin-bottom: 24px;
 }
@@ -525,200 +525,8 @@ button .icon {
   line-height: 1.5;
 }
 
-/* Visualization Section */
-.visualization-section {
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 24px;
-  overflow: hidden; /* Contain all children */
-}
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.title-group {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.section-header h2 {
-  margin: 0;
-  font-size: 20px;
-}
-
-.item-count {
-  background-color: var(--primary-very-light);
-  color: var(--primary);
-  padding: 4px 10px;
-  border-radius: var(--border-radius-md);
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.toggle-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.toggle-label {
-  font-size: 14px;
-  color: var(--text-medium);
-}
-
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 20px;
-  cursor: pointer;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--background-dark);
-  border-radius: 10px;
-  transition: var(--transition-standard);
-}
-
-.toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
-  border-radius: 50%;
-  transition: var(--transition-standard);
-}
-
-input:checked + .toggle-slider {
-  background-color: var(--primary);
-}
-
-input:checked + .toggle-slider:before {
-  transform: translateX(20px);
-}
-.chart-container {
-  background-color: white;
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: 24px;
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 30px;
-  overflow: visible !important; /* Critical for chart display */
-}
-
-.chart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-
-.chart-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.chart-tabs {
-  display: flex;
-  gap: 2px;
-  background-color: var(--background-light);
-  border-radius: var(--border-radius-md);
-  padding: 3px;
-}
-
-.chart-tabs button {
-  background: transparent;
-  border: none;
-  padding: 6px 12px;
-  border-radius: var(--border-radius-sm);
-  font-size: 13px;
-  color: var(--text-medium);
-}
-
-.chart-tabs button:hover {
-  color: var(--text-dark);
-}
-
-.chart-tabs button.active {
-  background-color: white;
-  color: var(--primary);
-  font-weight: 500;
-  box-shadow: var(--shadow-sm);
-}
-
-.chart-visualization {
-  width: 100%;
-  position: relative;
-  overflow: visible !important; /* Critical for chart display */
-}
-
-
-/* Fix for Recharts */
-.recharts-wrapper {
-  overflow: visible !important;
-}
-
-.recharts-surface {
-  overflow: visible !important;
-}
-
-.recharts-legend-wrapper {
-  overflow: visible !important;
-}
-
-
-
-
-
-
-
-
-.chart-legend {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
-
-.legend-label {
-  font-size: 13px;
-  color: var(--text-medium);
-}
-
-/* Reservations Section */
+/* Reservasjon */
 .reservations-section {
   margin-bottom: 24px;
 }
@@ -1182,7 +990,7 @@ input:checked + .toggle-slider:before {
   color: var(--text-light);
 }
 
-/* Settings Page */
+/* Instilling side */
 .settings-page {
   background-color: white;
   border-radius: var(--border-radius-lg);
@@ -1351,7 +1159,6 @@ input:checked + .toggle-slider:before {
   margin-bottom: 0;
 }
 
-/* Status-specific row styling */
 .status-venter-row {
   background-color: rgba(255, 152, 0, 0.03);
 }
@@ -1364,7 +1171,7 @@ input:checked + .toggle-slider:before {
   background-color: rgba(211, 47, 47, 0.03);
 }
 
-/* Responsive adjustments */
+/* Responsive mobil/dekstop/tablet */
 @media (max-width: 1200px) {
   .stats-metrics {
     flex-direction: column;
@@ -1443,7 +1250,7 @@ input:checked + .toggle-slider:before {
 }
 
 
-/* Print styles */
+/* Print */
 @media print {
   .dashboard-wrapper {
     padding: 0;
@@ -1508,20 +1315,20 @@ input:checked + .toggle-slider:before {
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Accessibility focus styles */
+/* Accessibility*/
 button:focus, input:focus, select:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--primary-transparent);
 }
 
-/* Ensure accessible focus for keyboard navigation */
+/* Accebility keyboard navigation */
 button:focus-visible, input:focus-visible, select:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
 
-/* Print Menu Styles */
+/* Print */
 .print-export-menu {
   position: relative;
 }
@@ -1576,19 +1383,16 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   transform: rotate(180deg);
 }
 
-/* Hide printable content during normal viewing */
 .printable-content {
   display: none;
 }
 
-/* Print-only styles */
 .print-only {
   display: none;
 }
 
-/* Enhanced Print Styles */
+/* Enhanced Print */
 @media print {
-  /* General print reset */
   body {
     background-color: white !important;
     color: black !important;
@@ -1598,12 +1402,10 @@ button:focus-visible, input:focus-visible, select:focus-visible {
     padding: 0 !important;
   }
   
-  /* Hide everything except the printable content */
   .dashboard-wrapper > *:not(.printable-content) {
     display: none !important;
   }
   
-  /* Show the printable content */
   .printable-content {
     display: block !important;
     width: 100% !important;
@@ -1612,14 +1414,12 @@ button:focus-visible, input:focus-visible, select:focus-visible {
     padding: 0 !important;
   }
   
-  /* Conditional display based on report type */
   body[data-print-report="reservations"] .reservation-report,
   body[data-print-report="statistics"] .statistics-report,
   body[data-print-report="reminders"] .reminder-report {
     display: block !important;
   }
   
-  /* Print report styling */
   .print-report {
     page-break-after: always;
     margin: 0;
@@ -1715,7 +1515,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
     color: #666;
   }
   
-  /* Page breaks */
   .print-table {
     page-break-inside: auto;
   }
@@ -1733,7 +1532,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
     display: table-footer-group;
   }
   
-  /* Print footer with page numbers */
   @page {
     margin: 2cm;
     @bottom-center {
@@ -1743,218 +1541,5 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   }
 }
 
-/* Help Guide Styles */
-.help-guide-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease-in-out;
-}
 
-.help-guide-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-}
 
-.help-guide-container {
-  background-color: white;
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-lg);
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  animation: slideUp 0.3s ease-in-out;
-  position: relative;
-  z-index: 1002;
-}
-
-.help-highlight-overlay {
-  position: absolute;
-  border: 3px solid var(--primary);
-  border-radius: var(--border-radius-md);
-  background-color: rgba(125, 32, 58, 0.1);
-  z-index: 1001;
-  pointer-events: none;
-  transition: all 0.3s ease-in-out;
-  opacity: 0;
-  box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.7);
-}
-
-.help-highlight-target {
-  position: relative;
-  z-index: 1001;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(125, 32, 58, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(125, 32, 58, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(125, 32, 58, 0); }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.help-close-button {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: transparent;
-  border: none;
-  color: var(--text-light);
-  font-size: 20px;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-}
-
-.help-close-button:hover {
-  color: var(--text-dark);
-}
-
-.help-guide-header {
-  padding: 20px;
-  border-bottom: 1px solid var(--border-light);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.help-guide-icon {
-  width: 40px;
-  height: 40px;
-  background-color: var(--primary-very-light);
-  color: var(--primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-}
-
-.help-guide-header h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.help-guide-content {
-  padding: 20px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.help-guide-content p {
-  margin: 0 0 16px 0;
-  line-height: 1.6;
-  font-size: 15px;
-}
-
-.help-guide-image {
-  margin-top: 16px;
-  border: 1px solid var(--border-light);
-  border-radius: var(--border-radius-md);
-  overflow: hidden;
-}
-
-.help-guide-image img {
-  width: 100%;
-  display: block;
-}
-
-.help-guide-footer {
-  padding: 16px 20px 20px;
-  border-top: 1px solid var(--border-light);
-}
-
-.help-guide-progress {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.progress-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: var(--background-dark);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.progress-dot.active {
-  background-color: var(--primary);
-  transform: scale(1.2);
-}
-
-.progress-dot:hover {
-  background-color: var(--primary-light);
-}
-
-.help-guide-buttons {
-  display: flex;
-  justify-content: space-between;
-}
-
-.help-guide-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 50px;
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: var(--shadow-md);
-  z-index: 100;
-  transition: var(--transition-standard);
-}
-
-.help-guide-button:hover {
-  background-color: var(--primary-light);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.help-guide-button svg {
-  font-size: 18px;
-}
-
-.chart-outer-container {
-  background-color: white;
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: 24px;
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 30px;
-  overflow: visible;
-}
-
-@media (max-width: 768px) {
-  .chart-outer-container {
-    padding: 16px;
-  }
-}

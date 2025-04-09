@@ -1,4 +1,3 @@
-// src/components/reservation/ReserveringDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './ReserveringDashboard.css';
@@ -10,7 +9,6 @@ import ReservationList from './ReservationList';
 import SettingsPanel from './SettingsPanel';
 import ToastNotification from '../common/ToastNotification';
 import LoadingSpinner from '../common/LoadingSpinner';
-import HelpGuide from './HelpGuide';
 import PrintableReports from './PrintableReports';
 
 import { formatDateNorwegian, parseNorwegianDate, calculateDaysBetween } from '../../utils/dateUtils';
@@ -31,13 +29,12 @@ function ReserveringDashboard() {
       ? 'aktive' 
       : 'oversikt';
   
-  // UI states
+  // UI 
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState('table');
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
-  const [helpGuideOpen, setHelpGuideOpen] = useState(false);
   
-  // Settings 
+  // Instillinger 
   const [pickupTimeLimit, setPickupTimeLimit] = useState(7);
   const [reminderDays, setReminderDays] = useState(2);
   const [tempSettings, setTempSettings] = useState(null);
@@ -46,15 +43,16 @@ function ReserveringDashboard() {
   const [materialData, setMaterialData] = useState([]);
   const [reminderLogs, setReminderLogs] = useState([]);
   const [sentAutomaticReminders, setSentAutomaticReminders] = useState([]);
+  const [pickupDistributionData, setPickupDistributionData] = useState([]);
   
-  // Statistics 
+  // Statestikk 
   const [statistics, setStatistics] = useState({
     averagePickupTime: 0,
     notPickedUpRate: 0,
     pendingReminders: 0
   });
   
-  // Filtering and sorting 
+  // Filtering and sortering
   const [filterStatus, setFilterStatus] = useState(FILTER_STATUSES.ALL);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'readyDate', direction: 'desc' });
@@ -72,13 +70,13 @@ function ReserveringDashboard() {
     actions: false
   });
 
-  //  notification
+  // Notifikasjon
   const showToast = (message, type = 'success') => {
     setToast({ visible: true, message, type });
     setTimeout(() => setToast({ visible: false, message: '', type: 'success' }), 3000);
   };
 
-  //  expiry date
+  // Expiry date calculation
   const calculateExpiryDate = (readyDate) => {
     if (!readyDate) return null;
     const date = parseNorwegianDate(readyDate);
@@ -88,13 +86,60 @@ function ReserveringDashboard() {
     return formatDateNorwegian(date);
   };
 
-  // Load data
+  // kalkulere hentetid fordeling data
+  const calculatePickupDistribution = () => {
+    // Group items by how many days they spent on the shelf
+    const dayGroups = {};
+    const pickedUpItems = materialData.filter(item => item.pickedUpDate);
+    
+    // tell materiale for hver dag
+    pickedUpItems.forEach(item => {
+      const days = item.daysOnShelf;
+      dayGroups[days] = (dayGroups[days] || 0) + 1;
+    });
+    
+    // kalkulere total material som ikke er hentet 
+    const totalItems = materialData.length || 1; // Prevent division by zero
+    const notPickedUpCount = materialData.filter(item => item.status === 'Utløpt').length;
+    
+    // lage  distribution data
+    const distributionData = [];
+    
+    // legge til data for dag 1-7 (eller hva enn hentefristen er)
+    for (let i = 1; i <= pickupTimeLimit; i++) {
+      const count = dayGroups[i] || 0;
+      const percentage = Math.round((count / totalItems) * 100);
+      distributionData.push({
+        day: `Dag ${i}`,
+        count,
+        percentage
+      });
+    }
+    
+    //legge til ikke hentet sist
+    distributionData.push({
+      day: "Ikke hentet",
+      count: notPickedUpCount,
+      percentage: Math.round((notPickedUpCount / totalItems) * 100)
+    });
+    
+    return distributionData;
+  };
+
+  // oppdatere pickup distribution data når den relevante dataen forandres
+  useEffect(() => {
+    if (materialData.length > 0) {
+      const distributionData = calculatePickupDistribution();
+      setPickupDistributionData(distributionData);
+    }
+  }, [materialData, pickupTimeLimit]); 
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       
       try {
-        // Load saved settings
+       
         const savedPickupTimeLimit = localStorage.getItem('pickupTimeLimit');
         const savedReminderDays = localStorage.getItem('reminderDays');
         
@@ -106,12 +151,11 @@ function ReserveringDashboard() {
           setReminderDays(parseInt(savedReminderDays));
         }
         
-        // Simulate API call
+        // simulere API call
         await new Promise(resolve => setTimeout(resolve, 800));
         
         const mockReservations = generateMockData();
         
-        // Process data
         const processedReservations = mockReservations.map(item => {
           const readyDateFormatted = formatDateNorwegian(item.readyDate);
           const pickedUpDateFormatted = item.pickedUpDate ? formatDateNorwegian(item.pickedUpDate) : null;
@@ -142,12 +186,16 @@ function ReserveringDashboard() {
         
         setMaterialData(processedReservations);
         
-        //  statistics
+        // kalkulere statestikk
         const pickedUpItems = processedReservations.filter(res => res.pickedUpDate);
-        const avgDays = pickedUpItems.reduce((sum, item) => sum + item.daysOnShelf, 0) / pickedUpItems.length || 0;
+        const avgDays = pickedUpItems.length > 0 
+          ? pickedUpItems.reduce((sum, item) => sum + item.daysOnShelf, 0) / pickedUpItems.length 
+          : 0;
         
         const expiredItems = processedReservations.filter(res => res.status === 'Utløpt');
-        const notPickedRate = (expiredItems.length / processedReservations.length) * 100;
+        const notPickedRate = processedReservations.length > 0
+          ? (expiredItems.length / processedReservations.length) * 100
+          : 0;
         
         setStatistics({
           averagePickupTime: avgDays.toFixed(1),
@@ -155,7 +203,7 @@ function ReserveringDashboard() {
           pendingReminders: 0
         });
         
-        //  reminder logs
+        // påminnelse logg
         const initialReminderLogs = [
           {
             id: 'rem-history-1',
@@ -164,8 +212,8 @@ function ReserveringDashboard() {
             author: 'Jørgine Massa Vasstrand',
             borrowerId: 'N00345678',
             borrowerName: 'Petter Hansen',
-            readyDate: processedReservations.find(r => r.id === 3).readyDate,
-            expiryDate: processedReservations.find(r => r.id === 3).expiryDate,
+            readyDate: processedReservations.find(r => r.id === 3)?.readyDate || '',
+            expiryDate: processedReservations.find(r => r.id === 3)?.expiryDate || '',
             reminderSentDate: formatDateNorwegian(new Date(Date.now() - 86400000)),
             status: 'Sendt automatisk'
           }
@@ -184,31 +232,26 @@ function ReserveringDashboard() {
     fetchData();
   }, []);
 
-  // Handle borrower click
   const handleBorrowerClick = (borrowerId) => {
     navigate(`/låner/${borrowerId}`);
     showToast(`Navigerer til lånerdetaljer for: ${borrowerId}`, 'info');
   };
 
-  // Save settings
   const saveSettings = (newSettings) => {
     if (newSettings) {
-      // Validate the values before saving
       const newPickupTimeLimit = typeof newSettings.pickupTimeLimit === 'number' ? 
         newSettings.pickupTimeLimit : pickupTimeLimit;
       
       const newReminderDays = typeof newSettings.reminderDays === 'number' ? 
         newSettings.reminderDays : reminderDays;
       
-      // Save to localStorage for persistence
+      // lagre i localStorage
       localStorage.setItem('pickupTimeLimit', newPickupTimeLimit);
       localStorage.setItem('reminderDays', newReminderDays);
       
-      // Update state
       setPickupTimeLimit(newPickupTimeLimit);
       setReminderDays(newReminderDays);
       
-      // Update expiry dates for all items if pickup time limit changed
       if (newPickupTimeLimit !== pickupTimeLimit) {
         setMaterialData(prevData => 
           prevData.map(item => ({
@@ -222,7 +265,7 @@ function ReserveringDashboard() {
     }
   };
 
-  // Send reminders
+  // sende påminnelser
   const sendAutomaticReminders = () => {
     const today = new Date();
     const remindersToSend = materialData
@@ -263,25 +306,7 @@ function ReserveringDashboard() {
 
   return (
     <div className="dashboard-wrapper">
-      {/* Help Guide  */}
-      <button 
-        className="help-guide-button" 
-        onClick={() => setHelpGuideOpen(true)}
-        aria-label="Åpne hjelpeguide"
-      >
-        <FiHelpCircle />
-        <span>Hjelp</span>
-      </button>
-      
-      {/* Help Guide */}
-      {helpGuideOpen && (
-        <HelpGuide 
-          onClose={() => setHelpGuideOpen(false)}
-          currentTab={currentTab}
-        />
-      )}
-      
-      {/*  Notification */}
+      {/* Notification */}
       <ToastNotification 
         visible={toast.visible}
         message={toast.message}
@@ -294,17 +319,18 @@ function ReserveringDashboard() {
         <main className="dashboard-main">
           {currentTab === 'oversikt' && (
             <>
-                <StatisticsSection 
+              <StatisticsSection 
                 statistics={statistics}
                 pickupTimeLimit={pickupTimeLimit}
                 reminderDays={reminderDays}
                 materialData={materialData} 
-                />
+              />
               <VisualizationSection 
                 materialData={materialData}
                 reminderLogs={reminderLogs}
                 pickupTimeLimit={pickupTimeLimit}
                 reminderDays={reminderDays}
+                pickupDistributionData={pickupDistributionData}
                 showToast={showToast}
               />
             </>
@@ -341,7 +367,7 @@ function ReserveringDashboard() {
         </main>
       )}
       
-      {/* Printable content */}
+      {/* Printable */}
       <PrintableReports 
         materialData={materialData}
         reminderLogs={reminderLogs}

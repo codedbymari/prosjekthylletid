@@ -1,0 +1,176 @@
+/* src/components/reservation/PrintableReports.css */
+.printable-content {
+    display: none;
+  }
+  
+  /* Print */
+  @media print {
+    body {
+      font-family: 'Arial', 'Helvetica Neue', sans-serif;
+      color: #121826;
+      background: white;
+      font-size: 12pt;
+      line-height: 1.5;
+    }
+    
+    .printable-content {
+      display: block;
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .dashboard-wrapper > *:not(.printable-content) {
+      display: none !important;
+    }
+    
+    .print-report {
+      margin-bottom: 2cm;
+      page-break-after: always;
+    }
+    
+    .print-report:last-child {
+      page-break-after: auto;
+      margin-bottom: 0;
+    }
+    
+    .print-header {
+      margin-bottom: 1cm;
+      border-bottom: 1pt solid #d0d6e6;
+      padding-bottom: 0.5cm;
+    }
+    
+    .print-header h1 {
+      font-size: 24pt;
+      color: #9d3353;
+      margin: 0 0 0.25cm 0;
+    }
+    
+    .print-date {
+      font-size: 10pt;
+      color: #606b85;
+      margin: 0;
+    }
+    
+    .print-summary {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1cm;
+    }
+    
+    .print-summary-item {
+      text-align: center;
+      flex: 1;
+      padding: 0.5cm;
+      background-color: #f9fafc;
+      border-radius: 8pt;
+      margin: 0 0.25cm;
+    }
+    
+    .print-summary-item:first-child {
+      margin-left: 0;
+    }
+    
+    .print-summary-item:last-child {
+      margin-right: 0;
+    }
+    
+    .print-summary-item h3 {
+      font-size: 10pt;
+      color: #606b85;
+      margin: 0 0 0.25cm 0;
+      font-weight: 600;
+    }
+    
+    .print-summary-item p {
+      font-size: 18pt;
+      color: #9d3353;
+      margin: 0;
+      font-weight: 700;
+    }
+    
+    .print-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1cm;
+      font-size: 9pt;
+    }
+    
+    .print-table th {
+      background-color: #f0f2f9;
+      color: #384255;
+      font-weight: 600;
+      text-align: left;
+      padding: 0.25cm;
+      border-bottom: 1pt solid #d0d6e6;
+    }
+    
+    .print-table td {
+      padding: 0.2cm 0.25cm;
+      border-bottom: 1pt solid #f0f2f9;
+      color: #384255;
+    }
+    
+    .print-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .status-venter-row {
+      background-color: #fff8e1;
+    }
+    
+    .status-hentet-row {
+      background-color: #e8f5e9;
+    }
+    
+    .status-utløpt-row {
+      background-color: #ffebee;
+    }
+    
+    .print-no-data {
+      padding: 1cm;
+      text-align: center;
+      color: #606b85;
+      background-color: #f9fafc;
+      border: 1pt dashed #d0d6e6;
+      border-radius: 8pt;
+    }
+    
+    .print-chart-data {
+      margin-top: 1cm;
+      padding: 1cm;
+      background-color: #f9fafc;
+      border-radius: 8pt;
+      text-align: center;
+    }
+    
+    .print-chart-data h2 {
+      font-size: 14pt;
+      color: #384255;
+      margin: 0 0 0.5cm 0;
+    }
+    
+    .print-chart-data p {
+      color: #606b85;
+      margin: 0;
+    }
+    
+    /* Add page numbers */
+    @page {
+      margin: 2cm;
+      counter-increment: page;
+    }
+    
+    @page :first {
+      margin-top: 3cm;
+    }
+    
+    .print-report::after {
+      content: "Side " counter(page);
+      position: absolute;
+      bottom: 0.5cm;
+      right: 0.5cm;
+      font-size: 8pt;
+      color: #a4adc1;
+    }
+  }
