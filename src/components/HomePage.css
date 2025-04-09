@@ -1,0 +1,415 @@
+.home-page {
+  --primary-color: #7d203a;
+  --primary-light: #9a3941;
+  --primary-dark: #5c1829;
+  --secondary-color: #f8f9fa;
+  --accent-color: #3a7d20;
+  --text-color: #333;
+  --light-text: #6c757d;
+  --border-color: #dee2e6;
+  --hover-color: #6a1b31;
+  
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: var(--text-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.home-content {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.welcome-container {
+  display: flex;
+  width: 100%;
+  gap: 2rem;
+  align-items: center;
+}
+
+.welcome-section {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  width: 100%;
+  max-width: 750px;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.project-badge {
+  display: inline-block;
+  background-color: rgba(125, 32, 58, 0.1);
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  border-radius: 30px;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.welcome-section h1 {
+  color: var(--text-color);
+  font-size: 2.2rem;
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+}
+
+.highlight {
+  color: var(--primary-color);
+  position: relative;
+  display: inline-block;
+}
+
+.highlight::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background-color: rgba(125, 32, 58, 0.2);
+  z-index: -1;
+  border-radius: 4px;
+}
+
+.subtitle {
+  color: var(--light-text);
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.project-description {
+  margin-bottom: 1.8rem;
+  line-height: 1.5;
+}
+
+.description-with-icon {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background-color: #f8f9fa;
+  padding: 1.2rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.icon-container {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+}
+
+.icon-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.project-description p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.key-features {
+  margin-bottom: 1.8rem;
+}
+
+.key-features h2 {
+  font-size: 1.3rem;
+  color: var(--text-color);
+  margin-bottom: 1.2rem;
+  text-align: center;
+  position: relative;
+  display: inline-block;
+}
+
+.key-features h2::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 3px;
+  background-color: var(--primary-color);
+  border-radius: 3px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+
+.feature-item {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f0f0f0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+}
+
+.feature-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--primary-color);
+  margin-bottom: 0.8rem;
+}
+
+.feature-item h3 {
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+  color: var(--text-color);
+}
+
+.feature-item p {
+  font-size: 0.9rem;
+  color: var(--light-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.login-section {
+  text-align: center;
+}
+
+.login-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.8rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 6px rgba(125, 32, 58, 0.2);
+}
+
+.login-button svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: var(--hover-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(125, 32, 58, 0.25);
+}
+
+.login-button:hover svg {
+  transform: translateX(4px);
+}
+
+.login-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(125, 32, 58, 0.3), 0 6px 12px rgba(125, 32, 58, 0.25);
+}
+
+.login-note {
+  margin-top: 0.8rem;
+  font-size: 0.85rem;
+  color: var(--light-text);
+}
+
+/* Decorative elements */
+.decoration-element {
+  display: none;
+}
+
+@media (min-width: 992px) {
+  .decoration-element {
+    display: block;
+    flex: 0 0 250px;
+  }
+  
+  .book-stack {
+    position: relative;
+    height: 350px;
+    width: 180px;
+    margin: 0 auto;
+  }
+  
+  .book {
+    position: absolute;
+    height: 180px;
+    border-radius: 3px 10px 10px 3px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transform: rotate(0deg);
+    transform-origin: bottom left;
+    transition: transform 0.3s ease;
+  }
+  
+  .book-1 {
+    width: 35px;
+    background-color: var(--primary-color);
+    bottom: 0;
+    left: 70px;
+    height: 200px;
+    z-index: 5;
+  }
+  
+  .book-2 {
+    width: 30px;
+    background-color: #3a7d20;
+    bottom: 0;
+    left: 105px;
+    height: 180px;
+    z-index: 4;
+  }
+  
+  .book-3 {
+    width: 40px;
+    background-color: #207d7d;
+    bottom: 0;
+    left: 135px;
+    height: 220px;
+    z-index: 3;
+  }
+  
+  .book-4 {
+    width: 25px;
+    background-color: #7d5520;
+    bottom: 0;
+    left: 45px;
+    height: 160px;
+    z-index: 2;
+  }
+  
+  .book-5 {
+    width: 45px;
+    background-color: #20347d;
+    bottom: 0;
+    left: 0;
+    height: 190px;
+    z-index: 1;
+  }
+  
+  .book-stack:hover .book-1 {
+    transform: rotate(-5deg);
+  }
+  
+  .book-stack:hover .book-2 {
+    transform: rotate(3deg);
+  }
+  
+  .book-stack:hover .book-3 {
+    transform: rotate(-2deg);
+  }
+  
+  .book-stack:hover .book-4 {
+    transform: rotate(4deg);
+  }
+  
+  .book-stack:hover .book-5 {
+    transform: rotate(-3deg);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 991px) {
+  .welcome-container {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-content {
+    padding: 1.2rem;
+  }
+  
+  .welcome-section {
+    padding: 1.2rem;
+  }
+  
+  .welcome-section h1 {
+    font-size: 1.8rem;
+  }
+  
+  .subtitle {
+    font-size: 0.95rem;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .description-with-icon {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-content {
+    padding: 1rem;
+  }
+  
+  .welcome-section {
+    padding: 1rem;
+  }
+  
+  .welcome-section h1 {
+    font-size: 1.6rem;
+  }
+  
+  .project-badge {
+    font-size: 0.7rem;
+  }
+  
+  .login-button {
+    width: 100%;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.welcome-section {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.feature-item:nth-child(1) { animation: fadeIn 0.6s ease-out 0.1s forwards; }
+.feature-item:nth-child(2) { animation: fadeIn 0.6s ease-out 0.2s forwards; }
+.feature-item:nth-child(3) { animation: fadeIn 0.6s ease-out 0.3s forwards; }
+.feature-item:nth-child(4) { animation: fadeIn 0.6s ease-out 0.4s forwards; }
+
+.feature-item {
+  opacity: 0;
+}

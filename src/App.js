@@ -1,15 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
+import HomePage from './components/HomePage';
 import HomeDashboard from './components/HomeDashboard';
 import BorrowerDashboard from './components/BorrowerDashboard';
-// Fix the import path to point to the new location
 import ReserveringDashboard from './components/reservation/ReserveringDashboard';
 import './layout.css';
 import './App.css';
 
 function App() {
+  return (
+    <Routes>
+      {/* Hjemmeside - uten sidebar og header */}
+      <Route path="/" element={<HomePage />} />
+      
+      {/* Ruter med sidebar og header */}
+      <Route path="/*" element={<AppLayout />} />
+    </Routes>
+  );
+}
+
+function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const toggleSidebar = () => {
@@ -37,13 +49,15 @@ function App() {
         {/* Content area */}
         <div className="content-area">
           <Routes>
-            <Route path="/" element={<HomeDashboard />} />
+            <Route path="/dashboard" element={<HomeDashboard />} />
             <Route path="/låner" element={<BorrowerDashboard />} />
             <Route path="/låner/:borrowerId" element={<BorrowerDashboard />} />
             <Route path="/reservering" element={<ReserveringDashboard />} />
             <Route path="/reservering/oversikt" element={<ReserveringDashboard />} />
             <Route path="/reservering/aktive" element={<ReserveringDashboard />} />
             <Route path="/reservering/innstillinger" element={<ReserveringDashboard />} />
+            {/* Redirect any unknown paths to dashboard */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </div>
       </div>

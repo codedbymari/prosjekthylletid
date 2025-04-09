@@ -10,7 +10,7 @@ import {
 import './HomeDashboard.css';
 
 const HomeDashboard = () => {
-  // Core state
+  // Hent valgt filial fra localStorage eller bruk standardverdi
   const [currentBranch, setCurrentBranch] = useState(() => {
     const saved = localStorage.getItem('currentBranch');
     return saved ? JSON.parse(saved) : {
@@ -18,7 +18,6 @@ const HomeDashboard = () => {
       name: 'Kolbotn bibliotek', 
       address: 'Kolbotnveien 22, 1410 Kolbotn',
       theme: '#7d203a',
-      logo: '📚'
     };
   });
   
@@ -27,14 +26,14 @@ const HomeDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [popularPeriod, setPopularPeriod] = useState('month');
   
-  // Events state
+  // Arrangementer
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventDetails, setShowEventDetails] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [showEventEditor, setShowEventEditor] = useState(false);
   
-  // Refs
+  // Referanser
   const dashboardRef = useRef(null);
   const popularTitlesRef = useRef(null);
   const eventsRef = useRef(null);
@@ -55,16 +54,34 @@ const HomeDashboard = () => {
     },
   ];
 
-  // Load events from localStorage on initial render
+  // Lytt etter endringer fra Sidebar
+  useEffect(() => {
+    const handleBranchChange = (event) => {
+      setCurrentBranch(event.detail);
+      setIsLoading(true);
+      
+      if (dashboardRef.current) {
+        dashboardRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    
+    window.addEventListener('branchChanged', handleBranchChange);
+    
+    return () => {
+      window.removeEventListener('branchChanged', handleBranchChange);
+    };
+  }, []);
+
+  // Last inn data når filialen endres
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       
       try {
-        // Simulate loading delay
+        // Simuler lasting
         await new Promise(r => setTimeout(r, 800));
         
-        // Load events from localStorage or generate new ones
+        // Last arrangementer fra localStorage eller generer nye
         const savedEvents = localStorage.getItem(`events-${currentBranch.id}`);
         if (savedEvents) {
           setEvents(JSON.parse(savedEvents));
@@ -74,17 +91,17 @@ const HomeDashboard = () => {
           localStorage.setItem(`events-${currentBranch.id}`, JSON.stringify(generatedEvents));
         }
         
-        // Generate popular titles with different data for each branch
+        // Generer populære titler med forskjellige data for hver filial
         setPopularTitles(generatePopularTitles());
         
-        // Update CSS variables for branch theme
+        // Oppdater CSS-variabler for filialens tema
         document.documentElement.style.setProperty('--branch-primary', currentBranch.theme);
         document.documentElement.style.setProperty('--branch-primary-light', adjustColor(currentBranch.theme, 20));
         document.documentElement.style.setProperty('--branch-primary-dark', adjustColor(currentBranch.theme, -20));
         document.documentElement.style.setProperty('--branch-primary-transparent', `${currentBranch.theme}1A`);
         
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Feil:', error);
       } finally {
         setIsLoading(false);
       }
@@ -93,7 +110,7 @@ const HomeDashboard = () => {
     fetchData();
   }, [currentBranch.id]);
 
-  // Animation setup for elements
+  // Animasjonsoppsett for elementer
   useEffect(() => {
     if (!isLoading && popularTitlesRef.current && eventsRef.current) {
       const popularItems = popularTitlesRef.current.querySelectorAll('.popular-book-card');
@@ -109,7 +126,7 @@ const HomeDashboard = () => {
     }
   }, [isLoading, popularTitles, events]);
 
-  // Click outside handler for branch menu
+  // Håndter klikk utenfor filialmenyen
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showBranchMenu && !e.target.closest('.branch-switcher')) {
@@ -121,7 +138,7 @@ const HomeDashboard = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showBranchMenu]);
 
-  // Click outside handler for modals
+  // Håndter klikk utenfor modaler
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target) && 
@@ -138,25 +155,25 @@ const HomeDashboard = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showEventDetails, showEventEditor]);
 
-  // Helper function to adjust color brightness
+  // Hjelpefunksjon for å justere fargelysstyrke
   const adjustColor = (hex, percent) => {
     hex = hex.replace('#', '');
     
-    // Convert to RGB
+    // Konverter til RGB
     let r = parseInt(hex.substring(0, 2), 16);
     let g = parseInt(hex.substring(2, 4), 16);
     let b = parseInt(hex.substring(4, 6), 16);
     
-    // Adjust brightness
+    // Juster lysstyrke
     r = Math.max(0, Math.min(255, r + percent));
     g = Math.max(0, Math.min(255, g + percent));
     b = Math.max(0, Math.min(255, b + percent));
     
-    // Convert back to hex
+    // Konverter tilbake til hex
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   };
 
-  // Helper functions for data generation
+  // Hjelpefunksjoner for datagenerering
   const generateEvents = () => {
     const today = new Date();
     
@@ -213,7 +230,7 @@ const HomeDashboard = () => {
   };
 
   const generatePopularTitles = () => {
-    // Different popular books for each branch to show visual change
+    // Forskjellige populære bøker for hver filial for å vise visuell endring
     if (currentBranch.id === 'b1') {
       return [
         {
@@ -304,7 +321,7 @@ const HomeDashboard = () => {
     }
   };
   
-  // Date utilities
+  // Datoverktøy
   const addDays = (date, days) => {
     const result = new Date(date);
     result.setDate(date.getDate() + days);
@@ -317,7 +334,7 @@ const HomeDashboard = () => {
     });
   };
   
-  // Event handlers
+  // Hendelseshåndterere
   const handleBranchChange = (branch) => {
     setCurrentBranch(branch);
     localStorage.setItem('currentBranch', JSON.stringify(branch));
@@ -327,6 +344,9 @@ const HomeDashboard = () => {
     if (dashboardRef.current) {
       dashboardRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    
+    // Send hendelse til Sidebar
+    window.dispatchEvent(new CustomEvent('dashboardBranchChanged', { detail: branch }));
   };
   
   const getLoanCountByPeriod = (book) => {
@@ -347,7 +367,7 @@ const HomeDashboard = () => {
     }
   };
   
-  // Event detail and editing handlers
+  // Håndterere for arrangementsdetaljer og redigering
   const handleViewEventDetails = (event) => {
     setSelectedEvent(event);
     setShowEventDetails(true);
@@ -359,7 +379,7 @@ const HomeDashboard = () => {
   };
   
   const handleSaveEvent = () => {
-    // Validate form
+    // Valider skjema
     if (!editingEvent.title.trim()) {
       alert('Tittel kan ikke være tom');
       return;
@@ -367,18 +387,18 @@ const HomeDashboard = () => {
     
     let updatedEvents;
     
-    // Check if this is a new event or an edit of existing event
+    // Sjekk om dette er et nytt arrangement eller redigering av eksisterende
     if (events.find(e => e.id === editingEvent.id)) {
-      // Update existing event
+      // Oppdater eksisterende arrangement
       updatedEvents = events.map(event => 
         event.id === editingEvent.id ? editingEvent : event
       );
     } else {
-      // Add new event
+      // Legg til nytt arrangement
       updatedEvents = [...events, editingEvent];
     }
     
-    // Sort events by date
+    // Sorter arrangementer etter dato
     updatedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
     
     setEvents(updatedEvents);
@@ -423,7 +443,7 @@ const HomeDashboard = () => {
     const today = new Date();
     
     const newEvent = {
-      id: Date.now(), // Use timestamp as ID
+      id: Date.now(), // Bruk tidsstempel som ID
       title: 'Nytt arrangement',
       description: 'Beskrivelse av arrangementet',
       date: formatDate(addDays(today, 7)),
@@ -450,7 +470,7 @@ const HomeDashboard = () => {
     );
   }
 
-  // Sort books by the selected period
+  // Sorter bøker etter valgt periode
   const sortedBooks = [...popularTitles].sort((a, b) => 
     getLoanCountByPeriod(b) - getLoanCountByPeriod(a)
   );
@@ -458,7 +478,7 @@ const HomeDashboard = () => {
   return (
     <div className="home-dashboard-container" ref={dashboardRef} style={{'--branch-primary': currentBranch.theme}}>
       <div className="home-dashboard">
-        {/* Branch switcher and search */}
+        {/* Filialvelger og søk */}
         <div className="dashboard-controls">
           <div className="branch-switcher">
             <button 
@@ -467,9 +487,6 @@ const HomeDashboard = () => {
               aria-label="Bytt filial"
               aria-expanded={showBranchMenu}
             >
-              <div className="branch-icon">
-                {currentBranch.logo}
-              </div>
               <div className="branch-info">
                 <span className="branch-name">{currentBranch.name}</span>
                 <span className="branch-address">{currentBranch.address}</span>
@@ -492,9 +509,6 @@ const HomeDashboard = () => {
                       '--item-bg': `${branch.theme}1A`
                     }}
                   >
-                    <div className="branch-menu-icon">
-                      {branch.logo}
-                    </div>
                     <div className="branch-menu-info">
                       <span>{branch.name}</span>
                       <span>{branch.address}</span>
@@ -511,7 +525,7 @@ const HomeDashboard = () => {
 
         <div className="dashboard-content">
           <div className="dashboard-grid">
-            {/* Popular titles section - Removed action buttons */}
+            {/* Populære titler-seksjon */}
             <section className="dashboard-section popular-section loaded">
               <div className="section-header">
                 <h2><FiBookOpen /> Populære titler</h2>
@@ -568,7 +582,7 @@ const HomeDashboard = () => {
               </div>
             </section>
             
-            {/* Upcoming events section - Improved button placement */}
+            {/* Kommende arrangementer-seksjon */}
             <section className="dashboard-section events-section loaded">
               <div className="section-header">
                 <h2><FiCalendar /> Kommende arrangementer</h2>
@@ -662,7 +676,7 @@ const HomeDashboard = () => {
         </div>
       </div>
       
-      {/* Event Details Modal */}
+      {/* Arrangementsdetaljer-modal */}
       {showEventDetails && selectedEvent && (
         <div className="modal-overlay">
           <div className="modal event-details-modal" ref={modalRef}>
@@ -752,8 +766,8 @@ const HomeDashboard = () => {
         </div>
       )}
       
-            {/* Event Editor Modal */}
-            {showEventEditor && editingEvent && (
+      {/* Arrangementsredigering-modal */}
+      {showEventEditor && editingEvent && (
         <div className="modal-overlay">
           <div className="modal event-editor-modal" ref={modalRef}>
             <div className="modal-header">
