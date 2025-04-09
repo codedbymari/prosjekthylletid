@@ -43,7 +43,6 @@ function AppLayout() {
       
       {/* Main content area */}
       <div className="main-content">
-        {/* Sidebar with proper props */}
         <Sidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
         
         {/* Content area */}
@@ -56,7 +55,6 @@ function AppLayout() {
             <Route path="/reservering/oversikt" element={<ReserveringDashboard />} />
             <Route path="/reservering/aktive" element={<ReserveringDashboard />} />
             <Route path="/reservering/innstillinger" element={<ReserveringDashboard />} />
-            {/* Redirect any unknown paths to dashboard */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </div>
