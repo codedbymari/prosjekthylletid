@@ -17,7 +17,7 @@ const HomePage = () => {
             <div className="welcome-header">
               <div className="project-badge">DATA3710 Praktisk IT-prosjekt</div>
               <h1>Prosjekt <span className="highlight">Hylletid</span></h1>
-              <p className="subtitle">En innovativ løsning for Nordre Follo Bibliotek</p>
+              <p className="subtitle"> i samarbeid med Nordre Follo Bibliotek</p>
             </div>
             
             <div className="project-description">

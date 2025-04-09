@@ -27,7 +27,7 @@ const Header = () => {
       setPageTitle(`Låner: ${borrowerId}`);
     } else {
       const baseRoute = '/' + path.split('/')[1];
-      setPageTitle(routeTitles[baseRoute] || 'Biblioteksystem');
+      setPageTitle(routeTitles[baseRoute] || 'Hjem');
     }
 
     if (path.startsWith('/reservering')) {
