@@ -43,22 +43,69 @@ Basert på denne statistikken kan bibliotekarer ta informerte beslutninger om hv
 
 ## Prosjektstruktur
 ```plaintext
+src tree
 .
-├── server
-│   └── server.js               # Express backend-server (eventuelt i en egen mappe)
-├── public                      # Offentlige ressurser for React
-├── src
-│   ├── components              # React-komponenter
-│   │   ├── Header.js           # Header-komponent
-│   │   ├── Header.css          # Styling for header
-│   │   ├── Sidebar.js          # Sidebar-komponent
-│   │   ├── Sidebar.css         # Styling for sidebar
-│   │   ├── Reportchart.js      # Diagramkomponent for visning av rapportdata
-│   │   ├── ReservationDashboard.js  # Hovedkomponenten for dashboardet
-│   │   └── ReserveringDashboard.css # Styling for dashboardet
-│   ├── dummyData.js            # Dummy-data for testing
-│   ├── App.js                  # Hoved-React-komponent
-│   ├── App.css                 # Globale stiler for appen
-│   ├── index.js                # React-entry point
-│   ├── index.css               # Globale stiler
-│   └── ...                     # Andre filer som test, etc.
+├── App.css
+├── App.js
+├── App.test.js
+├── Backend
+│   └── backend
+│       ├── Reservations.js
+│       ├── Reservations.sql
+│       ├── Server.js
+│       ├── database.db
+│       ├── statements.js
+│       └── statements.sql
+├── components
+│   ├── BorrowerDashboard.css
+│   ├── BorrowerDashboard.jsx
+│   ├── HomeDashboard.css
+│   ├── HomeDashboard.jsx
+│   ├── HomePage.css
+│   ├── HomePage.jsx
+│   ├── chart
+│   │   ├── BarChart.css
+│   │   ├── BarChart.jsx
+│   │   ├── ChartContainer.css
+│   │   ├── ChartContainer.jsx
+│   │   ├── PickupDistributionChart.css
+│   │   ├── PickupDistributionChart.jsx
+│   │   ├── ReportChart.css
+│   │   ├── ReportChart.jsx
+│   │   └── ScatterPlot.jsx
+│   ├── common
+│   │   ├── LoadingSpinner.jsx
+│   │   ├── NoResults.jsx
+│   │   ├── StatusBadge.jsx
+│   │   └── ToastNotification.jsx
+│   ├── layout
+│   │   ├── Header.css
+│   │   ├── Header.js
+│   │   ├── Sidebar.css
+│   │   └── Sidebar.js
+│   └── reservation
+│       ├── ExportMenu.css
+│       ├── ExportMenu.jsx
+│       ├── FilterBar.jsx
+│       ├── PrintableReports.css
+│       ├── PrintableReports.jsx
+│       ├── ReservationCards.jsx
+│       ├── ReservationList.jsx
+│       ├── ReservationTable.jsx
+│       ├── ReserveringDashboard.css
+│       ├── ReserveringDashboard.jsx
+│       ├── SettingsPanel.jsx
+│       ├── StatisticsSection.css
+│       ├── StatisticsSection.jsx
+│       ├── VisualizationSection.css
+│       └── VisualizationSection.jsx
+├── index.css
+├── index.js
+├── layout.css
+├── mockData.js
+├── reportWebVitals.js
+├── setupTests.js
+└── utils
+    ├── colors.js
+    └── dateUtils.js
+
