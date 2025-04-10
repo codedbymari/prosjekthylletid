@@ -201,7 +201,7 @@ function Sidebar() {
           <ul>
             <li>
               <NavLink 
-                to="/dashboard" 
+                to="/hjem" 
                 className={({isActive}) => isActive ? 'active' : ''} 
                 onClick={closeSidebar}
               >

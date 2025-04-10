@@ -48,14 +48,14 @@ function AppLayout() {
         {/* Content area */}
         <div className="content-area">
           <Routes>
-            <Route path="/dashboard" element={<HomeDashboard />} />
+            <Route path="/hjem" element={<HomeDashboard />} />
             <Route path="/låner" element={<BorrowerDashboard />} />
             <Route path="/låner/:borrowerId" element={<BorrowerDashboard />} />
             <Route path="/reservering" element={<ReserveringDashboard />} />
             <Route path="/reservering/oversikt" element={<ReserveringDashboard />} />
             <Route path="/reservering/aktive" element={<ReserveringDashboard />} />
             <Route path="/reservering/innstillinger" element={<ReserveringDashboard />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
           </Routes>
         </div>
       </div>
