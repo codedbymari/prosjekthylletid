@@ -1,73 +1,45 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 
-function Reservations() {
-    const [reservasjoner, setReservasjoner] = useState([]);
-    const [lånerne, setLånere] = useState([]);
-    const [error, setError] = useState(null);
+const Låner = () => {
+  const [lånere, setLånere] = useState([]);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        axios.get("http://localhost:5000/reservasjoner")
-            .then((response) => {
-                setReservasjoner(response.data);
-            })
-            .catch((error) => {
-                console.error("Feil ved henting av reservasjoner:", error);
-                setError("Kunne ikke laste reservasjoner. Prøv igjen senere.");
-            });
-        
-        axios.get("http://localhost:5000/lånere")
-            .then((response) => {
-                setLånere(response.data);
-            })
-            .catch((error) => {
-                console.error("Feil ved henting av lånere:", error);
-                setError("Kunne ikke laste lånere. Prøv igjen senere.");
-            });
-    }, []);
+  useEffect(() => {
+    fetch("http://localhost:3001/lånere")
+      .then((response) => response.json())
+      .then((data) => setLånere(data))
+      .catch((err) => {
+        setError("Kunne ikke hente lånere");
+        console.error(err);
+      });
+  }, []);
 
-    return (
-        <div>
-            <h1>Aktive reserveringer</h1>
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Tittel</th>
-                        <th>Forfatter</th>
-                        <th>Lånernummer</th>
-                        <th>Reservert dato</th>
-                        <th>Klar dato</th>
-                        <th>Hente frist</th>
-                        <th>Hentet dato</th>
-                        <th>Status</th>
-                        <th>Dager på hylle</th>
-                        <th>Hentenummer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {reservasjoner.map((res) => {
-                        // Finn låneren basert på lånernummer
-                        const låner = lånere.find((l) => l.lånernummer === res.lånernummer);
-                        return (
-                            <tr key={res.id}>
-                                <td>{res.tittel}</td>
-                                <td>{res.forfatter}</td>
-                                <td>{res.lånernummer} - {låner ? `${låner.fornavn} ${låner.etternavn}` : "Låner ikke funnet"}</td>
-                                <td>{res.reservert_dato}</td>
-                                <td>{res.klar_dato}</td>
-                                <td>{res.hente_frist}</td>
-                                <td>{res.hentet_dato || "Ikke hentet"}</td>
-                                <td>{res.status}</td>
-                                <td>{res.dager_på_hylle ?? "-"}</td>
-                                <td>{res.hentenummer}</td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
-        </div>
-    );
-}
+  return (
+    <div>
+      <h2>Lånere</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <table>
+        <thead>
+          <tr>
+            <th>Lånernummer</th>
+            <th>Fornavn</th>
+            <th>Etternavn</th>
+            <th>E-post</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lånere.map((låner) => (
+            <tr key={låner.lånernummer}>
+              <td>{låner.lånernummer}</td>
+              <td>{låner.fornavn}</td>
+              <td>{låner.etternavn}</td>
+              <td>{låner.epost}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
-export default Reservations;
+export default Låner;
