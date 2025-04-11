@@ -16,7 +16,8 @@ if(err){
     console.error("Kunne ikke koble til database", err.message);
     process.exit(1);
 } else{
-    console.log("Du er tilkoblen til Databasen");   
+    console.log("Du er tilkoblen til Databasen"); 
+}
 });
 
 //funksjon for å hente reserveringer
