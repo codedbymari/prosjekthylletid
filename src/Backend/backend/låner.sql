@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS lånere (
-    låner_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lånenummer INTEGER PRIMARY KEY AUTOINCREMENT,
     fornavn TEXT NOT NULL,
     etternavn TEXT NOT NULL,
     lånernummer TEXT NOT NULL UNIQUE,
