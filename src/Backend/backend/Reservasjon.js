@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 
-function Reservations() {
+const Reservations() => {
     const [reservasjoner, setReservasjoner] = useState([]);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        axios.get("http://localhost:5000/reservasjoner")
-            .then((response) => {
-                setReservasjoner(response.data);
-            })
-            .catch((error) => {
-                console.error("Feil ved henting av reservasjoner:", error);
-                setError("Kunne ikke laste reservasjoner. Prøv igjen senere.");
-            });
-    }, []);
+    fetch("http://localhost:3001/reservasjoner")
+      .then((response) => response.json())
+      .then((data) => setReservasjoner(data))
+      .catch((err) => {
+        setError("Kunne ikke hente reservasjoner");
+        console.error(err);
+      });
+  }, []);
 
     return (
         <div>
