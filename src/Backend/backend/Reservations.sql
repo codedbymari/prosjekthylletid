@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS reservasjoner (
     reservert_dato TEXT NOT NULL,
     klar_dato TEXT NOT NULL,
     hentet_dato TEXT,
-    status TEXT NOT NULL
+    status VARCHAR(20),
+    FOREIGN KEY (lånernummer) REFERENCES låner(lånernummer)
 );
 
 
@@ -21,5 +22,14 @@ VALUES
     ("Felix har følelser", "Charlotte Mjelde", "N00789012", "15.03.2025", "16.03.2025", "-", "Venter"),
     ("Skriket", "Jørn Lier Horst og Jan-Erik Fjell", "N00890123", "13.03.2025", "14.03.2025", "15.03.2025", "Hentet"),
     ("Juleroser", "Herborg Kråkevik", "N00901234", "14.03.2025", "15.03.2025", "-", "Utløpt"),
-    ("Søvngjengeren", "Lars Kepler", "N00012345", "10.03.2025", "12.03.2025", "-", "Venter");
+    ("Søvngjengeren", "Lars Kepler", "N00012345", "10.03.2025", "12.03.2025", "-", "Venter"),
+    ("En uvanlig venn", "Hilde Hagerup", "N00111223", "01.04.2025", "03.04.2025", "-", "Venter"),
+    ("Når katten er borte", "Maja Lunde", "N00222334", "02.04.2025", "04.04.2025", "06.04.2025", "Hentet"),
+    ("På vei til en ny verden", "Kari S. Krøyer", "N00333445", "03.04.2025", "05.04.2025", "-", "Venter"),
+    ("Sol over Bergen", "Jan Mehlum", "N00444556", "04.04.2025", "06.04.2025", "07.04.2025", "Hentet"),
+    ("Skattejakten", "Bjørn L. Fredriksen", "N00555667", "05.04.2025", "07.04.2025", "-", "Venter"),
+    ("Livet på skjerm", "Ingrid B. Wahl", "N00666778", "06.04.2025", "08.04.2025", "-", "Venter"),
+    ("Det forbudte rommet", "Siv L. Guldal", "N00777889", "07.04.2025", "09.04.2025", "10.04.2025", "Hentet"),
+    ("I skyggen av elgen", "Ellen R. Fredriksen", "N00888990", "08.04.2025", "10.04.2025", "-", "Venter"),
+    ("Under stjernene", "Nils A. Lofthus", "N00999001", "09.04.2025", "11.04.2025", "-", "Venter");
 
