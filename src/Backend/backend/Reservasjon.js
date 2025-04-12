@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Reservations() => {
     const [reservasjoner, setReservasjoner] = useState([]);
@@ -11,9 +11,8 @@ const Reservations() => {
       .catch((err) => {
         setError("Kunne ikke hente reservasjoner");
         console.error(err);
-      });
-  }, []);
-
+     });
+}, []);
     return (
         <div>
             <h1>Aktive reserveringer</h1>
