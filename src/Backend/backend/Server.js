@@ -10,15 +10,17 @@ app.use(cors()); //gjør det mulig å ta imot førespørsler fra frontend
 app.use(express.json());
 
 //åpner tilkoblingen SQLite-databasen
-const db = new sqlite3("database.db");
-//feilhåndtering
-if(err){
-    console.error("Kunne ikke koble til database", err.message);
+let db;
+try {
+    //åpner en tilkobling
+    db = new sqlite3("database.db");
+    //hvis vellykket:
+    console.log("Du er tilkoblet databasen");
+} catch (err) {
+    //hvis ikke:
+    console.error("Kunne ikke koble til database:", err.message);
     process.exit(1);
-} else{
-    console.log("Du er tilkoblen til Databasen"); 
 }
-});
 
 //funksjon for å hente reserveringer
 function hentReservasjoner(callback){
