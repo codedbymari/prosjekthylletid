@@ -1,8 +1,14 @@
 CREATE TABLE IF NOT EXISTS lånere (
+<<<<<<< HEAD
     låner_id INTEGER PRIMARY KEY AUTOINCREMENT,
     fornavn TEXT NOT NULL,
     etternavn TEXT NOT NULL,
     lånernummer TEXT NOT NULL UNIQUE,
+=======
+    lånernummer INTEGER PRIMARY KEY AUTOINCREMENT,
+    fornavn TEXT NOT NULL,
+    etternavn TEXT NOT NULL,
+>>>>>>> bf0852aa5b98c85e3e243f903c86700551d1ae0a
     epost TEXT NOT NULL,
     telefonnummer TEXT,
     adresse TEXT,

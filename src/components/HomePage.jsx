@@ -6,7 +6,11 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
+<<<<<<< HEAD
     navigate('/hjem');
+=======
+    navigate('/dashboard');
+>>>>>>> bf0852aa5b98c85e3e243f903c86700551d1ae0a
   };
 
   return (

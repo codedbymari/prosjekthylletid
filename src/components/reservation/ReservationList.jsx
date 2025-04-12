@@ -2,10 +2,17 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { FiGrid, FiList } from 'react-icons/fi';
+<<<<<<< HEAD
 import FilterBar from './FilterBar.jsx';
 import ReservationTable from './ReservationTable.jsx';
 import ReservationCards from './ReservationCards.jsx';
 import NoResults from '../common/NoResults.jsx';
+=======
+import FilterBar from './FilterBar';
+import ReservationTable from './ReservationTable.jsx';
+import ReservationCards from './ReservationCards';
+import NoResults from '../common/NoResults';
+>>>>>>> bf0852aa5b98c85e3e243f903c86700551d1ae0a
 
 const FILTER_STATUSES = {
   ALL: 'all',

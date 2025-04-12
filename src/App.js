@@ -55,7 +55,6 @@ function AppLayout() {
             <Route path="/reservering/oversikt" element={<ReserveringDashboard />} />
             <Route path="/reservering/aktive" element={<ReserveringDashboard />} />
             <Route path="/reservering/innstillinger" element={<ReserveringDashboard />} />
-
           </Routes>
         </div>
       </div>
