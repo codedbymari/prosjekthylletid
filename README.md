@@ -54,8 +54,9 @@ src tree
 │       ├── Reservations.sql
 │       ├── Server.js
 │       ├── database.db
-│       ├── statements.js
-│       └── statements.sql
+│       ├── importerData.js
+│       └── låner.js
+│       └── låner.sql
 ├── components
 │   ├── BorrowerDashboard.css
 │   ├── BorrowerDashboard.jsx
