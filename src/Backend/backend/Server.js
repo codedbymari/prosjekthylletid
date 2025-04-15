@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 let db;
 try {
     //åpner en tilkobling
-    db = new sqlite3("database.db");
+    db = new sqlite3.Database("database.db");
     //hvis vellykket:
     console.log("Du er tilkoblet databasen");
 } catch (err) {
