@@ -1,13 +1,15 @@
+const express = require('express');
+const cors = require('cors');
+const app = express(); 
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
-const express = require("express");
-const sqlite3 = require("better-sqlite3");
-const cors = require("cors");
 
-const app = express();
-const port = 5000;
 
-app.use(cors()); //gjør det mulig å ta imot førespørsler fra frontend
+app.use(cors()); 
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 //åpner tilkoblingen SQLite-databasen
 let db;
@@ -35,15 +37,24 @@ function hentLånere(callback){
 }
 
 
-// Route for å hente reservasjoner
-app.get("/reservasjoner", (req, res) => {
-    hentReservasjoner((err, rows) => {
-    if (err) {
-            return res.status(500).json({ error: err.message });
+// API-endepunkt for å hente reservasjoner
+app.get('/reservasjoner', (req, res) => {
+    const query = 'SELECT * FROM reservasjoner';  // Henter alle reserveringer
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('En feil oppstod ved henting av data.');
         }
-        res.json(rows);
+        res.json(rows); // Sender hele resultatet som JSON
     });
 });
+
+const PORT = 5000;
+app.listen(PORT, () => {
+    console.log(`Server kjører på http://localhost:${PORT}`);
+});
+
 
 // API-endepunkt for å hente lånere
 app.get("/låner", (req, res) => {
