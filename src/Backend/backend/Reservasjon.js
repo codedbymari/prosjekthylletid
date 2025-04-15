@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const Reservations() => {
+function Reservations() {
     const [reservasjoner, setReservasjoner] = useState([]);
     const [error, setError] = useState(null);
 
@@ -12,7 +12,9 @@ const Reservations() => {
         setError("Kunne ikke hente reservasjoner");
         console.error(err);
      });
+
 }, []);
+
     return (
         <div>
             <h1>Aktive reserveringer</h1>
