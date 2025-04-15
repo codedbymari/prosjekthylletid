@@ -10,6 +10,7 @@ import SettingsPanel from './SettingsPanel';
 import ToastNotification from '../common/ToastNotification';
 import LoadingSpinner from '../common/LoadingSpinner';
 import PrintableReports from './PrintableReports';
+import axios from 'axios';
 
 import { formatDateNorwegian, parseNorwegianDate, calculateDaysBetween } from '../../utils/dateUtils';
 
@@ -153,6 +154,10 @@ function ReserveringDashboard() {
         
         // simulere API call
         await new Promise(resolve => setTimeout(resolve, 800));
+
+        //For tilkobling til databasen
+        //const response = await axios.get('http://localhost:5000/reservasjoner');
+        //const mockReservations = response.data;
         
         const mockReservations = generateMockData();
         
@@ -231,6 +236,31 @@ function ReserveringDashboard() {
 
     fetchData();
   }, []);
+
+  //For å hente data
+  /*
+  async function fetchData() {
+    try {
+        const response = await axios.get("http://localhost:5000/reservasjoner");
+        const data = response.data;
+
+        // Filtrer bort eventuelle undefined eller null elementer
+        if (Array.isArray(data)) {
+            const filteredData = data.filter(item => item !== undefined && item !== null);
+
+            // Logg de filtrerte dataene for å se at det er riktig format
+            console.log("Filtrerte data:", filteredData);
+
+            // Sett de filtrerte dataene til state
+            setReservasjoner(filteredData);
+        } else {
+            console.error("Forventet en array, men fikk noe annet:", data);
+        }
+    } catch (error) {
+        console.error("Feil ved henting av reservasjonene:", error);
+    }
+}
+  */
 
   const handleBorrowerClick = (borrowerId) => {
     navigate(`/låner/${borrowerId}`);
