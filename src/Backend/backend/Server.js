@@ -1,10 +1,10 @@
-require("dotenv").config();
+
 const express = require("express");
 const sqlite3 = require("better-sqlite3");
 const cors = require("cors");
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = 5000;
 
 app.use(cors()); //gjør det mulig å ta imot førespørsler fra frontend
 app.use(express.json());
@@ -46,7 +46,7 @@ app.get("/reservasjoner", (req, res) => {
 });
 
 // API-endepunkt for å hente lånere
-app.get("/lånere", (req, res) => {
+app.get("/låner", (req, res) => {
     hentLånere((err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -57,8 +57,10 @@ app.get("/lånere", (req, res) => {
 
 
 // Start serveren
-app.listen(PORT, () => {
-    console.log(`Server kjører på http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Server kjører på http://localhost:${port}`);
 });
+
+
 
 
