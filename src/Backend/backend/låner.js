@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const Låner = () => {
   const [lånere, setLånere] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:3001/lånere")
-      .then((response) => response.json())
-      .then((data) => setLånere(data))
-      .catch((err) => {
-        setError("Kunne ikke hente lånere");
-        console.error(err);
+    axios.get("http://localhost:5000/låner")
+      .then((response) => {
+        setLånere(response.data);  // Her bruker du setLånere og ikke setReservasjoner
+      })
+      .catch((error) => {
+        console.error("Feil ved henting av lånere:", error);
+        setError("Kunne ikke laste lånere. Prøv igjen senere.");
       });
   }, []);
 
