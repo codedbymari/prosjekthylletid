@@ -8,7 +8,6 @@ const path = require('path');
 
 app.use(cors()); 
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 //åpner tilkoblingen SQLite-databasen
@@ -50,12 +49,6 @@ app.get('/reservasjoner', (req, res) => {
     });
 });
 
-const PORT = 5000;
-app.listen(PORT, () => {
-    console.log(`Server kjører på http://localhost:${PORT}`);
-});
-
-
 // API-endepunkt for å hente lånere
 app.get("/låner", (req, res) => {
     hentLånere((err, rows) => {
@@ -66,7 +59,7 @@ app.get("/låner", (req, res) => {
     });
 });
 
-
+const port= 5000;
 // Start serveren
 app.listen(port, () => {
     console.log(`Server kjører på http://localhost:${port}`);
