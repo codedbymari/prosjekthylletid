@@ -157,8 +157,7 @@ function VisualizationSection({
         <div className="title-group">
           <h2 className="section-title">
             <FiBarChart2 className="section-icon" />
-            Visualisering og rapporter
-          </h2>
+            Statistikk og oversikt        </h2>
         </div>
 
         <div className="action-buttons">
@@ -291,7 +290,7 @@ function VisualizationSection({
               <div className="chart-legend">
                 <div className="legend-item">
                   <span className="legend-color" style={{ backgroundColor: colors.primary }}></span>
-                  <span className="legend-label">Gjennomsnittlig hentetid (dager)</span>
+                  <span className="legend-label" > Gjennomsnittlig hentetid (dager) </span>
                 </div>
                 <div className="legend-item">
                   <span className="legend-color" style={{ backgroundColor: colors.secondary }}></span>
@@ -353,6 +352,8 @@ function VisualizationSection({
                     width={55}
                     axisLine={{ stroke: colors.neutral[200] }}
                     tickLine={{ stroke: colors.neutral[200] }}
+                    domain={[0, 'dataMax + 1']} // Set a fixed domain with some padding
+
                   >
                     <Label 
                       value="Gjennomsnittlig hentetid (dager)" 
@@ -361,9 +362,12 @@ function VisualizationSection({
                       style={{ 
                         fill: colors.primary, 
                         fontSize: containerWidth < 500 ? '10px' : '12px',
-                        fontWeight: 500
+                        fontWeight: 500,
+                        textAnchor: "middle"
+
                       }}
                       offset={-45}
+
                     />
                   </YAxis>
                   <YAxis 
@@ -377,6 +381,7 @@ function VisualizationSection({
                     width={55}
                     axisLine={{ stroke: colors.neutral[200] }}
                     tickLine={{ stroke: colors.neutral[200] }}
+                    
                   >
                     <Label 
                       value="Antall ikke hentet" 
@@ -385,7 +390,9 @@ function VisualizationSection({
                       style={{ 
                         fill: colors.secondary, 
                         fontSize: containerWidth < 500 ? '10px' : '12px',
-                        fontWeight: 500
+                        fontWeight: 500,
+                        textAnchor: "middle"
+
                       }}
                       offset={-45}
                     />

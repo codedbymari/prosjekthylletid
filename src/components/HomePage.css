@@ -78,18 +78,6 @@
   display: inline-block;
 }
 
-.highlight::after {
-  content: '';
-  position: absolute;
-  bottom: 5px;
-  left: 0;
-  width: 100%;
-  height: 8px;
-  background-color: rgba(125, 32, 58, 0.2);
-  z-index: -1;
-  border-radius: 4px;
-}
-
 .subtitle {
   color: var(--light-text);
   font-size: 1.rem;
@@ -132,25 +120,29 @@
 }
 
 .key-features {
-  margin-bottom: 1.8rem;
+  margin-bottom: 2.5rem;
+  width: 100%;
 }
 
 .key-features h2 {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   color: var(--text-color);
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
   position: relative;
   display: inline-block;
+  padding-bottom: 0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .key-features h2::after {
   content: '';
   position: absolute;
-  bottom: -6px;
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 50px;
+  width: 60px;
   height: 3px;
   background-color: var(--primary-color);
   border-radius: 3px;
@@ -159,41 +151,56 @@
 .features-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.2rem;
+  gap: 1.5rem;
 }
 
 .feature-item {
   background-color: white;
-  border-radius: 8px;
-  padding: 1.2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
-  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border-color);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .feature-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.05);
 }
 
 .feature-icon {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   color: var(--primary-color);
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;
+  background-color: rgba(125, 32, 58, 0.08);
+  padding: 0.6rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .feature-item h3 {
-  font-size: 1rem;
-  margin-bottom: 0.4rem;
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
   color: var(--text-color);
+  font-weight: 600;
 }
 
 .feature-item p {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--light-text);
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .login-section {
@@ -243,7 +250,6 @@
   color: var(--light-text);
 }
 
-/* Decorative elements */
 .decoration-element {
   display: none;
 }

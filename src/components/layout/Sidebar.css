@@ -36,20 +36,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px ;
+  padding: 10px;
   margin-bottom: 0px;
   background-color: var(--sidebar-header-color);
   cursor: pointer;
   position: relative;
   transition: background-color var(--transition-standard);
-  height: 106px;
+  min-height: 106px; 
+  height: auto; 
 }
-
 .user-profile:hover {
   background-color: #a54149;
 }
-
-/* Fjern hover-effekt på brukerprofilbilde */
 .user-profile.no-hover:hover .user-avatar {
   background-color: rgba(255, 255, 255, 0.2);
   transform: none;
@@ -421,6 +419,17 @@
   .content-area {
     margin-left: 0;
   }
+  .user-profile {
+    padding: 8px; 
+    min-height: auto; 
+  }
+  .user-name {
+    margin-bottom: 1px; 
+  }
+  .user-meta {
+    margin-top: 1px; 
+  }
+  
   
   .sidebar-overlay {
     --transition-standard: 0.2s ease;

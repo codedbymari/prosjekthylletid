@@ -29,58 +29,70 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <p>
-                  Prosjekt Hylletid optimaliserer bibliotekressurser ved å analysere hvor lenge bøker står på hentehyllen. 
-                  Målet er å redusere ventetid og forbedre tilgjengeligheten av populære titler.
+                Prosjektet har som mål å forbedre bibliotekets ressursutnyttelse ved å analysere hvor lenge bøker står uavhentet på hentehyllen. 
+                Målet er å redusere ventetid og gjøre populære titler raskere tilgjengelig for utlån.
+
+
                 </p>
               </div>
             </div>
             
             <div className="key-features">
-              <h2>Nøkkelfunksjoner</h2>
+            <h2>Funksjoner</h2>
               <div className="features-grid">
                 <div className="feature-item">
                   <div className="feature-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                      <path d="M12 2v6.5M12 13v9"></path>
+                      <path d="M19 6l-7-4-7 4"></path>
+                      <path d="M19 18l-7 4-7-4"></path>
                     </svg>
                   </div>
                   <h3>Datainnsamling</h3>
-                  <p>Strukturert innsamling av data om materialer på hentehyllen</p>
+                  <p>Strukturert uthenting av informasjon om materialer på hentehyllen</p>
                 </div>
                 
                 <div className="feature-item">
                   <div className="feature-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                      <line x1="3" y1="9" x2="21" y2="9"></line>
-                      <line x1="9" y1="21" x2="9" y2="9"></line>
+                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                     </svg>
                   </div>
                   <h3>Analyse</h3>
-                  <p>Avansert analyse av hylletid og utlånsmønstre</p>
+                  <p>Innsikt i hvor lenge bøker blir stående, og hvordan dette varierer over tid</p>
                 </div>
                 
                 <div className="feature-item">
                   <div className="feature-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
-                      <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                      <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                      <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                      <line x1="6" y1="6" x2="6" y2="6"></line>
+                      <line x1="6" y1="18" x2="6" y2="18"></line>
                     </svg>
                   </div>
                   <h3>Visualisering</h3>
-                  <p>Interaktive dashboards og rapporter</p>
+                  <p>Interaktive dashboards og rapporter som gjør dataene lettere å forstå</p>
                 </div>
                 
                 <div className="feature-item">
                   <div className="feature-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                      <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                      <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                      <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                      <path d="M10 7h4"></path>
+                      <path d="M7 10v4"></path>
+                      <path d="M17 10v4"></path>
+                      <path d="M10 17h4"></path>
                     </svg>
                   </div>
-                  <h3>Optimalisering</h3>
-                  <p>Anbefalinger for forbedring av hentefrister</p>
+                  <h3>Systemarkitektur</h3>
+                  <p>Komponentbasert frontend og backend med SQLite-database og API-er for datatilgang</p>
                 </div>
+                
               </div>
             </div>
             
