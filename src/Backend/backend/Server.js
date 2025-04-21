@@ -36,14 +36,14 @@ const db = new sqlite3.Database('./database.db', (err) => {
             }
         });
 
-        // Sjekk at tabellen 'laaner' finnes
-        db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='laaner'", (err, row) => {
+        // Sjekk at tabellen 'låner' finnes
+        db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='låner'", (err, row) => {
             if (err) {
-                console.error("Feil ved sjekk av tabell 'laaner':", err.message);
+                console.error("Feil ved sjekk av tabell 'låner':", err.message);
             } else if (!row) {
-                console.warn("Tabellen 'laaner' finnes ikke!");
+                console.warn("Tabellen 'låner' finnes ikke!");
             } else {
-                console.log("Tabellen 'laaner' finnes");
+                console.log("Tabellen 'låner' finnes");
             }
         });
     }
@@ -85,12 +85,27 @@ app.get("/låner", (req, res) => {
     });
 });
 
+// API-endepunlt for statistikk over antall reservasjoner per låner
+app.get('/statistikk', (req, res) => {
+    const query = `
+        SELECT låner.lånernummer, låner.fornavn, låner.etternavn, COUNT(*) AS antall_reservasjoner
+        FROM reservasjoner
+        JOIN låner ON reservasjoner.lånernummer = låner.lånernummer
+        GROUP BY låner.lånernummer;
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Feil ved henting av statistikk:", err);
+            return res.status(500).send('En feil oppstod ved henting av statistikk.');
+        }
+        res.json(rows);
+    });
+});
+
+
 const port= 5000;
 // Start serveren
 app.listen(port, () => {
     console.log(`Server kjører på http://localhost:${port}`);
 });
-
-
-
-
