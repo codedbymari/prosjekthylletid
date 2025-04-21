@@ -4,24 +4,50 @@ const app = express();
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-
-
 app.use(cors()); 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//åpner tilkoblingen SQLite-databasen
-let db;
-try {
-    //åpner en tilkobling
-    db = new sqlite3.Database("database.db");
-    //hvis vellykket:
-    console.log("Du er tilkoblet databasen");
-} catch (err) {
-    //hvis ikke:
-    console.error("Kunne ikke koble til database:", err.message);
-    process.exit(1);
-}
+// Koble til databasen
+const db = new sqlite3.Database('./database.db', (err) => {
+    if (err) {
+        console.error("Kunne ikke koble til database:", err.message);
+    } else {
+        console.log("Du er tilkoblet databasen");
+
+        db.all("SELECT name FROM sqlite_master WHERE type='table'", [], (err, rows) => {
+            if (err) {
+              console.error("Feil ved henting av tabeller:", err.message);
+            } else {
+              console.log("Tabeller i databasen:");
+              rows.forEach((row) => console.log(row.name));
+            }
+          });
+          
+
+        // Sjekk at tabellen 'reservasjoner' finnes
+        db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='reservasjoner'", (err, row) => {
+            if (err) {
+                console.error("Feil ved sjekk av tabell 'reservasjoner':", err.message);
+            } else if (!row) {
+                console.warn("Tabellen 'reservasjoner' finnes ikke!");
+            } else {
+                console.log("Tabellen 'reservasjoner' finnes");
+            }
+        });
+
+        // Sjekk at tabellen 'laaner' finnes
+        db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='laaner'", (err, row) => {
+            if (err) {
+                console.error("Feil ved sjekk av tabell 'laaner':", err.message);
+            } else if (!row) {
+                console.warn("Tabellen 'laaner' finnes ikke!");
+            } else {
+                console.log("Tabellen 'laaner' finnes");
+            }
+        });
+    }
+});
 
 //funksjon for å hente reserveringer
 function hentReservasjoner(callback){
