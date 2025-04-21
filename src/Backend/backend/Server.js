@@ -85,6 +85,45 @@ app.get("/låner", (req, res) => {
     });
 });
 
+// GET: Hent alle lånere med deres reservasjoner
+app.get('/låner', (req, res) => {
+    const query = `
+        SELECT låner.lånernummer, låner.fornavn, låner.etternavn, låner.epost, 
+               reservasjoner.bok_id, reservasjoner.status
+        FROM låner
+        LEFT JOIN reservasjoner ON låner.lånernummer = reservasjoner.lånernummer
+    `;
+ 
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Feil ved henting av lånere:", err);
+            return res.status(500).json({ error: err.message });
+        }
+ 
+        // Gruppere reservasjoner etter låner
+        const groupedLånere = rows.reduce((acc, row) => {
+            const { lånernummer, fornavn, etternavn, epost } = row;
+            if (!acc[lånernummer]) {
+                acc[lånernummer] = {
+                    lånernummer,
+                    fornavn,
+                    etternavn,
+                    epost,
+                    reservasjoner: []
+                };
+            }
+            acc[lånernummer].reservasjoner.push({
+                bok_id: row.bok_id,
+                status: row.status
+            });
+            return acc;
+        }, {});
+ 
+        // Send gruppene som et array
+        res.json(Object.values(groupedLånere));
+    });
+});
+
 // API-endepunlt for statistikk over antall reservasjoner per låner
 app.get('/statistikk', (req, res) => {
     const query = `
