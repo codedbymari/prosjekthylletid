@@ -6,6 +6,7 @@ import HomePage from './components/HomePage';
 import HomeDashboard from './components/HomeDashboard';
 import BorrowerDashboard from './components/BorrowerDashboard';
 import ReserveringDashboard from './components/reservation/ReserveringDashboard';
+import ReservasjonStatistikk from './components/reservation/reservasjonStatistikk';
 import './layout.css';
 import './App.css';
 
@@ -55,6 +56,7 @@ function AppLayout() {
             <Route path="/reservering/oversikt" element={<ReserveringDashboard />} />
             <Route path="/reservering/aktive" element={<ReserveringDashboard />} />
             <Route path="/reservering/innstillinger" element={<ReserveringDashboard />} />
+            <Route path="/statistikk" element={<ReservasjonStatistikk />} />
           </Routes>
         </div>
       </div>
