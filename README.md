@@ -2,6 +2,10 @@
 
 Dette prosjektet er et prototype dashboard som viser statistikk over hvor lenge lånemateriale står på hentehylla i biblioteksystemet Quria. 
 
+![image](https://github.com/user-attachments/assets/c37f9c19-af14-4d5e-8b20-34c5d3dc9a67)
+
+
+
 ## Innhold
 
 - [Om prosjektet](#om-prosjektet)
