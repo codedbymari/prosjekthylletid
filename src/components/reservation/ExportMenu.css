@@ -629,7 +629,6 @@ src/components/reservation/ExportMenu.css
   color: rgb(66, 2, 13);
 }
 
-
 .export-menu-dropdown {
   background-color: #ffffff;
   border-radius: 12px;
@@ -684,7 +683,7 @@ src/components/reservation/ExportMenu.css
   background-color: #6A0000;
 }
 
-/* Alternativ-panelet alias */
+
 .export-options-panel {
   background-color: #F3F4F7;
   padding: 20px;
@@ -702,14 +701,13 @@ label {
   display: block;
 }
 
-/* Eksport-knapper container alias */
+
 .export-menu-options {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-/* Eksport-knapp alias */
 .export-menu-item {
   background-color: #7d203a;
   color: white;
