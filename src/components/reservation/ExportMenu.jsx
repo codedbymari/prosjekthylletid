@@ -340,7 +340,7 @@ const ExportMenu = ({
                 onClick={handleExport}
               >
                 <FiFileText className="menu-icon" />
-                <span className="menu-text">Eksporter til CSV</span>
+                <span className="menu-text">Eksporter som Excel-fil</span>
               </button>
               
               <button 
@@ -350,6 +350,13 @@ const ExportMenu = ({
                 <FiPrinter className="menu-icon" />
                 <span className="menu-text">Skriv ut rapport</span>
               </button>
+               <button 
+              className="export-menu-item" 
+              onClick={handlePDFExport}
+            >
+              <FiFilePlus className="menu-icon" />
+              <span className="menu-text">Eksporter som PDF-fil</span>
+            </button>
             </div>
           )}
         </div>
