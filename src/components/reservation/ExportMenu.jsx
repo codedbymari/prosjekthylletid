@@ -182,7 +182,7 @@ const ExportMenu = ({
       {isOpen && (
         <div className="export-menu-dropdown">
           <div className="export-menu-header">
-            <h3>Eksporter data</h3>
+          < h3 style={{ color: '#800020', opacity: 0.8, fontWeight: 200 }}> Eksporter data:    </h3>
             <button 
               className="export-options-button" 
               onClick={toggleOptions}
