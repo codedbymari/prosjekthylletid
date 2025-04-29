@@ -13,6 +13,7 @@ const ExportMenu = ({
   pickupTimeLimit,
   reminderDays,
   showToast 
+  
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showExportOptions, setShowExportOptions] = useState(false);
@@ -23,6 +24,7 @@ const ExportMenu = ({
     dateFormat: 'norwegian', 
     dateRange: 'all' 
   });
+  
   const [customDateRange, setCustomDateRange] = useState({
     from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     to: new Date().toISOString().split('T')[0]
@@ -118,23 +120,53 @@ const ExportMenu = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `bibliotek_data_${timestamp}.csv`);
+  link.setAttribute('download', `NordreFollo_data.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     
-    showToast('Data eksportert til CSV-fil', 'success');
+    showToast('Data eksportert til excel-fil', 'success');
     setIsOpen(false);
     setShowExportOptions(false);
   };
-  
-  const handlePrint = () => {
-    window.print();
-    showToast('Utskriftsvindu åpnet', 'info');
+
+  // Function to generate PDF from data
+  const handlePDFExport = () => {
+    const doc = new jsPDF();
+
+    if (exportOptions.includeReservations) {
+      doc.text('RESERVASJONER', 10, 10);
+      doc.text('Tittel, Forfatter, Låner-ID, Klar dato, Hentefrist, Hentet dato, Status, Dager på hylla, Hentenummer', 10, 20);
+      materialData.forEach((item, index) => {
+        doc.text(`${item.title}, ${item.author}, ${item.borrowerId}, ${item.readyDate}, ${item.expiryDate}, ${item.pickedUpDate || ''}, ${item.status}, ${item.daysOnShelf !== null ? item.daysOnShelf : ''}, ${item.pickupNumber}`, 10, 30 + (index * 10));
+      });
+      doc.addPage();
+    }
+
+    if (exportOptions.includeReminders) {
+      doc.text('PÅMINNELSER', 10, 10);
+      doc.text('Tittel, Forfatter, Låner-ID, Klar dato, Hentefrist, Påminnelse sendt, Status', 10, 20);
+      reminderLogs.forEach((log, index) => {
+        doc.text(`${log.title}, ${log.author}, ${log.borrowerId}, ${log.readyDate}, ${log.expiryDate}, ${log.reminderSentDate}, ${log.status}`, 10, 30 + (index * 10));
+      });
+      doc.addPage();
+    }
+
+    if (exportOptions.includeStatistics) {
+      doc.text('STATISTIKK', 10, 10);
+      doc.text('Periode, Gjennomsnittlig hentetid (dager), Antall ikke hentet', 10, 20);
+      chartData.forEach((item, index) => {
+        doc.text(`${item.periode}, ${item.antallDager}, ${item.antallIkkeHentet}`, 10, 30 + (index * 10));
+      });
+    }
+
+    doc.save(`NordreFollo_data.pdf`);
+    showToast('Data eksportert til PDF', 'success');
     setIsOpen(false);
+    setShowExportOptions(false);
   };
-  
+
   return (
     <div className="export-menu-container" ref={menuRef}>
       <button 
