@@ -120,7 +120,7 @@ const ExportMenu = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-  link.setAttribute('download', `NordreFollo_data.csv`);
+    link.setAttribute('download', `NordreFollo_data.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -342,15 +342,7 @@ const ExportMenu = ({
                 <FiFileText className="menu-icon" />
                 <span className="menu-text">Eksporter som Excel-fil</span>
               </button>
-              
               <button 
-                className="export-menu-item" 
-                onClick={handlePrint}
-              >
-                <FiPrinter className="menu-icon" />
-                <span className="menu-text">Skriv ut rapport</span>
-              </button>
-               <button 
               className="export-menu-item" 
               onClick={handlePDFExport}
             >
