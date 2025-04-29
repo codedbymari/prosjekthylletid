@@ -135,6 +135,61 @@ function ReserveringDashboard() {
     }
   }, [materialData, pickupTimeLimit]); 
 
+
+     /* useEffect(() => {
+      const fetchData = async () => {
+        setIsLoading(true);
+        try {
+          const response = await axios.get("http://localhost:5000/reservasjoner");
+          const data = response.data;
+  
+          if (Array.isArray(data)) {
+            const filteredData = data.filter(item => item !== undefined && item !== null);
+            console.log("Filtrerte data:", filteredData);
+  
+            // Kartlegg dataene
+            const mappedData = filteredData.map(item => {
+              const reserved = parseNorwegianDate(item.reservert_dato);
+              const pickedUp = parseNorwegianDate(item.hentet_dato);
+              const shelfDate = pickedUp || new Date();
+            
+              const daysOnShelf = reserved && shelfDate
+                ? calculateDaysBetween(reserved, shelfDate)
+                : 0;
+            
+              return {
+                id: item.id,
+                title: item.tittel,
+                author: item.forfatter,
+                borrowerId: item.lanernummer,
+                reservedDate: item.reservert_dato,
+                readyDate: item.klar_dato,
+                pickedUpDate: item.hentet_dato,
+                status: item.status,
+                expiryDate: item.hentefrist,
+                daysOnShelf,
+                pickupNumber: item.hentenr,
+              };
+            });
+            
+  
+            console.log("Mapped data:", mappedData); // Debug
+            setMaterialData(mappedData);
+            
+          } else {
+            console.error("Forventet en array, men fikk noe annet:", data);
+          }
+        } catch (error) {
+          console.error("Feil ved henting av reservasjonene:", error);
+          showToast("Kunne ikke hente data fra serveren", "error");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      fetchData();
+    }, []); */
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
