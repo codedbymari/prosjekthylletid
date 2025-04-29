@@ -1,4 +1,4 @@
-/* src/components/reservation/ExportMenu.css */
+/* src/components/reservation/ExportMenu.css 
 .export-menu-container {
     position: relative;
   }
@@ -116,7 +116,7 @@
     color: #9d3353;
   }
   
-  /* Export */
+  /* Export
   .export-options-panel {
     padding: 16px;
     max-height: 70vh;
@@ -252,7 +252,7 @@
     background-color: #852c45;
   }
   
-  /* Responsive */
+  /* Responsive 
   @media (max-width: 768px) {
     .export-menu-dropdown {
       width: 280px;
@@ -293,9 +293,447 @@
     }
   }
   
-  /* Print*/
+  /* Print
   @media print {
     .export-menu-container {
       display: none;
     }
   }
+
+src/components/reservation/ExportMenu.css 
+.export-menu-container {
+    position: relative;
+  }
+  
+  .export-menu-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: white;
+    border: 1px solid #d0d6e6;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #384255;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .export-menu-button:hover {
+    background-color: #f0f2f9;
+    border-color: #a4adc1;
+  }
+  
+  .button-icon {
+    font-size: 16px;
+    color: #9d3353;
+  }
+  
+  .export-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 320px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.04);
+    z-index: 100;
+    overflow: hidden;
+    border: 1px solid rgba(208, 214, 230, 0.6);
+    animation: dropdown-appear 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  @keyframes dropdown-appear {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .export-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #f0f2f9;
+  }
+  
+  .export-menu-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #121826;
+  }
+  
+  .export-options-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: #3f8ca8;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .export-options-button:hover {
+    background-color: rgba(63, 140, 168, 0.08);
+  }
+  
+  .export-menu-options {
+    padding: 8px;
+  }
+  
+  .export-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 14px;
+    color: #384255;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .export-menu-item:hover {
+    background-color: #f0f2f9;
+  }
+  
+  .menu-icon {
+    font-size: 18px;
+    color: #9d3353;
+  }
+  
+  /* Export 
+  .export-options-panel {
+    padding: 16px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  .export-options-panel h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #384255;
+    margin: 16px 0 8px;
+  }
+  
+  .export-options-panel h4:first-child {
+    margin-top: 0;
+  }
+  
+  .export-option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .export-option-checkbox,
+  .export-option-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #606b85;
+    cursor: pointer;
+  }
+  
+  .export-option-checkbox input[type="checkbox"],
+  .export-option-radio input[type="radio"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: #9d3353;
+  }
+  
+  .checkbox-label,
+  .radio-label {
+    cursor: pointer;
+  }
+  
+  .custom-date-range {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 12px;
+    background-color: #f0f2f9;
+    border-radius: 8px;
+  }
+  
+  .date-range-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .date-range-field label {
+    font-size: 13px;
+    color: #384255;
+    font-weight: 500;
+  }
+  
+  .date-input-wrapper {
+    position: relative;
+  }
+  
+  .date-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #606b85;
+    pointer-events: none;
+  }
+  
+  .date-range-field input[type="date"] {
+    width: 100%;
+    padding: 8px 8px 8px 32px;
+    border: 1px solid #d0d6e6;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #384255;
+    background-color: white;
+  }
+  
+  .export-options-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f2f9;
+  }
+  
+  .cancel-options-button,
+  .apply-options-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .cancel-options-button {
+    background-color: transparent;
+    border: 1px solid #d0d6e6;
+    color: #606b85;
+  }
+  
+  .cancel-options-button:hover {
+    background-color: #f0f2f9;
+    border-color: #a4adc1;
+  }
+  
+  .apply-options-button {
+    background-color: #9d3353;
+    border: 1px solid #9d3353;
+    color: white;
+  }
+  
+  .apply-options-button:hover {
+    background-color: #852c45;
+  }
+  
+  /* Responsive 
+  @media (max-width: 768px) {
+    .export-menu-dropdown {
+      width: 280px;
+      right: -40px;
+    }
+    
+    .button-text {
+      display: none;
+    }
+    
+    .export-menu-button {
+      padding: 8px;
+    }
+    
+    .export-options-panel {
+      max-height: 400px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .export-menu-dropdown {
+      width: 260px;
+      right: -80px;
+    }
+    
+    .export-menu-item {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+    
+    .export-options-panel h4 {
+      font-size: 13px;
+    }
+    
+    .export-option-checkbox, 
+    .export-option-radio {
+      font-size: 13px;
+    }
+  }
+  
+  /* Print
+  @media print {
+    .export-menu-container {
+      display: none;
+    }
+  }
+ */
+
+/* src/components/reservation/ExportMenu.css */
+.export-menu-container {
+  position: relative;
+}
+
+.export-menu-button {
+  background-color: #7d203a;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.export-menu-button:hover {
+  background-color: white;
+  
+}
+
+.button-icon {
+  font-size: 16px;
+  color: rgb(66, 2, 13);
+}
+
+
+.export-menu-dropdown {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  padding: 20px;
+  max-width: 400px;
+  animation: fadeIn 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  border: 1px solid #e0e0e0;
+}
+
+@keyframes dropdown-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.export-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.export-menu-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #2835A5;
+}
+
+.export-options-button {
+  background-color: #800000;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.export-options-button:hover {
+  background-color: #6A0000;
+}
+
+/* Alternativ-panelet alias */
+.export-options-panel {
+  background-color: #F3F4F7;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+input[type="checkbox"] {
+  margin-right: 10px;
+}
+label {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Eksport-knapper container alias */
+.export-menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Eksport-knapp alias */
+.export-menu-item {
+  background-color: #7d203a;
+  color: white;
+  border: none;
+  padding: 4px 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.export-menu-item:hover {
+  background-color: #661a2f;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+
