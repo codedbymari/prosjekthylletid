@@ -28,7 +28,7 @@ function Reservations() {
                         <th>Lånernummer</th>
                         <th>Reservert dato</th>
                         <th>Klar dato</th>
-                        <th>Hente frist</th>
+                        <th>Hentefrist</th>
                         <th>Hentet dato</th>
                         <th>Status</th>
                         <th>Dager på hylle</th>
@@ -43,7 +43,7 @@ function Reservations() {
                             <td>{res.lånernummer}</td>
                             <td>{res.reservert_dato}</td>
                             <td>{res.klar_dato}</td>
-                            <td>{res.hente_frist}</td>
+                            <td>{res.hentefrist}</td>
                             <td>{res.hentet_dato || "Ikke hentet"}</td>
                             <td>{res.status}</td>
                             <td>{res.dager_på_hylle ?? "-"}</td>
