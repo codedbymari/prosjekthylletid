@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   FiCalendar, FiClock, FiBookOpen, 
-  FiMapPin, FiCheck, FiArrowRight, FiSearch,
-  FiUsers, FiChevronDown, FiHome, FiBook,
-  FiEye, FiFilter, FiEdit, FiX, FiSave, 
+  FiMapPin, FiCheck,
+  FiUsers, FiChevronDown, FiBook,
+  FiEye, FiEdit, FiX, FiSave, 
   FiTrash2, FiChevronUp, FiMapPin as FiLocation,
   FiAlertCircle
 } from 'react-icons/fi';
@@ -54,106 +54,18 @@ const HomeDashboard = () => {
     },
   ];
 
-  // Lytt etter endringer fra Sidebar
-  useEffect(() => {
-    const handleBranchChange = (event) => {
-      setCurrentBranch(event.detail);
-      setIsLoading(true);
-      
-      if (dashboardRef.current) {
-        dashboardRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    };
-    
-    window.addEventListener('branchChanged', handleBranchChange);
-    
-    return () => {
-      window.removeEventListener('branchChanged', handleBranchChange);
-    };
-  }, []);
-
-  // Last inn data når filialen endres
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      
-      try {
-        // Simuler lasting
-        await new Promise(r => setTimeout(r, 800));
-        
-        // Last arrangementer fra localStorage eller generer nye
-        const savedEvents = localStorage.getItem(`events-${currentBranch.id}`);
-        if (savedEvents) {
-          setEvents(JSON.parse(savedEvents));
-        } else {
-          const generatedEvents = generateEvents();
-          setEvents(generatedEvents);
-          localStorage.setItem(`events-${currentBranch.id}`, JSON.stringify(generatedEvents));
-        }
-        
-        // Generer populære titler med forskjellige data for hver filial
-        setPopularTitles(generatePopularTitles());
-        
-        // Oppdater CSS-variabler for filialens tema
-        document.documentElement.style.setProperty('--branch-primary', currentBranch.theme);
-        document.documentElement.style.setProperty('--branch-primary-light', adjustColor(currentBranch.theme, 20));
-        document.documentElement.style.setProperty('--branch-primary-dark', adjustColor(currentBranch.theme, -20));
-        document.documentElement.style.setProperty('--branch-primary-transparent', `${currentBranch.theme}1A`);
-        
-      } catch (error) {
-        console.error('Feil:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchData();
-  }, [currentBranch.id]);
-
-  // Animasjonsoppsett for elementer
-  useEffect(() => {
-    if (!isLoading && popularTitlesRef.current && eventsRef.current) {
-      const popularItems = popularTitlesRef.current.querySelectorAll('.popular-book-card');
-      const eventItems = eventsRef.current.querySelectorAll('.event-card');
-      
-      popularItems.forEach((item, i) => {
-        item.style.setProperty('--index', i);
-      });
-      
-      eventItems.forEach((item, i) => {
-        item.style.setProperty('--index', i);
-      });
-    }
-  }, [isLoading, popularTitles, events]);
-
-  // Håndter klikk utenfor filialmenyen
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (showBranchMenu && !e.target.closest('.branch-switcher')) {
-        setShowBranchMenu(false);
-      }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showBranchMenu]);
-
-  // Håndter klikk utenfor modaler
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (modalRef.current && !modalRef.current.contains(e.target) && 
-          !e.target.closest('.admin-button')) {
-        setShowEventDetails(false);
-        setShowEventEditor(false);
-      }
-    };
-    
-    if (showEventDetails || showEventEditor) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showEventDetails, showEventEditor]);
+  // Datoverktøy
+  const addDays = (date, days) => {
+    const result = new Date(date);
+    result.setDate(date.getDate() + days);
+    return result;
+  };
+  
+  const formatDate = (date) => {
+    return date.toLocaleDateString('no-NO', {
+      day: '2-digit', month: '2-digit', year: 'numeric'
+    });
+  };
 
   // Hjelpefunksjon for å justere fargelysstyrke
   const adjustColor = (hex, percent) => {
@@ -174,6 +86,7 @@ const HomeDashboard = () => {
   };
 
   // Hjelpefunksjoner for datagenerering
+  // FLYTTET OPP: defineringer av disse funksjonene
   const generateEvents = () => {
     const today = new Date();
     
@@ -320,20 +233,108 @@ const HomeDashboard = () => {
       ];
     }
   };
-  
-  // Datoverktøy
-  const addDays = (date, days) => {
-    const result = new Date(date);
-    result.setDate(date.getDate() + days);
-    return result;
-  };
-  
-  const formatDate = (date) => {
-    return date.toLocaleDateString('no-NO', {
-      day: '2-digit', month: '2-digit', year: 'numeric'
-    });
-  };
-  
+
+  // Lytt etter endringer fra Sidebar
+  useEffect(() => {
+    const handleBranchChange = (event) => {
+      setCurrentBranch(event.detail);
+      setIsLoading(true);
+      
+      if (dashboardRef.current) {
+        dashboardRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    
+    window.addEventListener('branchChanged', handleBranchChange);
+    
+    return () => {
+      window.removeEventListener('branchChanged', handleBranchChange);
+    };
+  }, []);
+
+  // Last inn data når filialen endres
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      
+      try {
+        // Simuler lasting
+        await new Promise(r => setTimeout(r, 800));
+        
+        // Last arrangementer fra localStorage eller generer nye
+        const savedEvents = localStorage.getItem(`events-${currentBranch.id}`);
+        if (savedEvents) {
+          setEvents(JSON.parse(savedEvents));
+        } else {
+          const generatedEvents = generateEvents();
+          setEvents(generatedEvents);
+          localStorage.setItem(`events-${currentBranch.id}`, JSON.stringify(generatedEvents));
+        }
+        
+        // Generer populære titler med forskjellige data for hver filial
+        setPopularTitles(generatePopularTitles());
+        
+        // Oppdater CSS-variabler for filialens tema
+        document.documentElement.style.setProperty('--branch-primary', currentBranch.theme);
+        document.documentElement.style.setProperty('--branch-primary-light', adjustColor(currentBranch.theme, 20));
+        document.documentElement.style.setProperty('--branch-primary-dark', adjustColor(currentBranch.theme, -20));
+        document.documentElement.style.setProperty('--branch-primary-transparent', `${currentBranch.theme}1A`);
+        
+      } catch (error) {
+        console.error('Feil:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [currentBranch.id, currentBranch.theme]);
+
+  // Animasjonsoppsett for elementer
+  useEffect(() => {
+    if (!isLoading && popularTitlesRef.current && eventsRef.current) {
+      const popularItems = popularTitlesRef.current.querySelectorAll('.popular-book-card');
+      const eventItems = eventsRef.current.querySelectorAll('.event-card');
+      
+      popularItems.forEach((item, i) => {
+        item.style.setProperty('--index', i);
+      });
+      
+      eventItems.forEach((item, i) => {
+        item.style.setProperty('--index', i);
+      });
+    }
+  }, [isLoading, popularTitles, events]);
+
+  // Håndter klikk utenfor filialmenyen
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showBranchMenu && !e.target.closest('.branch-switcher')) {
+        setShowBranchMenu(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showBranchMenu]);
+
+  // Håndter klikk utenfor modaler
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target) && 
+          !e.target.closest('.admin-button')) {
+        setShowEventDetails(false);
+        setShowEventEditor(false);
+      }
+    };
+    
+    if (showEventDetails || showEventEditor) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showEventDetails, showEventEditor]);
+
   // Hendelseshåndterere
   const handleBranchChange = (branch) => {
     setCurrentBranch(branch);
@@ -734,6 +735,7 @@ const HomeDashboard = () => {
                       <div 
                         className="attendance-fill" 
                         style={{width: `${(selectedEvent.attendees / selectedEvent.maxAttendees) * 100}%`}}
+                      
                       ></div>
                     </div>
                   </div>

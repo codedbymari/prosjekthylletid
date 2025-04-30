@@ -60,7 +60,7 @@ const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
   };
   
   const renderCustomBarLabel = (props) => {
-    const { x, y, width, height, value } = props;
+    const { x, y, width, value } = props;
     const radius = 10;
     
     return (

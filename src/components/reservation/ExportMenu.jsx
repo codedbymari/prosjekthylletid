@@ -1,7 +1,7 @@
 // src/components/reservation/ExportMenu.jsx
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { FiDownload, FiFilePlus, FiPrinter, FiFileText, FiChevronDown, FiCheck, FiX, FiSliders, FiCalendar } from 'react-icons/fi';
+import { FiDownload, FiFilePlus, FiFileText, FiCheck, FiX, FiSliders, FiCalendar } from 'react-icons/fi';
 import './ExportMenu.css';
 import { jsPDF } from "jspdf";  // Import jsPDF
 
