@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { FiDownload, FiFilePlus, FiFileText, FiCheck, FiX, FiSliders, FiCalendar } from 'react-icons/fi';
 import './ExportMenu.css';
 import { jsPDF } from "jspdf";  // Import jsPDF
+import autoTable from 'jspdf-autotable';
+
 
 const ExportMenu = ({ 
   materialData, 
@@ -132,40 +134,97 @@ const ExportMenu = ({
   };
 
   // Function to generate PDF from data
+
+
   const handlePDFExport = () => {
-    const doc = new jsPDF();
+   const doc = new jsPDF();
+ const primaryColor = '#7d203a';
+ const secondaryColor = '#9a3941';
 
-    if (exportOptions.includeReservations) {
-      doc.text('RESERVASJONER', 10, 10);
-      doc.text('Tittel, Forfatter, Låner-ID, Klar dato, Hentefrist, Hentet dato, Status, Dager på hylla, Hentenummer', 10, 20);
-      materialData.forEach((item, index) => {
-        doc.text(`${item.title}, ${item.author}, ${item.borrowerId}, ${item.readyDate}, ${item.expiryDate}, ${item.pickedUpDate || ''}, ${item.status}, ${item.daysOnShelf !== null ? item.daysOnShelf : ''}, ${item.pickupNumber}`, 10, 30 + (index * 10));
-      });
-      doc.addPage();
-    }
+// Title Header (on same page)
+doc.setFontSize(20);
+doc.setTextColor(primaryColor);
+ doc.text('Nordre Follo Reservasjon Rapport', 14, 20);
+doc.setFontSize(12);
+doc.setTextColor(100);
+doc.text(`Generert: ${new Date().toLocaleDateString()}`, 14, 28);
 
-    if (exportOptions.includeReminders) {
-      doc.text('PÅMINNELSER', 10, 10);
-      doc.text('Tittel, Forfatter, Låner-ID, Klar dato, Hentefrist, Påminnelse sendt, Status', 10, 20);
-      reminderLogs.forEach((log, index) => {
-        doc.text(`${log.title}, ${log.author}, ${log.borrowerId}, ${log.readyDate}, ${log.expiryDate}, ${log.reminderSentDate}, ${log.status}`, 10, 30 + (index * 10));
-      });
-      doc.addPage();
-    }
+let currentY = 38;
+ // Reservations
+ if (exportOptions.includeReservations) {
+ doc.setTextColor(primaryColor);
+ doc.setFontSize(16);
+ doc.text('Reservasjoner', 14, currentY);
+ currentY += 6;
 
-    if (exportOptions.includeStatistics) {
-      doc.text('STATISTIKK', 10, 10);
-      doc.text('Periode, Gjennomsnittlig hentetid (dager), Antall ikke hentet', 10, 20);
-      chartData.forEach((item, index) => {
-        doc.text(`${item.periode}, ${item.antallDager}, ${item.antallIkkeHentet}`, 10, 30 + (index * 10));
-      });
-    }
+ autoTable(doc, {
+  startY: currentY,
+head: [[
+'Tittel', 'Forfatter', 'Låner-ID', 'Klar dato', 'Hentefrist',
+'Hentet dato', 'Status', 'Dager på hylla', 'Hentenummer'
+ ]],
+ body: materialData.map(item => [
+ item.title, item.author, item.borrowerId, item.readyDate, item.expiryDate,
+ item.pickedUpDate || '', item.status, item.daysOnShelf ?? '', item.pickupNumber
+ ]),
+ styles: { fontSize: 9 },
+ headStyles: { fillColor: primaryColor },
+ });
 
-    doc.save(`NordreFollo_data.pdf`);
-    showToast('Data eksportert til PDF', 'success');
-    setIsOpen(false);
-    setShowExportOptions(false);
-  };
+ currentY = doc.lastAutoTable.finalY + 10;
+ }
+
+// Reminders
+ if (exportOptions.includeReminders) {
+ doc.setTextColor(primaryColor);
+ doc.setFontSize(16);
+ doc.text('Påminnelser', 14, currentY);
+ currentY += 6;
+
+ autoTable(doc, {
+ startY: currentY,
+head: [[
+ 'Tittel', 'Forfatter', 'Låner-ID', 'Klar dato', 'Hentefrist',
+ 'Påminnelse sendt', 'Status'
+ ]],
+ body: reminderLogs.map(log => [
+log.title, log.author, log.borrowerId, log.readyDate, log.expiryDate,
+ log.reminderSentDate, log.status
+ ]),
+ styles: { fontSize: 9 },
+ headStyles: { fillColor: secondaryColor },
+});
+
+ currentY = doc.lastAutoTable.finalY + 10;
+}
+
+// Statistics
+ if (exportOptions.includeStatistics) {
+ doc.setTextColor(primaryColor);
+doc.setFontSize(16);
+doc.text('Statistikk', 14, currentY);
+currentY += 6;
+
+autoTable(doc, {
+ startY: currentY,
+ head: [[
+ 'Periode', 'Gjennomsnittlig hentetid (dager)', 'Antall ikke hentet'
+ ]],
+body: chartData.map(item => [
+ item.periode, item.antallDager, item.antallIkkeHentet
+ ]),
+styles: { fontSize: 9 },
+headStyles: { fillColor: primaryColor },
+ });
+ }
+
+ doc.save('NordreFollo_data.pdf');
+ showToast('Data eksportert til PDF', 'success');
+ setIsOpen(false);
+ setShowExportOptions(false);
+};
+    
+    
 
   return (
     <div className="export-menu-container" ref={menuRef}>

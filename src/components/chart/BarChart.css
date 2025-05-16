@@ -48,6 +48,64 @@
   transition: filter 0.2s ease;
 }
 
+/* Enhanced styles for better readability */
+.chart-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.chart-helper-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* Enhanced tooltip styles */
+.custom-tooltip {
+  background-color: rgba(255, 255, 255, 0.97);
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 270px;
+  border: 1px solid rgba(225, 230, 240, 0.7);
+}
+
+.tooltip-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+/* Weekday highlight styles */
+.recharts-xAxis .recharts-cartesian-axis-tick text tspan {
+  font-weight: inherit;
+}
+
+.weekday-highlight {
+  font-weight: 600 !important;
+}
+
+/* Better visibility for bars */
+.recharts-bar-rectangle {
+  transition: opacity 0.2s ease;
+}
+
+.recharts-bar-rectangle:hover {
+  opacity: 0.85;
+}
+
+/* Legend improvements */
+.recharts-legend-item {
+  margin-right: 16px !important;
+}
+
+.recharts-legend-item-text {
+  margin-left: 6px !important;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .bar-chart-tooltip {
     font-size: 12px;
@@ -58,4 +116,29 @@
   .bar-chart-tooltip h4 {
     font-size: 13px;
   }
+  
+  .chart-title {
+    font-size: 14px;
+  }
+  
+  .chart-helper-text {
+    font-size: 11px;
+  }
+}
+
+/* Focus styles for accessibility */
+.recharts-dot:focus, 
+.recharts-bar-rectangle:focus {
+  outline: 2px solid #7d203a;
+  outline-offset: 2px;
+}
+
+/* Interactive elements highlight */
+.scatter-legend > div {
+  cursor: help;
+}
+
+.scatter-legend > div:hover {
+  background-color: rgba(240, 240, 240, 0.5);
+  border-radius: 4px;
 }

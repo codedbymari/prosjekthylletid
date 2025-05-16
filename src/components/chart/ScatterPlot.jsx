@@ -5,7 +5,7 @@ import colors from '../../utils/colors';
 import './BarChart.css';
 
 const ScatterPlot = ({ containerWidth = 600, containerHeight = 400 }) => {
-  //  data
+  // Data
   const scatterData = [
     { x: 1600, y: 1.0, title: 'Tørt land', author: 'Jørn Lier Horst' },
     { x: 1500, y: 1.2, title: 'Kongen av Os', author: 'Jo Nesbø' },
@@ -48,6 +48,7 @@ const ScatterPlot = ({ containerWidth = 600, containerHeight = 400 }) => {
     } : { r: 0, g: 0, b: 0 };
   };
   
+  // Enhanced tooltip for better clarity
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -55,23 +56,51 @@ const ScatterPlot = ({ containerWidth = 600, containerHeight = 400 }) => {
       
       return (
         <div className="custom-tooltip">
-          <p className="tooltip-title" style={{ color: colors.primary }}>{data.title}</p>
+          <p className="tooltip-title" style={{ 
+            color: colors.primary, 
+            fontWeight: 600,
+            borderBottom: `1px solid ${colors.neutral[200]}`,
+            paddingBottom: '6px',
+            marginBottom: '8px'
+          }}>{data.title}</p>
           <p>
             <span className="tooltip-label">Forfatter:</span>
-            <span className="tooltip-value" style={{ color: colors.neutral[900] }}>{data.author}</span>
+            <span className="tooltip-value" style={{ 
+              color: colors.neutral[900],
+              fontWeight: 500
+            }}>{data.author}</span>
           </p>
           <p>
             <span className="tooltip-label">Antall på venteliste:</span>
-            <span className="tooltip-value" style={{ color: pointColor }}>
+            <span className="tooltip-value" style={{ 
+              color: pointColor,
+              fontWeight: 600
+            }}>
               {data.x > 999 ? `${(data.x/1000).toFixed(1)}k` : data.x}
             </span>
           </p>
           <p>
             <span className="tooltip-label">Dager på hentehylla:</span>
-            <span className="tooltip-value" style={{ color: pointColor }}>
+            <span className="tooltip-value" style={{ 
+              color: pointColor,
+              fontWeight: 600
+            }}>
               {data.y.toFixed(1)}
             </span>
           </p>
+          
+          {/* info for bedre forståelse */}
+          <div style={{ 
+            marginTop: '8px', 
+            fontSize: '11px',
+            color: colors.neutral[600],
+            borderTop: `1px solid ${colors.neutral[200]}`,
+            paddingTop: '6px'
+          }}>
+            {data.x > 1000 ? 
+              'Populær bok som hentes raskt' : 
+              'Mindre etterspurt, lengre hentetid'}
+          </div>
         </div>
       );
     }
@@ -89,6 +118,17 @@ const ScatterPlot = ({ containerWidth = 600, containerHeight = 400 }) => {
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
+      <div className="chart-header" style={{ textAlign: 'center', marginBottom: '15px' }}>
+        <h3 style={{ 
+          fontSize: containerWidth < 500 ? '14px' : '16px', 
+          margin: '0 0 5px 0',
+          color: colors.neutral[800],
+          fontWeight: 600
+        }}>
+        </h3>
+       
+      </div>
+      
       <ResponsiveContainer width="100%" height={400}>
         <ScatterChart
           margin={getMargins()}
@@ -186,8 +226,84 @@ const ScatterPlot = ({ containerWidth = 600, containerHeight = 400 }) => {
               />
             ))}
           </Scatter>
+          
+          <svg>
+            <defs>
+              <linearGradient id="colorLegend" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor={colors.secondary} />
+                <stop offset="100%" stopColor={colors.primary} />
+              </linearGradient>
+            </defs>
+          </svg>
         </ScatterChart>
       </ResponsiveContainer>
+      
+      {/* bedre innsikt forklaring */}
+      <div className="scatter-legend" style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        margin: '15px 0',
+        flexWrap: 'wrap',
+        fontSize: containerWidth < 500 ? '11px' : '12px',
+        color: colors.neutral[700],
+        padding: '8px',
+        backgroundColor: 'rgba(245, 247, 250, 0.5)',
+        borderRadius: '4px'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          marginRight: '15px',
+          marginBottom: '5px'
+        }}>
+          <div style={{ 
+            width: '30px',
+            height: '10px',
+            background: `linear-gradient(to right, ${colors.secondary}, ${colors.primary})`,
+            marginRight: '5px',
+            borderRadius: '2px'
+          }}></div>
+          <span>Høyere popularitet</span>
+        </div>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          marginBottom: '5px'
+        }}>
+          <div style={{ 
+            width: '10px',
+            height: '10px',
+            border: '1px solid #ddd',
+            borderRadius: '50%',
+            marginRight: '5px',
+            position: 'relative'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '-5px',
+              left: '-5px',
+              width: '20px',
+              height: '20px',
+              border: '1px solid #ddd',
+              borderRadius: '50%',
+              opacity: 0.5
+            }}></div>
+          </div>
+          <span>Større sirkel = flere på venteliste</span>
+        </div>
+      </div>
+      
+      {/* Add interpretative hint to help users understand the chart */}
+      <div style={{ 
+        fontSize: '12px',
+        textAlign: 'center', 
+        color: colors.neutral[600],
+        marginTop: '5px',
+        fontStyle: 'italic'
+      }}>
+        Husk: Jo flere lånere på venteliste, jo raskere blir boken hentet. 
+      </div>
     </div>
   );
 };

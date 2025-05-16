@@ -192,12 +192,11 @@ body, html {
 /* Enhanced sidebar styling */
 .sidebar {
   position: fixed;
-  top: var(--header-height);
+  top: 0;
   left: 0;
   bottom: 0;
   width: var(--sidebar-width);
   background-color: var(--primary);
-  color: var(--primary-contrast);
   z-index: var(--z-sidebar);
   display: flex;
   flex-direction: column;

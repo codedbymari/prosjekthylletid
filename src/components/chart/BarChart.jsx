@@ -2,17 +2,7 @@
 import React from 'react';
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
 import './BarChart.css';
-const primaryBurgundy = "#7d203a";
-const primaryGreen = "#4a7c59";
 
-const palette = {
-  // farger
-  burgundy: {
-    main: "#7d203a",
-    light: "#9d405a",
-    dark: "#5d0020"
-  }
-};
 const BarChart = ({ 
   data, 
   containerWidth = 600, 
@@ -38,6 +28,7 @@ const BarChart = ({
     return { ...baseMargin, left: 60, right: 60 };
   };
   
+  // Enhanced tooltip with clearer visual hierarchy and more detailed information
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
@@ -48,7 +39,7 @@ const BarChart = ({
               <span className="tooltip-label">{entry.name}:</span>
               <span 
                 className="tooltip-value"
-                style={{ color: entry.color }}
+                style={{ color: entry.color, fontWeight: 600 }}
               >
                 {entry.name.includes('dager') ? 
                   `${entry.value.toFixed(1)} dager` : 
@@ -61,9 +52,30 @@ const BarChart = ({
     }
     return null;
   };
+
+  // Enhanced X-axis formatter to make weekdays more clear
+  const formatXAxisTick = (value) => {
+    // If value is a weekday (Mandag, Tirsdag, etc.), make it more prominent
+    const weekdays = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
+    if (weekdays.includes(value) || weekdays.some(day => value.includes(day))) {
+      return value;
+    }
+    return value;
+  };
   
   return (
     <div className="bar-chart">
+      {/* Add an explicit title for the chart to improve understanding */}
+      <div className="chart-title" style={{ 
+        textAlign: 'center', 
+        marginBottom: '10px',
+        fontSize: containerWidth < 500 ? '14px' : '16px',
+        color: '#333',
+        fontWeight: 600
+      }}>
+        {xAxisDataKey === "ukedag" ? "Aktivitet per ukedag" : "Oversikt"}
+      </div>
+
       <ResponsiveContainer width="100%" height="100%">
         <RechartsBarChart
           data={data}
@@ -74,10 +86,28 @@ const BarChart = ({
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis 
             dataKey={xAxisDataKey} 
-            tick={{ fontSize: containerWidth < 500 ? 10 : 12 }}
+            tick={{ 
+              fontSize: containerWidth < 500 ? 10 : 12,
+              fill: "#333",
+              fontWeight: xAxisDataKey === "ukedag" ? 600 : 400, // Make weekday text bolder
+            }}
             tickMargin={10}
             height={50}
             padding={{ left: 10, right: 10 }}
+            tickFormatter={formatXAxisTick}
+            label={
+              xAxisDataKey === "ukedag" ? {
+                value: "Ukedag",
+                position: "insideBottom",
+                offset: -10,
+                style: { 
+                  fill: "#555", 
+                  fontSize: containerWidth < 500 ? '10px' : '12px',
+                  textAnchor: 'middle',
+                  fontWeight: 500
+                }
+              } : null
+            }
           />
           <YAxis 
             yAxisId="left" 
@@ -95,7 +125,8 @@ const BarChart = ({
               style={{ 
                 fill: leftBarColor, 
                 fontSize: containerWidth < 500 ? '10px' : '12px',
-                textAnchor: 'middle'
+                textAnchor: 'middle',
+                fontWeight: 500
               }}
               offset={-45}
             />
@@ -115,7 +146,8 @@ const BarChart = ({
               style={{ 
                 fill: rightBarColor, 
                 fontSize: containerWidth < 500 ? '10px' : '12px',
-                textAnchor: 'middle'
+                textAnchor: 'middle',
+                fontWeight: 500
               }}
               offset={-45}
             />
@@ -146,6 +178,8 @@ const BarChart = ({
             radius={[4, 4, 0, 0]}
             animationDuration={800}
             animationEasing="ease-out"
+            // Add pattern or texture for better visual distinction
+            fillOpacity={0.9}
           />
           <Bar 
             yAxisId="right" 
@@ -156,9 +190,23 @@ const BarChart = ({
             animationDuration={800}
             animationEasing="ease-out"
             animationBegin={100}
+            // Add pattern or texture for better visual distinction
+            fillOpacity={0.9}
           />
         </RechartsBarChart>
       </ResponsiveContainer>
+
+      {/* Add helper text for weekday view to help users like Siri */}
+      {xAxisDataKey === "ukedag" && (
+        <div className="chart-helper-text" style={{
+          fontSize: containerWidth < 500 ? '11px' : '12px',
+          color: '#666',
+          textAlign: 'center',
+          marginTop: '10px'
+        }}>
+          Tips: Søyler viser aktivitet for hver ukedag. Høyere søyle betyr mer aktivitet.
+        </div>
+      )}
     </div>
   );
 };

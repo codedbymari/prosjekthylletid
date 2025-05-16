@@ -392,10 +392,11 @@ function ReserveringDashboard() {
   return (
     <div className="dashboard-wrapper">
       {/* Notification */}
-      <ToastNotification 
+      <ToastNotification
         visible={toast.visible}
         message={toast.message}
         type={toast.type}
+        onClose={() => setToast({ ...toast, visible: false })}
       />
       
       {isLoading ? (

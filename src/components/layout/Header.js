@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import './Header.css';
 
-const Header = () => {
+const Header = ({ isSidebarCollapsed }) => {
   const location = useLocation();
   const [pageTitle, setPageTitle] = useState('');
   const [activeTab, setActiveTab] = useState('oversikt');
@@ -45,20 +45,20 @@ const Header = () => {
 
   return (
     <>
-      <header className="app-header library-header">
+      <header className={`app-header library-header ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         <div className="header-content">
           <div className="page-title-wrapper">
-            <h1 className="page-title" style={{ marginLeft: '10px', color: '#6b7280' }}>
+            <h1 className="page-title">
               {pageTitle}
             </h1>
           </div>
           <div className="header-actions">
-            {}
+            {/* Header actions go here */}
           </div>
         </div>
         
         {showReservationTabs && (
-          <div className="nav-tabs">
+          <div className={`nav-tabs ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
             <Link 
               to="/reservering" 
               className={`nav-tab ${activeTab === 'oversikt' ? 'active' : ''}`}

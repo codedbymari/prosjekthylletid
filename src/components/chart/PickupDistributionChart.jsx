@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList, Legend } from 'recharts';
 import colors from '../../utils/colors';
 import './PickupDistributionChart.css';
+
 const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
   const calculateCumulative = () => {
     let cumulative = 0;
@@ -19,20 +20,30 @@ const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
   
   const dataWithCumulative = calculateCumulative();
   
-  const totalPickedUp = data
-    .filter(item => item.day !== "Ikke hentet")
-    .reduce((sum, item) => sum + item.percentage, 0);
+  // Highlight the day with highest pickup percentage
+  const pickupData = dataWithCumulative.filter(item => item.day !== "Ikke hentet");
+  const maxPickupItem = pickupData.reduce((prev, current) => 
+    (prev.percentage > current.percentage) ? prev : current, { percentage: 0 });
   
+  const totalPickedUp = pickupData.reduce((sum, item) => sum + item.percentage, 0);
   const notPickedUp = data.find(item => item.day === "Ikke hentet")?.percentage || 0;
   
-  //  tooltip
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const item = payload[0].payload;
       
+      // more descriptive day label
+      let dayLabel = item.day;
+      if (item.day !== "Ikke hentet") {
+        //  description for which day has most pickups
+        if (item.day === maxPickupItem.day) {
+          dayLabel = `${item.day} (Mest populær hentedag!)`;
+        }
+      }
+      
       return (
         <div className="custom-tooltip">
-          <p className="tooltip-title">{item.day}</p>
+          <p className="tooltip-title">{dayLabel}</p>
           <p className="tooltip-item">
             <span className="tooltip-label">Prosentandel:</span>
             <span className="tooltip-value" style={{ color: item.day === "Ikke hentet" ? colors.error : colors.primary }}>
@@ -41,7 +52,7 @@ const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
           </p>
           {item.cumulativePercentage !== null && (
             <p className="tooltip-item">
-              <span className="tooltip-label">Kumulativ prosentandel:</span>
+              <span className="tooltip-label">Totalt hentet til nå:</span>
               <span className="tooltip-value" style={{ color: colors.secondary }}>
                 {item.cumulativePercentage}%
               </span>
@@ -60,20 +71,21 @@ const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
   };
   
   const renderCustomBarLabel = (props) => {
-    const { x, y, width, value } = props;
+    const { x, y, width, value, index } = props;
     const radius = 10;
+    const isMaxDay = dataWithCumulative[index]?.day === maxPickupItem.day;
     
     return (
       <g>
         <text 
           x={x + width / 2} 
           y={y - radius} 
-          fill="#606b85" 
+          fill="#384255" 
           textAnchor="middle" 
           dominantBaseline="middle"
           style={{
             fontSize: containerWidth < 500 ? '10px' : '12px',
-            fontWeight: '500'
+            fontWeight: isMaxDay ? '700' : '500'
           }}
         >
           {value}%
@@ -81,16 +93,52 @@ const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
       </g>
     );
   };
+
+  const CustomXAxisTick = (props) => {
+    const { x, y, payload } = props;
+    const isMaxDay = payload.value === maxPickupItem.day;
+    
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text 
+          x={0} 
+          y={0} 
+          dy={16} 
+          textAnchor="middle" 
+          fill={isMaxDay ? colors.primary : colors.neutral[700]}
+          style={{
+            fontSize: containerWidth < 500 ? '10px' : '12px',
+            fontWeight: isMaxDay ? '700' : '500'
+          }}
+        >
+          {payload.value}
+        </text>
+        {isMaxDay && (
+          <text 
+            x={0} 
+            y={18} 
+            dy={16} 
+            textAnchor="middle" 
+            fill={colors.primary}
+            style={{
+              fontSize: containerWidth < 500 ? '8px' : '10px',
+              fontWeight: '500'
+            }}
+          >
+            ★ Mest populær
+          </text>
+        )}
+      </g>
+    );
+  };
+
+
+    
+
   
   return (
     <div className="pickup-distribution-chart">
-      <div className="distribution-chart-header">
-        <h3 className="chart-title">Fordeling av hentetid</h3>
-        <p className="chart-description">
-          Viser når lånere henter sine reservasjoner etter at de er lagt på hentehylla
-        </p>
-      </div>
-      
+     
       <div className="chart-container" style={{ height: 350 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -99,19 +147,16 @@ const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
               top: 30, 
               right: containerWidth < 500 ? 10 : 30, 
               left: containerWidth < 500 ? 10 : 20, 
-              bottom: 50 
+              bottom: 60 
             }}
             barCategoryGap={containerWidth < 500 ? 3 : 8}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={colors.neutral[200]} />
             <XAxis 
               dataKey="day" 
-              tick={{ 
-                fill: colors.neutral[700],
-                fontSize: containerWidth < 500 ? 10 : 12
-              }}
+              tick={<CustomXAxisTick />}
               tickMargin={10}
-              height={50}
+              height={60}
             />
             <YAxis 
               tickFormatter={(value) => `${value}%`}
@@ -121,10 +166,17 @@ const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
               }}
               domain={[0, 100]}
               allowDecimals={false}
+              label={{ 
+                value: 'Prosentandel', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fill: colors.neutral[700], fontSize: containerWidth < 500 ? 10 : 12 }
+              }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Bar 
               dataKey="percentage" 
+              name="Prosentandel hentet"
               radius={[4, 4, 0, 0]}
               animationDuration={800}
               animationEasing="ease-out"
@@ -139,9 +191,11 @@ const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
                   key={`cell-${index}`} 
                   fill={entry.day === "Ikke hentet" 
                     ? colors.error 
-                    : entry.percentage > 15
+                    : entry.day === maxPickupItem.day
                       ? colors.primary
-                      : colors.primaryLight
+                      : entry.percentage > 15
+                        ? colors.primary
+                        : colors.primaryLight
                   }
                   stroke={entry.day === "Ikke hentet" ? colors.error : colors.primary}
                   strokeWidth={0.5}
@@ -152,7 +206,7 @@ const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
         </ResponsiveContainer>
       </div>
       
-      {/* oppsummering */}
+      {/* Oppsummering med forbedret lesbarhet */}
       <div className="distribution-insights">
         <div className="insight-metric">
           <span className="insight-value">{totalPickedUp}%</span>
