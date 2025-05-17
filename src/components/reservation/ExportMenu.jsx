@@ -122,7 +122,7 @@ const ExportMenu = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `NordreFollo_data.csv`);
+    link.setAttribute('download', `NordreFollo_data_${timestamp}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -138,90 +138,91 @@ const ExportMenu = ({
 
   const handlePDFExport = () => {
    const doc = new jsPDF();
- const primaryColor = '#7d203a';
- const secondaryColor = '#9a3941';
+   const timestamp = getTimestamp();
+   const primaryColor = '#7d203a';
+   const secondaryColor = '#9a3941';
 
-// Title Header (on same page)
-doc.setFontSize(20);
-doc.setTextColor(primaryColor);
- doc.text('Nordre Follo Reservasjon Rapport', 14, 20);
-doc.setFontSize(12);
-doc.setTextColor(100);
-doc.text(`Generert: ${new Date().toLocaleDateString()}`, 14, 28);
+  // Title Header (on same page)
+  doc.setFontSize(20);
+  doc.setTextColor(primaryColor);
+  doc.text('Nordre Follo Reservasjon Rapport', 14, 20);
+  doc.setFontSize(12);
+  doc.setTextColor(100);
+  doc.text(`Generert: ${new Date().toLocaleDateString()}`, 14, 28);
 
-let currentY = 38;
- // Reservations
- if (exportOptions.includeReservations) {
- doc.setTextColor(primaryColor);
- doc.setFontSize(16);
- doc.text('Reservasjoner', 14, currentY);
- currentY += 6;
+  let currentY = 38;
+  // Reservations
+  if (exportOptions.includeReservations) {
+    doc.setTextColor(primaryColor);
+    doc.setFontSize(16);
+    doc.text('Reservasjoner', 14, currentY);
+    currentY += 6;
 
- autoTable(doc, {
-  startY: currentY,
-head: [[
-'Tittel', 'Forfatter', 'Låner-ID', 'Klar dato', 'Hentefrist',
-'Hentet dato', 'Status', 'Dager på hylla', 'Hentenummer'
- ]],
- body: materialData.map(item => [
- item.title, item.author, item.borrowerId, item.readyDate, item.expiryDate,
- item.pickedUpDate || '', item.status, item.daysOnShelf ?? '', item.pickupNumber
- ]),
- styles: { fontSize: 9 },
- headStyles: { fillColor: primaryColor },
- });
+    autoTable(doc, {
+      startY: currentY,
+      head: [[
+        'Tittel', 'Forfatter', 'Låner-ID', 'Klar dato', 'Hentefrist',
+        'Hentet dato', 'Status', 'Dager på hylla', 'Hentenummer'
+      ]],
+      body: materialData.map(item => [
+        item.title, item.author, item.borrowerId, item.readyDate, item.expiryDate,
+        item.pickedUpDate || '', item.status, item.daysOnShelf ?? '', item.pickupNumber
+      ]),
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: primaryColor },
+    });
 
- currentY = doc.lastAutoTable.finalY + 10;
- }
+    currentY = doc.lastAutoTable.finalY + 10;
+  }
 
-// Reminders
- if (exportOptions.includeReminders) {
- doc.setTextColor(primaryColor);
- doc.setFontSize(16);
- doc.text('Påminnelser', 14, currentY);
- currentY += 6;
+  // Reminders
+  if (exportOptions.includeReminders) {
+    doc.setTextColor(primaryColor);
+    doc.setFontSize(16);
+    doc.text('Påminnelser', 14, currentY);
+    currentY += 6;
 
- autoTable(doc, {
- startY: currentY,
-head: [[
- 'Tittel', 'Forfatter', 'Låner-ID', 'Klar dato', 'Hentefrist',
- 'Påminnelse sendt', 'Status'
- ]],
- body: reminderLogs.map(log => [
-log.title, log.author, log.borrowerId, log.readyDate, log.expiryDate,
- log.reminderSentDate, log.status
- ]),
- styles: { fontSize: 9 },
- headStyles: { fillColor: secondaryColor },
-});
+    autoTable(doc, {
+      startY: currentY,
+      head: [[
+        'Tittel', 'Forfatter', 'Låner-ID', 'Klar dato', 'Hentefrist',
+        'Påminnelse sendt', 'Status'
+      ]],
+      body: reminderLogs.map(log => [
+        log.title, log.author, log.borrowerId, log.readyDate, log.expiryDate,
+        log.reminderSentDate, log.status
+      ]),
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: secondaryColor },
+    });
 
- currentY = doc.lastAutoTable.finalY + 10;
-}
+    currentY = doc.lastAutoTable.finalY + 10;
+  }
 
-// Statistics
- if (exportOptions.includeStatistics) {
- doc.setTextColor(primaryColor);
-doc.setFontSize(16);
-doc.text('Statistikk', 14, currentY);
-currentY += 6;
+  // Statistics
+  if (exportOptions.includeStatistics) {
+    doc.setTextColor(primaryColor);
+    doc.setFontSize(16);
+    doc.text('Statistikk', 14, currentY);
+    currentY += 6;
 
-autoTable(doc, {
- startY: currentY,
- head: [[
- 'Periode', 'Gjennomsnittlig hentetid (dager)', 'Antall ikke hentet'
- ]],
-body: chartData.map(item => [
- item.periode, item.antallDager, item.antallIkkeHentet
- ]),
-styles: { fontSize: 9 },
-headStyles: { fillColor: primaryColor },
- });
- }
+    autoTable(doc, {
+      startY: currentY,
+      head: [[
+        'Periode', 'Gjennomsnittlig hentetid (dager)', 'Antall ikke hentet'
+      ]],
+      body: chartData.map(item => [
+        item.periode, item.antallDager, item.antallIkkeHentet
+      ]),
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: primaryColor },
+    });
+  }
 
- doc.save('NordreFollo_data.pdf');
- showToast('Data eksportert til PDF', 'success');
- setIsOpen(false);
- setShowExportOptions(false);
+  doc.save(`NordreFollo_data_${timestamp}.pdf`);
+  showToast('Data eksportert til PDF', 'success');
+  setIsOpen(false);
+  setShowExportOptions(false);
 };
     
     

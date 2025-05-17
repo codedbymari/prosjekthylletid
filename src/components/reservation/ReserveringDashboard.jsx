@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './ReserveringDashboard.css';
 import { generateMockData } from '../../mockData';
-import { FiHelpCircle } from 'react-icons/fi';
+// Removed unused import FiHelpCircle
 import StatisticsSection from './StatisticsSection';
 import VisualizationSection from './VisualizationSection';
 import ReservationList from './ReservationList';
@@ -10,7 +10,7 @@ import SettingsPanel from './SettingsPanel';
 import ToastNotification from '../common/ToastNotification';
 import LoadingSpinner from '../common/LoadingSpinner';
 import PrintableReports from './PrintableReports';
-import axios from 'axios';
+// Removed unused import axios - it's commented out in the actual fetch logic
 
 import { formatDateNorwegian, parseNorwegianDate, calculateDaysBetween } from '../../utils/dateUtils';
 
@@ -38,7 +38,7 @@ function ReserveringDashboard() {
   // Instillinger 
   const [pickupTimeLimit, setPickupTimeLimit] = useState(7);
   const [reminderDays, setReminderDays] = useState(2);
-  const [tempSettings, setTempSettings] = useState(null);
+  // Removed unused state tempSettings and setTempSettings
   
   // Data 
   const [materialData, setMaterialData] = useState([]);
@@ -77,18 +77,18 @@ function ReserveringDashboard() {
     setTimeout(() => setToast({ visible: false, message: '', type: 'success' }), 3000);
   };
 
-  // Expiry date calculation
-  const calculateExpiryDate = (readyDate) => {
+  // Expiry date calculation - now defined with useCallback to avoid dependency issues
+  const calculateExpiryDate = useCallback((readyDate) => {
     if (!readyDate) return null;
     const date = parseNorwegianDate(readyDate);
     if (!date) return null;
     
     date.setDate(date.getDate() + pickupTimeLimit);
     return formatDateNorwegian(date);
-  };
+  }, [pickupTimeLimit]);
 
-  // kalkulere hentetid fordeling data
-  const calculatePickupDistribution = () => {
+  // kalkulere hentetid fordeling data - now defined with useCallback to avoid dependency issues
+  const calculatePickupDistribution = useCallback(() => {
     // Group items by how many days they spent on the shelf
     const dayGroups = {};
     const pickedUpItems = materialData.filter(item => item.pickedUpDate);
@@ -125,7 +125,7 @@ function ReserveringDashboard() {
     });
     
     return distributionData;
-  };
+  }, [materialData, pickupTimeLimit]);
 
   // oppdatere pickup distribution data når den relevante dataen forandres
   useEffect(() => {
@@ -133,7 +133,7 @@ function ReserveringDashboard() {
       const distributionData = calculatePickupDistribution();
       setPickupDistributionData(distributionData);
     }
-  }, [materialData, pickupTimeLimit]); 
+  }, [materialData, pickupTimeLimit, calculatePickupDistribution]); 
 
 
      /* useEffect(() => {
@@ -290,7 +290,7 @@ function ReserveringDashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [calculateExpiryDate]);
 
   //For å hente data
   /*

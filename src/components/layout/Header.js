@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import './Header.css';
 
@@ -7,7 +7,8 @@ const Header = ({ isSidebarCollapsed }) => {
   const [pageTitle, setPageTitle] = useState('');
   const [activeTab, setActiveTab] = useState('oversikt');
   
-  const routeTitles = {
+  // Wrap routeTitles in useMemo so it doesn't get recreated on every render
+  const routeTitles = useMemo(() => ({
     '/': 'Hjem',
     '/låner': 'Låner',
     '/reservering': 'Reservering',
@@ -17,7 +18,7 @@ const Header = ({ isSidebarCollapsed }) => {
     '/fjernlån': 'Fjernlån',
     '/arrangementer': 'Arrangementer',
     '/oppsett': 'Oppsett'
-  };
+  }), []);
   
   useEffect(() => {
     const path = location.pathname;
@@ -39,7 +40,7 @@ const Header = ({ isSidebarCollapsed }) => {
         setActiveTab('oversikt');
       }
     }
-  }, [location]);
+  }, [location, routeTitles]);
 
   const showReservationTabs = location.pathname.startsWith('/reservering');
 

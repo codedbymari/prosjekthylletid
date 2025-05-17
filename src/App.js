@@ -6,7 +6,6 @@ import HomePage from './components/HomePage';
 import HomeDashboard from './components/HomeDashboard';
 import BorrowerDashboard from './components/BorrowerDashboard';
 import ReserveringDashboard from './components/reservation/ReserveringDashboard';
-import ReservasjonStatistikk from './components/reservation/reservasjonStatistikk';
 import ToastNotification from './components/common/ToastNotification'; 
 import PagePlaceholder from './components/layout/PagePlaceholder';
 import './layout.css';

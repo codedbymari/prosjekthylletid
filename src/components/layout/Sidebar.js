@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 
 function Sidebar() {
@@ -8,7 +8,6 @@ function Sidebar() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const location = useLocation();
   
   // Get selected branch from localStorage or use Kolbotn as default
   const [selectedBranch, setSelectedBranch] = useState(() => {
@@ -20,18 +19,14 @@ function Sidebar() {
   const profileModalRef = useRef(null);
   const sidebarRef = useRef(null);
   const toggleButtonRef = useRef(null);
-  const contentAreaRef = useRef(null);
   const navigate = useNavigate();
   
   // List of branches
   const branches = ['Kolbotn', 'Ski'];
   
-  // List of active and placeholder routes
-  const activeRoutes = ['/hjem', '/låner', '/reservering'];
-  const placeholderRoutes = ['/samlinger', '/innkjøp', '/fjernlån', '/arrangementer', '/statistikk', '/oppsett', '/hjelp'];
-  
   // Function to update toggle button position and content margin
-  const updatePositions = () => {
+  // Wrapped in useCallback to prevent recreation on every render
+  const updatePositions = useCallback(() => {
     const sidebar = sidebarRef.current;
     const toggleButton = toggleButtonRef.current;
     const contentArea = document.querySelector('.content-area');
@@ -51,20 +46,19 @@ function Sidebar() {
         contentArea.style.marginLeft = '0';
       }
     }
-  };
+  }, [isOpen, isMobile]); // Dependencies for updatePositions
   
   useEffect(() => {
     document.body.classList.toggle('sidebar-collapsed', !isOpen);
     
     // Update positions after sidebar state change
-    // Use double requestAnimationFrame to ensure CSS transitions complete
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         updatePositions();
       });
     });
-  }, [isOpen]);
-  
+  }, [isOpen, updatePositions]); // Now updatePositions is stable
+
   useEffect(() => {
     const handleResize = () => {
       const newIsMobile = window.innerWidth <= 768;
@@ -90,7 +84,7 @@ function Sidebar() {
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isMobile]);
+  }, [isMobile, updatePositions]); // Now updatePositions is stable
   
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -268,15 +262,7 @@ function Sidebar() {
     );
   };
 
-  // Handle "back" action for PagePlaceholder
-  const handlePlaceholderBack = () => {
-    navigate(-1);
-  };
-
-  // Handle "home" action for PagePlaceholder
-  const handlePlaceholderHome = () => {
-    navigate('/hjem');
-  };
+ 
 
   return (
     <>

@@ -85,155 +85,6 @@ const HomeDashboard = () => {
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   };
 
-  // Hjelpefunksjoner for datagenerering
-  // FLYTTET OPP: defineringer av disse funksjonene
-  const generateEvents = () => {
-    const today = new Date();
-    
-    return [
-      {
-        id: 1,
-        title: 'Forfattermøte: Agnes Ravatn',
-        description: 'Samtale om boken "Dei sju dørene" med forfatter Agnes Ravatn. Arrangementet er gratis, men krever påmelding på forhånd.',
-        date: formatDate(addDays(today, 2)),
-        time: '18:00 - 19:30',
-        location: currentBranch.name,
-        attendees: 28,
-        maxAttendees: 50,
-        isNew: true,
-        isFeatured: false
-      },
-      {
-        id: 2,
-        title: 'Lesestund for barn 3-5 år',
-        description: 'Vi leser fra nye barnebøker og har det gøy med rim og regler. Passer for barn mellom 3 og 5 år. Foreldre må være til stede.',
-        date: formatDate(addDays(today, 4)),
-        time: '10:30 - 11:15',
-        location: `${currentBranch.name}, Barneavdelingen`,
-        attendees: 12,
-        maxAttendees: 15,
-        isNew: false,
-        isFeatured: false
-      },
-      {
-        id: 3,
-        title: 'Digital kompetanse for seniorer',
-        description: 'Lær å bruke nettbrett og smartphone. Ta gjerne med eget utstyr. Vi har også nettbrett til utlån under kurset.',
-        date: formatDate(addDays(today, 1)),
-        time: '13:00 - 15:00',
-        location: `${currentBranch.name}, Datarommet`,
-        attendees: 8,
-        maxAttendees: 12,
-        isNew: false,
-        isFeatured: false
-      },
-      {
-        id: 4,
-        title: 'Språkkafé',
-        description: 'Praktiser norsk i en uformell setting. Alle språknivåer er velkomne. Kaffe og te serveres.',
-        date: formatDate(addDays(today, 0)),
-        time: '17:00 - 18:30',
-        location: `${currentBranch.name}, Kafé Lesehesten`,
-        attendees: 18,
-        maxAttendees: 30,
-        isNew: false,
-        isFeatured: true
-      }
-    ].sort((a, b) => new Date(a.date) - new Date(b.date));
-  };
-
-  const generatePopularTitles = () => {
-    // Forskjellige populære bøker for hver filial for å vise visuell endring
-    if (currentBranch.id === 'b1') {
-      return [
-        {
-          id: 1, title: 'Kongeriket', author: 'Jo Nesbø',
-          weeklyCount: 14, monthlyCount: 42, yearlyCount: 156,
-          available: true, category: 'Krim'
-        },
-        {
-          id: 2, title: 'Kniv', author: 'Jo Nesbø',
-          weeklyCount: 11, monthlyCount: 38, yearlyCount: 134,
-          available: false, category: 'Krim'
-        },
-        {
-          id: 3, title: 'Gleden med skjeden', 
-          author: 'Nina Brochmann & Ellen Støkken Dahl',
-          weeklyCount: 8, monthlyCount: 29, yearlyCount: 97,
-          available: true, category: 'Fakta'
-        },
-        {
-          id: 4, title: 'Hjernen er stjernen', author: 'Kaja Nordengen',
-          weeklyCount: 7, monthlyCount: 26, yearlyCount: 88,
-          available: true, category: 'Fakta'
-        },
-        {
-          id: 5, title: 'Arv og Miljø', author: 'Vigdis Hjorth',
-          weeklyCount: 6, monthlyCount: 22, yearlyCount: 79,
-          available: false, category: 'Skjønnlitteratur'
-        }
-      ];
-    } else if (currentBranch.id === 'b2') {
-      return [
-        {
-          id: 1, title: 'Doppler', author: 'Erlend Loe',
-          weeklyCount: 16, monthlyCount: 45, yearlyCount: 167,
-          available: true, category: 'Skjønnlitteratur'
-        },
-        {
-          id: 2, title: 'Bli best med mental trening', author: 'Erik Bertrand Larssen',
-          weeklyCount: 13, monthlyCount: 41, yearlyCount: 142,
-          available: true, category: 'Fakta'
-        },
-        {
-          id: 3, title: 'Svøm med dem som drukner', 
-          author: 'Lars Mytting',
-          weeklyCount: 10, monthlyCount: 32, yearlyCount: 105,
-          available: false, category: 'Skjønnlitteratur'
-        },
-        {
-          id: 4, title: 'Snømannen', author: 'Jo Nesbø',
-          weeklyCount: 9, monthlyCount: 28, yearlyCount: 94,
-          available: false, category: 'Krim'
-        },
-        {
-          id: 5, title: 'Kunsten å høre hjerteslag', author: 'Jan-Philipp Sendker',
-          weeklyCount: 7, monthlyCount: 25, yearlyCount: 82,
-          available: true, category: 'Skjønnlitteratur'
-        }
-      ];
-    } else {
-      return [
-        {
-          id: 1, title: 'Bienes historie', author: 'Maja Lunde',
-          weeklyCount: 15, monthlyCount: 44, yearlyCount: 162,
-          available: false, category: 'Skjønnlitteratur'
-        },
-        {
-          id: 2, title: 'Min kamp 1', author: 'Karl Ove Knausgård',
-          weeklyCount: 12, monthlyCount: 40, yearlyCount: 138,
-          available: true, category: 'Skjønnlitteratur'
-        },
-        {
-          id: 3, title: 'Kilden', 
-          author: 'Anne Holt',
-          weeklyCount: 9, monthlyCount: 31, yearlyCount: 103,
-          available: true, category: 'Krim'
-        },
-        {
-          id: 4, title: 'Å tenke, fort og langsomt', author: 'Daniel Kahneman',
-          weeklyCount: 8, monthlyCount: 27, yearlyCount: 91,
-          available: true, category: 'Fakta'
-        },
-        {
-          id: 5, title: 'Beatles', author: 'Lars Saabye Christensen',
-          weeklyCount: 6, monthlyCount: 24, yearlyCount: 80,
-          available: false, category: 'Skjønnlitteratur'
-        }
-      ];
-    }
-  };
-
   // Lytt etter endringer fra Sidebar
   useEffect(() => {
     const handleBranchChange = (event) => {
@@ -254,6 +105,154 @@ const HomeDashboard = () => {
 
   // Last inn data når filialen endres
   useEffect(() => {
+    // Move functions inside useEffect to fix dependency issue
+    const generateEvents = () => {
+      const today = new Date();
+      
+      return [
+        {
+          id: 1,
+          title: 'Forfattermøte: Agnes Ravatn',
+          description: 'Samtale om boken "Dei sju dørene" med forfatter Agnes Ravatn. Arrangementet er gratis, men krever påmelding på forhånd.',
+          date: formatDate(addDays(today, 2)),
+          time: '18:00 - 19:30',
+          location: currentBranch.name,
+          attendees: 28,
+          maxAttendees: 50,
+          isNew: true,
+          isFeatured: false
+        },
+        {
+          id: 2,
+          title: 'Lesestund for barn 3-5 år',
+          description: 'Vi leser fra nye barnebøker og har det gøy med rim og regler. Passer for barn mellom 3 og 5 år. Foreldre må være til stede.',
+          date: formatDate(addDays(today, 4)),
+          time: '10:30 - 11:15',
+          location: `${currentBranch.name}, Barneavdelingen`,
+          attendees: 12,
+          maxAttendees: 15,
+          isNew: false,
+          isFeatured: false
+        },
+        {
+          id: 3,
+          title: 'Digital kompetanse for seniorer',
+          description: 'Lær å bruke nettbrett og smartphone. Ta gjerne med eget utstyr. Vi har også nettbrett til utlån under kurset.',
+          date: formatDate(addDays(today, 1)),
+          time: '13:00 - 15:00',
+          location: `${currentBranch.name}, Datarommet`,
+          attendees: 8,
+          maxAttendees: 12,
+          isNew: false,
+          isFeatured: false
+        },
+        {
+          id: 4,
+          title: 'Språkkafé',
+          description: 'Praktiser norsk i en uformell setting. Alle språknivåer er velkomne. Kaffe og te serveres.',
+          date: formatDate(addDays(today, 0)),
+          time: '17:00 - 18:30',
+          location: `${currentBranch.name}, Kafé Lesehesten`,
+          attendees: 18,
+          maxAttendees: 30,
+          isNew: false,
+          isFeatured: true
+        }
+      ].sort((a, b) => new Date(a.date) - new Date(b.date));
+    };
+
+    const generatePopularTitles = () => {
+      // Forskjellige populære bøker for hver filial for å vise visuell endring
+      if (currentBranch.id === 'b1') {
+        return [
+          {
+            id: 1, title: 'Kongeriket', author: 'Jo Nesbø',
+            weeklyCount: 14, monthlyCount: 42, yearlyCount: 156,
+            available: true, category: 'Krim'
+          },
+          {
+            id: 2, title: 'Kniv', author: 'Jo Nesbø',
+            weeklyCount: 11, monthlyCount: 38, yearlyCount: 134,
+            available: false, category: 'Krim'
+          },
+          {
+            id: 3, title: 'Gleden med skjeden', 
+            author: 'Nina Brochmann & Ellen Støkken Dahl',
+            weeklyCount: 8, monthlyCount: 29, yearlyCount: 97,
+            available: true, category: 'Fakta'
+          },
+          {
+            id: 4, title: 'Hjernen er stjernen', author: 'Kaja Nordengen',
+            weeklyCount: 7, monthlyCount: 26, yearlyCount: 88,
+            available: true, category: 'Fakta'
+          },
+          {
+            id: 5, title: 'Arv og Miljø', author: 'Vigdis Hjorth',
+            weeklyCount: 6, monthlyCount: 22, yearlyCount: 79,
+            available: false, category: 'Skjønnlitteratur'
+          }
+        ];
+      } else if (currentBranch.id === 'b2') {
+        return [
+          {
+            id: 1, title: 'Doppler', author: 'Erlend Loe',
+            weeklyCount: 16, monthlyCount: 45, yearlyCount: 167,
+            available: true, category: 'Skjønnlitteratur'
+          },
+          {
+            id: 2, title: 'Bli best med mental trening', author: 'Erik Bertrand Larssen',
+            weeklyCount: 13, monthlyCount: 41, yearlyCount: 142,
+            available: true, category: 'Fakta'
+          },
+          {
+            id: 3, title: 'Svøm med dem som drukner', 
+            author: 'Lars Mytting',
+            weeklyCount: 10, monthlyCount: 32, yearlyCount: 105,
+            available: false, category: 'Skjønnlitteratur'
+          },
+          {
+            id: 4, title: 'Snømannen', author: 'Jo Nesbø',
+            weeklyCount: 9, monthlyCount: 28, yearlyCount: 94,
+            available: false, category: 'Krim'
+          },
+          {
+            id: 5, title: 'Kunsten å høre hjerteslag', author: 'Jan-Philipp Sendker',
+            weeklyCount: 7, monthlyCount: 25, yearlyCount: 82,
+            available: true, category: 'Skjønnlitteratur'
+          }
+        ];
+      } else {
+        return [
+          {
+            id: 1, title: 'Bienes historie', author: 'Maja Lunde',
+            weeklyCount: 15, monthlyCount: 44, yearlyCount: 162,
+            available: false, category: 'Skjønnlitteratur'
+          },
+          {
+            id: 2, title: 'Min kamp 1', author: 'Karl Ove Knausgård',
+            weeklyCount: 12, monthlyCount: 40, yearlyCount: 138,
+            available: true, category: 'Skjønnlitteratur'
+          },
+          {
+            id: 3, title: 'Kilden', 
+            author: 'Anne Holt',
+            weeklyCount: 9, monthlyCount: 31, yearlyCount: 103,
+            available: true, category: 'Krim'
+          },
+          {
+            id: 4, title: 'Å tenke, fort og langsomt', author: 'Daniel Kahneman',
+            weeklyCount: 8, monthlyCount: 27, yearlyCount: 91,
+            available: true, category: 'Fakta'
+          },
+          {
+            id: 5, title: 'Beatles', author: 'Lars Saabye Christensen',
+            weeklyCount: 6, monthlyCount: 24, yearlyCount: 80,
+            available: false, category: 'Skjønnlitteratur'
+          }
+        ];
+      }
+    };
+
     const fetchData = async () => {
       setIsLoading(true);
       
@@ -288,7 +287,7 @@ const HomeDashboard = () => {
     };
     
     fetchData();
-  }, [currentBranch.id, currentBranch.theme]);
+  }, [currentBranch.id, currentBranch.theme, currentBranch.name]);
 
   // Animasjonsoppsett for elementer
   useEffect(() => {
@@ -753,7 +752,7 @@ const HomeDashboard = () => {
                 >
                   Lukk
                 </button>
-                <button 
+                <button
                   className="modal-button primary"
                   onClick={() => {
                     setShowEventDetails(false);

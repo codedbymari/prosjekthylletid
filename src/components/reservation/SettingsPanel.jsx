@@ -1,7 +1,7 @@
 // src/components/reservation/SettingsPanel.jsx
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { FiSettings, FiClock, FiMail, FiX, FiSave } from 'react-icons/fi';
+import { FiClock, FiMail, FiX, FiSave } from 'react-icons/fi';
 
 function SettingsPanel({ 
   pickupTimeLimit, 

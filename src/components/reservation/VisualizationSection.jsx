@@ -1,13 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { 
-  FiBarChart2, 
-  FiInfo, 
-  FiTrendingUp, 
-  FiTrendingDown, 
-  FiArrowUp, 
-  FiArrowDown,
-  FiHelpCircle,
+  FiBarChart2,
+  FiInfo,
   FiPieChart,
   FiGrid,
   FiCalendar,
@@ -42,7 +37,6 @@ function VisualizationSection({
   showToast
 }) {
   const [statisticsView, setStatisticsView] = useState('weekly');
-  const [showInsights, setShowInsights] = useState(false);
   const [chartType, setChartType] = useState('barChart'); // 'barChart', 'scatterPlot', 'distribution'
   const [showIntro, setShowIntro] = useState(true);
   const [showGlossary, setShowGlossary] = useState(false);
@@ -157,62 +151,6 @@ function VisualizationSection({
   
   const mostActiveDay = findMostActiveDay();
   
-  const getChartTrend = () => {
-    if (chartData.length < 2) return { trend: 'neutral', icon: FiInfo };
-    
-    const firstValue = chartData[0].antallDager;
-    const lastValue = chartData[chartData.length - 1].antallDager;
-    const trend = lastValue < firstValue ? 'positive' : lastValue > firstValue ? 'negative' : 'neutral';
-    
-    const percentChange = firstValue !== 0 
-      ? Math.abs(Math.round(((lastValue - firstValue) / firstValue) * 100)) 
-      : 0;
-    
-    let trendIcon;
-    if (trend === 'positive') {
-      trendIcon = percentChange > 10 ? FiTrendingDown : FiArrowDown;
-    } else if (trend === 'negative') {
-      trendIcon = percentChange > 10 ? FiTrendingUp : FiArrowUp;
-    } else {
-      trendIcon = FiInfo;
-    }
-    
-    return { trend, icon: trendIcon, percentChange };
-  };
-  
-  const getNotPickedUpTrend = () => {
-    if (chartData.length < 2) return { trend: 'neutral', icon: FiInfo };
-    
-    const firstValue = chartData[0].antallIkkeHentet;
-    const lastValue = chartData[chartData.length - 1].antallIkkeHentet;
-    const trend = lastValue < firstValue ? 'positive' : lastValue > firstValue ? 'negative' : 'neutral';
-    
-    const percentChange = firstValue !== 0 
-      ? Math.abs(Math.round(((lastValue - firstValue) / firstValue) * 100)) 
-      : 0;
-    
-    let trendIcon;
-    if (trend === 'positive') {
-      trendIcon = percentChange > 10 ? FiTrendingDown : FiArrowDown;
-    } else if (trend === 'negative') {
-      trendIcon = percentChange > 10 ? FiTrendingUp : FiArrowUp;
-    } else {
-      trendIcon = FiInfo;
-    }
-    
-    return { trend, icon: trendIcon, percentChange };
-  };
-  
-  const { trend: pickupTrend, icon: PickupTrendIcon, percentChange: pickupChange } = getChartTrend();
-  const { trend: notPickedUpTrend, icon: NotPickedUpTrendIcon, percentChange: notPickedUpChange } = getNotPickedUpTrend();
-
-  const getBarFill = (entry) => {
-    if (statisticsView === 'weekly' && mostActiveDay && entry.periode === mostActiveDay.day) {
-      return "url(#highlightGradient)";
-    }
-    return "url(#primaryGradient)";
-  };
-
   const IntroductionPanel = () => (
     <div className="intro-panel">
       <div className="intro-header">
