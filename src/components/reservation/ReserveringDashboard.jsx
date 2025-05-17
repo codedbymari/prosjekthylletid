@@ -318,7 +318,7 @@ function ReserveringDashboard() {
   */
 
   const handleBorrowerClick = (borrowerId) => {
-    navigate(`/låner/${borrowerId}`);
+    navigate(`/laaner/${borrowerId}`);
     showToast(`Navigerer til lånerdetaljer for: ${borrowerId}`, 'info');
   };
 

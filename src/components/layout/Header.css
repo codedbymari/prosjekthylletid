@@ -91,12 +91,10 @@ body.sidebar-collapsed .nav-tabs {
   font-size: 0.875rem;
   font-weight: 500;
   border-bottom: 0px solid transparent;
-  transition: all 0.2s ease;
 }
 
 .nav-tab:hover {
-  color: #334155;
-  background-color: rgba(0, 0, 0, 0.03);
+  color: #7d203a;
 }
 
 .nav-tab.active {

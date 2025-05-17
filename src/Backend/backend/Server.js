@@ -76,7 +76,7 @@ app.get('/reservasjoner', (req, res) => {
 });
 
 // API-endepunkt for å hente lånere
-app.get("/låner", (req, res) => {
+app.get("/laaner", (req, res) => {
     hentLånere((err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -86,7 +86,7 @@ app.get("/låner", (req, res) => {
 });
 
 // GET: Hent alle lånere med deres reservasjoner
-app.get('/låner', (req, res) => {
+app.get('/laaner', (req, res) => {
     const query = `
         SELECT låner.lånernummer, låner.fornavn, låner.etternavn, låner.epost, 
                reservasjoner.bok_id, reservasjoner.status

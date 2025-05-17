@@ -6,7 +6,7 @@ const Låner = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/låner")
+    axios.get("http://localhost:5000/laaner")
       .then((response) => {
         setLånere(response.data);  // Her bruker du setLånere og ikke setReservasjoner
       })

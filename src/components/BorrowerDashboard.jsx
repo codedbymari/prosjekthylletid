@@ -414,7 +414,7 @@ function BorrowerDashboard() {
             )}
 
             <div className="navigation-link">
-              <Link to="/låner">← Tilbake til låneroversikt</Link>
+              <Link to="/laaner">← Tilbake til låneroversikt</Link>
             </div>
           </>
         )}
@@ -472,7 +472,7 @@ function BorrowerDashboard() {
                     <td>{reservation.title}</td>
                     <td>{reservation.author}</td>
                     <td>
-                      <Link to={`/låner/${reservation.borrower.id}`} className="borrower-link">
+                      <Link to={`/laaner/${reservation.borrower.id}`} className="borrower-link">
                         {reservation.borrower.id}
                       </Link>
                     </td>

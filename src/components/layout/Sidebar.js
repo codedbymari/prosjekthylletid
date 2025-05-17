@@ -1,15 +1,22 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import './Sidebar.css';
+import UnavailableFeatureTooltip from './UnavailableFeatureTooltip';
 
-function Sidebar() {
-  // Change to true so sidebar is open by default
+function Sidebar({ unavailableRoutes = [], onUnavailableFeature }) {
+  // sidebar is open by default
   const [isOpen, setIsOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [hoveredUnavailableItem, setHoveredUnavailableItem] = useState(null);
   
-  // Get selected branch from localStorage or use Kolbotn as default
+  // State for tooltip
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+  const [tooltipMessage, setTooltipMessage] = useState('');
+  
+  // use Kolbotn as default
   const [selectedBranch, setSelectedBranch] = useState(() => {
     const saved = localStorage.getItem('currentBranch');
     return saved ? JSON.parse(saved).name : 'Kolbotn';
@@ -19,27 +26,25 @@ function Sidebar() {
   const profileModalRef = useRef(null);
   const sidebarRef = useRef(null);
   const toggleButtonRef = useRef(null);
+  const itemRefs = useRef({});
   const navigate = useNavigate();
+  const location = useLocation();
   
   // List of branches
   const branches = ['Kolbotn', 'Ski'];
   
-  // Function to update toggle button position and content margin
-  // Wrapped in useCallback to prevent recreation on every render
+
   const updatePositions = useCallback(() => {
     const sidebar = sidebarRef.current;
     const toggleButton = toggleButtonRef.current;
     const contentArea = document.querySelector('.content-area');
     
     if (sidebar && toggleButton && contentArea) {
-      // Get the sidebar's right edge position
       const sidebarRightEdge = sidebar.getBoundingClientRect().right;
       
-      // Set the toggle button's left position
       toggleButton.style.left = `${sidebarRightEdge}px`;
       
-      // Set content margin based on sidebar state
-      // In mobile view, content area should not have a margin
+
       if (!isMobile) {
         contentArea.style.marginLeft = isOpen ? '240px' : '60px';
       } else {
@@ -51,25 +56,21 @@ function Sidebar() {
   useEffect(() => {
     document.body.classList.toggle('sidebar-collapsed', !isOpen);
     
-    // Update positions after sidebar state change
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         updatePositions();
       });
     });
-  }, [isOpen, updatePositions]); // Now updatePositions is stable
-
+  }, [isOpen, updatePositions]); 
   useEffect(() => {
     const handleResize = () => {
       const newIsMobile = window.innerWidth <= 768;
       setIsMobile(newIsMobile);
       
-      // If switching to mobile, automatically collapse sidebar
       if (newIsMobile && !isMobile) {
         setIsOpen(false);
       }
       
-      // Update positions on resize
       requestAnimationFrame(() => {
         updatePositions();
       });
@@ -102,6 +103,12 @@ function Sidebar() {
           !event.target.closest('.sidebar-edge-toggle')) {
         setIsOpen(false);
       }
+      
+      // Close tooltip when clicking outside
+      if (tooltipVisible && !event.target.closest('.unavailable') && 
+          !event.target.closest('.unavailable-feature-tooltip')) {
+        setTooltipVisible(false);
+      }
     };
     
     const handleKeyDown = (event) => {
@@ -112,6 +119,8 @@ function Sidebar() {
           setUserMenuOpen(false);
         } else if (isOpen && isMobile) {
           setIsOpen(false);
+        } else if (tooltipVisible) {
+          setTooltipVisible(false);
         }
       }
       
@@ -129,7 +138,7 @@ function Sidebar() {
       document.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, userMenuOpen, showProfileModal, navigate, isMobile]);
+  }, [isOpen, userMenuOpen, showProfileModal, navigate, isMobile, tooltipVisible]);
   
   // Listen for changes from HomeDashboard
   useEffect(() => {
@@ -170,7 +179,6 @@ function Sidebar() {
       theme: '#7d203a',
     };
     
-    // Save to localStorage and dispatch to HomeDashboard
     localStorage.setItem('currentBranch', JSON.stringify(branchData));
     window.dispatchEvent(new CustomEvent('branchChanged', { detail: branchData }));
   };
@@ -191,12 +199,73 @@ function Sidebar() {
     setUserMenuOpen(false);
   };
 
+  const handleMouseEnter = (path) => {
+    if (unavailableRoutes && unavailableRoutes.includes(path)) {
+      setHoveredUnavailableItem(path);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredUnavailableItem(null);
+  };
+
+  const handleUnavailableClick = (e, path) => {
+    e.preventDefault();
+    
+    // Get position of the clicked item for tooltip placement
+    if (itemRefs.current[path]) {
+      const rect = itemRefs.current[path].getBoundingClientRect();
+      const position = {
+        top: rect.top + rect.height / 2,
+        left: rect.left + rect.width + 20, // Position to the right of the sidebar item
+      };
+      
+      // Set tooltip message based on the route
+      let message = 'Denne funksjonen er ikke tilgjengelig i prototypen';
+      
+      if (path === '/fjernlån') {
+        message = 'Fjernlån-funksjonen kommer i en senere versjon av prototypen';
+      } else if (path === '/innkjøp') {
+        message = 'Innkjøp-funksjonen er under utvikling';
+      } else if (path === '/oppsett') {
+        message = 'Oppsett er kun tilgjengelig for administratorer';
+      }
+      
+      // Show the tooltip with position and message
+      setTooltipPosition(position);
+      setTooltipMessage(message);
+      setTooltipVisible(true);
+      
+      // Also call the original handler if provided
+      if (onUnavailableFeature) {
+        onUnavailableFeature(e, path, position);
+      }
+    }
+  };
+
+  // Handler to close the tooltip
+  const handleCloseTooltip = () => {
+    setTooltipVisible(false);
+  };
+
   // Handler for navigation links
   const handleNavLinkClick = (path, e) => {
+    // Check if route is unavailable
+    if (unavailableRoutes && unavailableRoutes.includes(path)) {
+      handleUnavailableClick(e, path);
+      return;
+    }
+
     // On mobile, close the sidebar
     if (isMobile) {
       closeSidebar();
     }
+  };
+
+  // Function to check if a path is currently active
+  const isActive = (path) => {
+    const currentPath = '/' + location.pathname.split('/')[1];
+    return currentPath === path;
   };
 
   // Icon mapping for the menu items
@@ -208,7 +277,7 @@ function Sidebar() {
           <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
         </svg>
       ),
-      '/låner': (
+      '/laaner': (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
         </svg>
@@ -261,8 +330,6 @@ function Sidebar() {
       </svg>
     );
   };
-
- 
 
   return (
     <>
@@ -349,7 +416,7 @@ function Sidebar() {
           <ul className="main-menu">
             {[
               { path: '/hjem', text: 'Hjem' },
-              { path: '/låner', text: 'Lånere' },
+              { path: '/laaner', text: 'Lånere' },
               { path: '/samlinger', text: 'Samlinger' },
               { path: '/reservering', text: 'Reservering' },
               { path: '/innkjøp', text: 'Innkjøp' },
@@ -357,36 +424,89 @@ function Sidebar() {
               { path: '/arrangementer', text: 'Arrangementer' },
               { path: '/statistikk', text: 'Statistikk' },
               { path: '/oppsett', text: 'Oppsett' }
-            ].map((item) => (
-              <li key={item.path}>
-                <NavLink 
-                  to={item.path} 
-                  className={({isActive}) => `${isActive ? 'active' : ''} ${!isOpen ? 'icon-only' : ''}`} 
-                  onClick={(e) => handleNavLinkClick(item.path, e)}
-                  title={item.text}
+            ].map((item) => {
+              const isUnavailable = unavailableRoutes && unavailableRoutes.includes(item.path);
+              const isItemActive = isActive(item.path);
+              const isItemHovered = hoveredUnavailableItem === item.path;
+              
+              return (
+                <li 
+                  key={item.path}
+                  ref={el => itemRefs.current[item.path] = el}
+                  onMouseEnter={() => handleMouseEnter(item.path)}
+                  onMouseLeave={handleMouseLeave}
+                  className={isUnavailable ? 'unavailable' : ''}
                 >
-                  <span className="menu-icon" aria-hidden="true">
-                    {getIconForRoute(item.path)}
-                  </span>
-                  {isOpen && <span className="menu-text">{item.text}</span>}
-                </NavLink>
-              </li>
-            ))}
+                  {isUnavailable ? (
+                    <a 
+                      href="#" 
+                      className={`${isItemActive ? 'active' : ''} ${!isOpen ? 'icon-only' : ''}`}
+                      onClick={(e) => handleUnavailableClick(e, item.path)}
+                      title={item.text}
+                    >
+                      <span className="menu-icon" aria-hidden="true">
+                        {getIconForRoute(item.path)}
+                      </span>
+                      {isOpen && <span className="menu-text">{item.text}</span>}
+                      {isOpen && isItemHovered && (
+                        <div className="unavailable-tooltip">
+                        </div>
+                      )}
+                    </a>
+                  ) : (
+                    <NavLink 
+                      to={item.path} 
+                      className={({isActive}) => `${isActive ? 'active' : ''} ${!isOpen ? 'icon-only' : ''}`} 
+                      onClick={(e) => handleNavLinkClick(item.path, e)}
+                      title={item.text}
+                    >
+                      <span className="menu-icon" aria-hidden="true">
+                        {getIconForRoute(item.path)}
+                      </span>
+                      {isOpen && <span className="menu-text">{item.text}</span>}
+                    </NavLink>
+                  )}
+                </li>
+              );
+            })}
           </ul>
           
           <ul className="bottom-menu">
-            <li className="help-menu-item">
-              <NavLink 
-                to="/hjelp" 
-                className={({isActive}) => `help-link ${isActive ? 'active' : ''} ${!isOpen ? 'icon-only' : ''}`} 
-                onClick={(e) => handleNavLinkClick('/hjelp', e)}
-                title="Hjelp (F1)"
-              >
-                <span className="menu-icon" aria-hidden="true">
-                  {getIconForRoute('/hjelp')}
-                </span>
-                {isOpen && <span className="menu-text">Hjelp (F1)</span>}
-              </NavLink>
+            <li 
+              className="help-menu-item"
+              ref={el => itemRefs.current['/hjelp'] = el}
+              onMouseEnter={() => handleMouseEnter('/hjelp')}
+              onMouseLeave={handleMouseLeave}
+            >
+              {unavailableRoutes && unavailableRoutes.includes('/hjelp') ? (
+                <a 
+                  href="#" 
+                  className={`help-link ${isActive('/hjelp') ? 'active' : ''} ${!isOpen ? 'icon-only' : ''}`}
+                  onClick={(e) => handleUnavailableClick(e, '/hjelp')}
+                  title="Hjelp (F1)"
+                >
+                  <span className="menu-icon" aria-hidden="true">
+                    {getIconForRoute('/hjelp')}
+                  </span>
+                  {isOpen && <span className="menu-text">Hjelp (F1)</span>}
+                  {isOpen && hoveredUnavailableItem === '/hjelp' && (
+                    <div className="unavailable-tooltip">
+                    </div>
+                  )}
+                </a>
+              ) : (
+                <NavLink 
+                  to="/hjelp" 
+                  className={({isActive}) => `help-link ${isActive ? 'active' : ''} ${!isOpen ? 'icon-only' : ''}`} 
+                  onClick={(e) => handleNavLinkClick('/hjelp', e)}
+                  title="Hjelp (F1)"
+                >
+                  <span className="menu-icon" aria-hidden="true">
+                    {getIconForRoute('/hjelp')}
+                  </span>
+                  {isOpen && <span className="menu-text">Hjelp (F1)</span>}
+                </NavLink>
+              )}
             </li>
           </ul>
         </div>
@@ -399,17 +519,18 @@ function Sidebar() {
         onClick={toggleSidebar} 
         aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path
             d={isOpen
               ? "M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"
               : "M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"}
-            fill="white"
+            fill="currentColor"
           />
         </svg>
       </button>
       
       {/* Profile settings modal */}
+      
       {showProfileModal && (
         <div className="modal-overlay">
           <div className="modal profile-modal" ref={profileModalRef}>
@@ -445,7 +566,7 @@ function Sidebar() {
                   <label htmlFor="current-password">Nåværende passord</label>
                   <input 
                     type="password" 
-                    id="current-password" 
+                    id="current-password"
                     placeholder="••••••••"
                     disabled
                   />
@@ -518,8 +639,18 @@ function Sidebar() {
           </div>
         </div>
       )}
+
+{tooltipVisible && (
+  <UnavailableFeatureTooltip
+    position={tooltipPosition}
+    message={tooltipMessage}
+    onClose={handleCloseTooltip}
+  />
+)}
+
     </>
   );
+  
 }
 
 export default Sidebar;

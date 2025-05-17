@@ -208,9 +208,6 @@ function StatisticsSection({ statistics, pickupTimeLimit, reminderDays, material
               </div>
             </div>
             
-            <div className="stat-additional-info">
-              Totalt {materialData.length} reservasjoner i systemet
-            </div>
             
             {activeExplanation === 'active-res' && (
               <div className="stat-explanation">

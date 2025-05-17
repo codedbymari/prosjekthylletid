@@ -6,12 +6,13 @@ const Header = ({ isSidebarCollapsed }) => {
   const location = useLocation();
   const [pageTitle, setPageTitle] = useState('');
   const [activeTab, setActiveTab] = useState('oversikt');
-  
-  // Wrap routeTitles in useMemo so it doesn't get recreated on every render
+
   const routeTitles = useMemo(() => ({
     '/': 'Hjem',
-    '/låner': 'Låner',
+    '/laaner': 'Låner',
     '/reservering': 'Reservering',
+    '/reservering/aktive': 'Aktive reserveringer',
+    '/reservering/innstillinger': 'Innstillinger',
     '/statistikk': 'Statistikk',
     '/innkjøp': 'Innkjøp',
     '/samlinger': 'Samlinger',
@@ -19,17 +20,23 @@ const Header = ({ isSidebarCollapsed }) => {
     '/arrangementer': 'Arrangementer',
     '/oppsett': 'Oppsett'
   }), []);
-  
+
+  const getTitleFromPath = (path) => {
+    if (path.startsWith('/laaner/')) {
+      return `Lånere`;
+    }
+
+    // Try to match full path first
+    if (routeTitles[path]) return routeTitles[path];
+
+    // Try to match base route
+    const baseRoute = '/' + path.split('/')[1];
+    return routeTitles[baseRoute] || 'Hjem';
+  };
+
   useEffect(() => {
     const path = location.pathname;
-    
-    if (path.startsWith('/låner/')) {
-      const borrowerId = path.split('/').pop();
-      setPageTitle(`Låner: ${borrowerId}`);
-    } else {
-      const baseRoute = '/' + path.split('/')[1];
-      setPageTitle(routeTitles[baseRoute] || 'Hjem');
-    }
+    setPageTitle(getTitleFromPath(path));
 
     if (path.startsWith('/reservering')) {
       if (path.includes('/aktive')) {
@@ -45,46 +52,42 @@ const Header = ({ isSidebarCollapsed }) => {
   const showReservationTabs = location.pathname.startsWith('/reservering');
 
   return (
-    <>
-      <header className={`app-header library-header ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-        <div className="header-content">
-          <div className="page-title-wrapper">
-            <h1 className="page-title">
-              {pageTitle}
-            </h1>
-          </div>
-          <div className="header-actions">
-            {/* Header actions go here */}
-          </div>
+    <header className={`app-header library-header ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <div className="header-content">
+        <div className="page-title-wrapper">
+          <h1 className="page-title">{pageTitle}</h1>
         </div>
-        
-        {showReservationTabs && (
-          <div className={`nav-tabs ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-            <Link 
-              to="/reservering" 
-              className={`nav-tab ${activeTab === 'oversikt' ? 'active' : ''}`}
-              onClick={() => setActiveTab('oversikt')}
-            >
-              Oversikt
-            </Link>
-            <Link 
-              to="/reservering/aktive" 
-              className={`nav-tab ${activeTab === 'aktive' ? 'active' : ''}`}
-              onClick={() => setActiveTab('aktive')}
-            >
-              Aktive reserveringer
-            </Link>
-            <Link 
-              to="/reservering/innstillinger" 
-              className={`nav-tab ${activeTab === 'innstillinger' ? 'active' : ''}`}
-              onClick={() => setActiveTab('innstillinger')}
-            >
-              Innstillinger
-            </Link>
-          </div>
-        )} 
-      </header>
-    </>
+        <div className="header-actions">
+          {/* Header actions go here */}
+        </div>
+      </div>
+
+      {showReservationTabs && (
+        <div className={`nav-tabs ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+          <Link 
+            to="/reservering" 
+            className={`nav-tab ${activeTab === 'oversikt' ? 'active' : ''}`}
+            onClick={() => setActiveTab('oversikt')}
+          >
+            Oversikt
+          </Link>
+          <Link 
+            to="/reservering/aktive" 
+            className={`nav-tab ${activeTab === 'aktive' ? 'active' : ''}`}
+            onClick={() => setActiveTab('aktive')}
+          >
+            Aktive reserveringer
+          </Link>
+          <Link 
+            to="/reservering/innstillinger" 
+            className={`nav-tab ${activeTab === 'innstillinger' ? 'active' : ''}`}
+            onClick={() => setActiveTab('innstillinger')}
+          >
+            Innstillinger
+          </Link>
+        </div>
+      )}
+    </header>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
 import HomePage from './components/HomePage';
@@ -7,9 +7,20 @@ import HomeDashboard from './components/HomeDashboard';
 import BorrowerDashboard from './components/BorrowerDashboard';
 import ReserveringDashboard from './components/reservation/ReserveringDashboard';
 import ToastNotification from './components/common/ToastNotification'; 
-import PagePlaceholder from './components/layout/PagePlaceholder';
+import UnavailableFeatureTooltip from './components/layout/UnavailableFeatureTooltip';
 import './layout.css';
 import './App.css';
+
+// List of routes that are not implemented in the prototype
+const unavailableRoutes = [
+  '/samlinger',
+  '/innkjøp',
+  '/fjernlån',
+  '/arrangementer',
+  '/statistikk',
+  '/oppsett',
+  '/hjelp'
+];
 
 function App() {
   return (
@@ -25,6 +36,24 @@ function AppLayout() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
+  const [showFeatureTooltip, setShowFeatureTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ top: '50%', left: '50%' });
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Check if current path is in unavailable routes
+  useEffect(() => {
+    const currentPath = '/' + location.pathname.split('/')[1];
+    if (unavailableRoutes.includes(currentPath)) {
+      // Navigate back to previous page or home
+      navigate(-1, { replace: true });
+      
+      // Show the tooltip in the center of the screen
+      setTooltipPosition({ top: '50%', left: '50%' });
+      setShowFeatureTooltip(true);
+    }
+  }, [location.pathname, navigate]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -34,6 +63,15 @@ function AppLayout() {
     setToastMessage(message);
     setToastType(type);
     setShowToast(true);
+  };
+
+  const handleUnavailableFeature = (e, path, position) => {
+    e.preventDefault();
+    // Use the position where the click happened if provided
+    if (position) {
+      setTooltipPosition(position);
+    }
+    setShowFeatureTooltip(true);
   };
 
   useEffect(() => {
@@ -48,28 +86,21 @@ function AppLayout() {
     <div className="app-container">
       <Header onMenuClick={toggleSidebar} />
       <div className="main-content">
-        <Sidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          onToggle={toggleSidebar} 
+          unavailableRoutes={unavailableRoutes}
+          onUnavailableFeature={handleUnavailableFeature}
+        />
         <div className="content-area">
           <Routes>
             <Route path="/hjem" element={<HomeDashboard showToast={showToastMessage} />} />
-            <Route path="/låner" element={<BorrowerDashboard showToast={showToastMessage} />} />
-            <Route path="/låner/:borrowerId" element={<BorrowerDashboard showToast={showToastMessage} />} />
+            <Route path="/laaner" element={<BorrowerDashboard showToast={showToastMessage} />} />
+            <Route path="/laaner/:borrowerId" element={<BorrowerDashboard showToast={showToastMessage} />} />
             <Route path="/reservering" element={<ReserveringDashboard showToast={showToastMessage} />} />
             <Route path="/reservering/oversikt" element={<ReserveringDashboard showToast={showToastMessage} />} />
             <Route path="/reservering/aktive" element={<ReserveringDashboard showToast={showToastMessage} />} />
             <Route path="/reservering/innstillinger" element={<ReserveringDashboard showToast={showToastMessage} />} />
-            {/*  <Route path="/statistikk" element={<ReservasjonStatistikk showToast={showToastMessage} />} /> */}
-            
-            <Route path="/samlinger" element={<PagePlaceholder pageName="/samlinger" onBack={() => window.history.back()} onHome={() => window.location.href = '/hjem'} />} />
-            <Route path="/innkjøp" element={<PagePlaceholder pageName="/innkjøp" onBack={() => window.history.back()} onHome={() => window.location.href = '/hjem'} />} />
-            <Route path="/fjernlån" element={<PagePlaceholder pageName="/fjernlån" onBack={() => window.history.back()} onHome={() => window.location.href = '/hjem'} />} />
-            <Route path="/arrangementer" element={<PagePlaceholder pageName="/arrangementer" onBack={() => window.history.back()} onHome={() => window.location.href = '/hjem'} />} />
-            <Route path="/statistikk" element={<PagePlaceholder pageName="/statistikk" onBack={() => window.history.back()} onHome={() => window.location.href = '/hjem'} />} />
-            <Route path="/oppsett" element={<PagePlaceholder pageName="/oppsett" onBack={() => window.history.back()} onHome={() => window.location.href = '/hjem'} />} />
-            <Route path="/hjelp" element={<PagePlaceholder pageName="/hjelp" onBack={() => window.history.back()} onHome={() => window.location.href = '/hjem'} />} />
-           
-            <Route path="*" element={<Navigate to="/hjem" replace />} />
-
           </Routes>
         </div>
       </div>
@@ -79,6 +110,12 @@ function AppLayout() {
         message={toastMessage}
         type={toastType}
         onClose={() => setShowToast(false)}
+      />
+      
+      <UnavailableFeatureTooltip
+        isVisible={showFeatureTooltip}
+        onClose={() => setShowFeatureTooltip(false)}
+        position={tooltipPosition}
       />
     </div>
   );
