@@ -38,7 +38,6 @@ const HomePage = () => {
             </div>
             
             <div className="key-features">
-            <h2>Funksjoner</h2>
               <div className="features-grid">
                 <div className="feature-item">
                   <div className="feature-icon">
@@ -104,7 +103,7 @@ const HomePage = () => {
                   <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
               </button>
-              <p className="login-note">Utviklet av studenter ved OsloMet</p>
+              <p className="login-note">Utviklet av studenter ved OsloMet ❤️</p>
             </div>
           </div>
           
