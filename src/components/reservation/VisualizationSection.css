@@ -105,7 +105,7 @@
 .chart-types button.active,
 .time-periods button.active {
   background-color: #f0f5ff;
-  color: #3182ce;
+  color: #1950a0;
   border-color: #bfdeff;
   font-weight: 600;
 }
@@ -286,7 +286,7 @@
 .glossary-toggle-btn {
   background: none;
   border: none;
-  color: #3182ce;
+  color: #1950a0;
   cursor: pointer;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -377,7 +377,7 @@
   padding: 0.5rem 0.75rem;
   background-color: #f0f5ff;
   border: 1px solid #bfdeff;
-  color: #3182ce;
+  color: #1950a0;
 }
 
 .help-icon {
