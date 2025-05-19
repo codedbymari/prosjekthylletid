@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import './UnavailableFeatureTooltip.css';
+import './styles/UnavailableFeatureTooltip.css';
 
 const UnavailableFeatureTooltip = ({ isVisible, onClose, position, message, }) => {
   const tooltipRef = useRef(null);

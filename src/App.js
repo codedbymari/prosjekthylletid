@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
-import HomePage from './components/HomePage';
-import HomeDashboard from './components/HomeDashboard';
-import BorrowerDashboard from './components/BorrowerDashboard';
-import ReserveringDashboard from './components/reservation/ReserveringDashboard';
+import HomePage from './pages/HomePage';
+import HomeDashboard from './components/HomeDashboard/HomeDashboard';
+import BorrowerDashboard from './components/borrowers/BorrowerDashboard';
+import ReserveringDashboard from './components/reservation/components/ReserveringDashboard';
 import ToastNotification from './components/common/ToastNotification'; 
 import UnavailableFeatureTooltip from './components/layout/UnavailableFeatureTooltip';
+import HelpSection from './components/help/HelpSection';
 import './layout.css';
 import './App.css';
 
@@ -18,8 +19,7 @@ const unavailableRoutes = [
   '/fjernlån',
   '/arrangementer',
   '/statistikk',
-  '/oppsett',
-  '/hjelp'
+  '/oppsett'
 ];
 
 function App() {
@@ -101,6 +101,7 @@ function AppLayout() {
             <Route path="/reservering/oversikt" element={<ReserveringDashboard showToast={showToastMessage} />} />
             <Route path="/reservering/aktive" element={<ReserveringDashboard showToast={showToastMessage} />} />
             <Route path="/reservering/innstillinger" element={<ReserveringDashboard showToast={showToastMessage} />} />
+            <Route path="/hjelp" element={<HelpSection />} />
           </Routes>
         </div>
       </div>

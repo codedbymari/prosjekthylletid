@@ -1,7 +1,7 @@
 // src/components/reservation/PrintableReports.jsx
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import './PrintableReports.css';
+import '../styles/PrintableReports.css';
 
 function PrintableReports({ materialData, reminderLogs, statistics, pickupTimeLimit, reminderDays }) {
   const printContentRef = useRef(null);

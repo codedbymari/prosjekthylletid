@@ -1,11 +1,10 @@
-// src/components/reservation/ReservationList.jsx
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { FiGrid, FiList } from 'react-icons/fi';
-import FilterBar from './FilterBar';
-import ReservationTable from './ReservationTable.jsx';
-import ReservationCards from './ReservationCards';
-import NoResults from '../common/NoResults';
+import FilterBar from '../helpers/FilterBar.js';
+import ReservationTable from './ReservationTable.js';
+import ReservationCards from './ReservationCards.js';
+import NoResults from '../../common/NoResults.js';
 
 const FILTER_STATUSES = {
   ALL: 'all',

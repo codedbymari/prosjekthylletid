@@ -4,7 +4,7 @@
   --sidebar-width-mobile: 100%;
   --sidebar-collapsed-width: 64px;
   --sidebar-bg-color: #7d203a;
-  --header-height: 107.3px !important;
+  --header-height: 80px !important;
   --nav-tabs-height: 40px;
 }
 
@@ -32,22 +32,22 @@ body.sidebar-collapsed .app-header {
   height: 100% !important;
   width: 100% !important;
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important; 
   justify-content: space-between !important;
-  padding: 0 20px !important;
+  padding: 5px 20px 0 20px !important; 
 }
 
 .page-title-wrapper {
   position: relative !important;
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important; 
 }
 
 .page-title {
-  font-size: 1.25rem !important;
-  font-weight: 600 !important;
+  font-size: 1.5rem !important;
+  font-weight: 400 !important;
   margin: 0 !important;
-  color: #6b7280 !important;
+  color: #374151; /* mørk grå-blå */
   text-align: left !important;
   white-space: nowrap !important;
   overflow: hidden !important;
@@ -65,14 +65,13 @@ body.sidebar-collapsed .app-header {
 /* sub-menu */
 .nav-tabs {
   position: fixed;
-  top: 70px; 
-  left: var(--sidebar-width-desktop); 
+  top: 44px;
+  left: 224px; 
   right: 0;
   display: flex;
   z-index: 19;
   transition: left 0.3s ease;
   padding-bottom: 10px;
-  background-color: white;
   padding-top: 5px;
 }
 

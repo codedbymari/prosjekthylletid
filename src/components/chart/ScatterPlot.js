@@ -2,7 +2,7 @@
 import React from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, Cell, ZAxis } from 'recharts';
 import colors from '../../utils/colors';
-import './BarChart.css';
+import './styles/BarChart.css';
 
 const ScatterPlot = ({ containerWidth = 600, containerHeight = 400 }) => {
   // Data

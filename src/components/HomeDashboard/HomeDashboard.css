@@ -239,6 +239,9 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+.dashboard-section.popular-section.loaded {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 
 /* Dashboard sections */
 .dashboard-section {
@@ -254,6 +257,7 @@
 .dashboard-section.loaded {
   opacity: 1;
   transform: translateY(0);
+
 }
 
 .section-header {

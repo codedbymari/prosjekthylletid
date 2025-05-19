@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './ReserveringDashboard.css';
-import { generateMockData } from '../../mockData';
+import '../styles/ReserveringDashboard.css';
+import { generateMockData } from '../../../utils/mockData';
 // Removed unused import FiHelpCircle
-import StatisticsSection from './StatisticsSection';
-import VisualizationSection from './VisualizationSection';
-import ReservationList from './ReservationList';
-import SettingsPanel from './SettingsPanel';
-import ToastNotification from '../common/ToastNotification';
-import LoadingSpinner from '../common/LoadingSpinner';
-import PrintableReports from './PrintableReports';
+import StatisticsSection from '../components/StatisticsSection';
+import VisualizationSection from '../components/VisualizationSection';
+import ReservationList from '../components/ReservationList';
+import SettingsPanel from '../components/SettingsPanel';
+import ToastNotification from '../../common/ToastNotification';
+import LoadingSpinner from '../../common/LoadingSpinner';
+import PrintableReports from '../helpers/PrintableReports';
 // Removed unused import axios - it's commented out in the actual fetch logic
 
-import { formatDateNorwegian, parseNorwegianDate, calculateDaysBetween } from '../../utils/dateUtils';
+import { formatDateNorwegian, parseNorwegianDate, calculateDaysBetween } from '../../../utils/dateUtils';
 
 const FILTER_STATUSES = {
   ALL: 'all',

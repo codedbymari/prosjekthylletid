@@ -10,7 +10,7 @@ import {
   FiChevronDown,
   FiChevronUp
 } from 'react-icons/fi';
-import './StatisticsSection.css';
+import '../styles/StatisticsSection.css';
 
 
 function StatisticsSection({ statistics, pickupTimeLimit, reminderDays, materialData }) {

@@ -1,6 +1,6 @@
 // src/components/chart/ChartContainer.jsx
 import React, { useRef, useEffect, useState } from 'react';
-import './ChartContainer.css';
+import './styles/ChartContainer.css';
 
 const ChartContainer = ({ 
   children, 

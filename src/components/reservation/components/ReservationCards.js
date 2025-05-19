@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FiUser, FiCalendar, FiClock, FiCheckCircle, FiInfo } from 'react-icons/fi';
-import StatusBadge from '../common/StatusBadge';
+import StatusBadge from '../../common/StatusBadge';
 
 function ReservationCards({ data, handleBorrowerClick }) {
   const isDateExpired = (dateString) => {

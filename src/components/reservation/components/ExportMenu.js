@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { FiDownload, FiFilePlus, FiFileText, FiCheck, FiX, FiSliders, FiCalendar } from 'react-icons/fi';
-import './ExportMenu.css';
+import '../styles/ExportMenu.css';
 import { jsPDF } from "jspdf";  // Import jsPDF
 import autoTable from 'jspdf-autotable';
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import './Sidebar.css';
+import './styles/Sidebar.css';
 import UnavailableFeatureTooltip from './UnavailableFeatureTooltip';
 
 function Sidebar({ unavailableRoutes = [], onUnavailableFeature }) {
@@ -217,7 +217,7 @@ function Sidebar({ unavailableRoutes = [], onUnavailableFeature }) {
       const rect = itemRefs.current[path].getBoundingClientRect();
       const position = {
         top: rect.top + rect.height / 2,
-        left: rect.left + rect.width + 20, // Position to the right of the sidebar item
+        left: rect.left + rect.width + 20, 
       };
       
       // Set tooltip message based on the route
@@ -283,9 +283,8 @@ function Sidebar({ unavailableRoutes = [], onUnavailableFeature }) {
         </svg>
       ),
       '/samlinger': (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z" />
-        </svg>
+        <svg width="24" height="24" viewBox="0 0 33 36" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M6.59 9.935v19.234H1.995V9.935h4.59m1.1-2H.905a.9.9 0 0 0-.9.9v21.424a.9.9 0 0 0 .9.9h6.78a.9.9 0 0 0 .9-.9V8.84a.9.9 0 0 0-.9-.9ZM18.095 2v27.169h-4.344V2zm1.1-2h-6.54a.9.9 0 0 0-.9.9v29.359a.9.9 0 0 0 .9.9h6.534a.9.9 0 0 0 .9-.9V.907a.9.9 0 0 0-.9-.9ZM29.66 13.658v15.511h-4.222V13.658zm1.1-2h-6.412a.9.9 0 0 0-.9.9v17.7a.9.9 0 0 0 .9.9h6.412a.905.905 0 0 0 .9-.9v-17.7a.905.905 0 0 0-.9-.9"/>
+        <path d="M0 12.56h8.59v2H0zm11.75-6.811h8.344v2H11.75zm0 3.742h8.344v2H11.75zm11.687 5.663h8.223v2h-8.223zm0 3.398h8.223v2h-8.223z"/></svg>
       ),
       '/reservering': (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -293,14 +292,13 @@ function Sidebar({ unavailableRoutes = [], onUnavailableFeature }) {
         </svg>
       ),
       '/innkjøp': (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.5 13v9m0-9-8-5m8 5 8-5m-12-2.5 8 5M4.5 8l8-5 8 5v9l-8 5-8-5z" stroke="#7d203a" stroke-width="1.2"/>
+        </svg> 
       ),
       '/fjernlån': (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12z" />
-        </svg>
+        <svg width="24" height="24" viewBox="0 0 1024 1024" fill="currentColor" class="icon" xmlns="http://www.w3.org/2000/svg">
+          <path d="M128.896 736H96a32 32 0 0 1-32-32V224a32 32 0 0 1 32-32h576a32 32 0 0 1 32 32v96h164.544a32 32 0 0 1 31.616 27.136l54.144 352A32 32 0 0 1 922.688 736h-91.52a144 144 0 1 1-286.272 0H415.104a144 144 0 1 1-286.272 0zm23.36-64a143.872 143.872 0 0 1 239.488 0H568.32c17.088-25.6 42.24-45.376 71.744-55.808V256H128v416zm655.488 0h77.632l-19.648-128H704v64.896A144 144 0 0 1 807.744 672m48.128-192-14.72-96H704v96zM688 832a80 80 0 1 0 0-160 80 80 0 0 0 0 160m-416 0a80 80 0 1 0 0-160 80 80 0 0 0 0 160"/></svg>
       ),
       '/arrangementer': (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">

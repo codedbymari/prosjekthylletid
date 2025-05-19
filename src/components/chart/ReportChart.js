@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label } from "recharts";
 import ScatterPlot from './ScatterPlot';
 import colors from '../../utils/colors';
-import './ReportChart.css';
+import './styles/ReportChart.css';
 
 function ReportChart({ data }) {
   const [showScatterPlot, setShowScatterPlot] = useState(false);

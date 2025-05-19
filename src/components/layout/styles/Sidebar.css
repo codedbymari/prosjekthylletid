@@ -1,14 +1,13 @@
-```css
 .sidebar {
-  position: fixed; /* Keeps the sidebar in a fixed position in the viewport */
-  top: 0; /* Positioned at the top */
-  left: 0; /* Positioned at the left edge */
-  height: 100%; /* Full height of the viewport */
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  height: 100%; 
   background-color: #7d203a !important;
   color: white;
-  width: 60px; /* Default/mini width */
+  width: 60px; /* Default/mini sidebar width */
   transition: width 0.3s ease; /* Smooth transition for width changes */
-  z-index: 1000; /* Ensure sidebar is above other content */
+  z-index: 1000; 
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -25,11 +24,10 @@
 }
 
 .sidebar > * {
-  overflow-x: hidden; /* Keep the internals with hidden overflow */
+  overflow-x: hidden; 
 }
 
 /* Styles for the toggle button */
-
 .sidebar-edge-toggle {
   position: fixed;
   bottom: 40px;
@@ -40,7 +38,7 @@
   background-color: white;
   border: 2px solid #7d203a;
   border-radius: 50%;
-  color: #7d203a !important; /* default icon color */
+  color: #7d203a !important;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -52,14 +50,14 @@
 
 .sidebar-edge-toggle:hover {
   background-color: #8f3049;
-  color: white !important; /* icon color on hover */
+  color: white !important; 
 }
 
 .sidebar-edge-toggle svg {
   width: 20px;
   height: 20px;
   display: block;
-  fill: currentColor !important; /* this is key */
+  fill: currentColor !important; /* this is important to keep */
 }
 
 
@@ -87,15 +85,12 @@
 
 /* Styles for the main content area */
 .content-area {
-  /* margin-left is controlled by JavaScript */
-  margin-left: 0; /* Set default to 0 or adjust based on base layout */
-  padding-left: 24px; /* Keep your desired internal padding */
-  transition: margin-left 0.3s ease; /* Smooth transition for margin change */
-  /* If main-content is flex, content-area might need flex-grow */
+  margin-left: 0; 
+  padding-left: 24px; 
+  transition: margin-left 0.3s ease; 
   flex-grow: 1;
 }
 
-/* Styles for the main content wrapper if it's a flex container */
 .main-content {
   display: flex;
   flex-direction: row;
@@ -107,7 +102,7 @@
   height: 100%; 
 }
 
-/* User profile section - IMPROVED */
+/* User profile section  */
 .user-profile {
   display: flex;
   flex-direction: column;
@@ -120,6 +115,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
   color: white !important; 
+  height: 80px;
 }
 
 .user-profile.mini {
@@ -195,7 +191,7 @@
   position: absolute;
   top: calc(100% + 4px);
   left: 8px;
-  right: 8px; /* Keep margin on both sides */
+  right: 8px; 
   background-color: white;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
@@ -203,7 +199,7 @@
   z-index: 10;
   display: none;
   overflow: hidden;
-  max-width: calc(100% - 16px); /* Account for left/right margins */
+  max-width: calc(100% - 16px); 
 }
 
 .user-dropdown.open {
@@ -264,9 +260,6 @@
 }
 
 
-
-
-
 /* Add this for the animation of tooltip popup */
 @keyframes fade-in {
   from { opacity: 0; }
@@ -286,7 +279,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Helps push Help to bottom */
+  justify-content: space-between; 
   background-color: #7d203a !important;
 }
 
@@ -301,7 +294,7 @@
 }
 
 .bottom-menu {
-  margin-top: auto; /* Push to bottom */
+  margin-top: auto; 
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -321,20 +314,37 @@
   font-size: 14px;
 }
 
-.sidebar-nav a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
 
-.sidebar-nav a.active {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.sidebar-nav a.icon-only {
-  justify-content: center;
-  padding: 12px;
+.sidebar-nav a svg {
+  transition: all 0.2s ease;
+  fill: rgba(255, 255, 255, 0.7);
 }
 
 
+.sidebar-nav a:hover svg {
+  fill: white;
+  transform: scale(1.1);
+}
+
+.sidebar-nav a svg {
+  transition: all 0.3s ease; 
+}
+
+.sidebar-nav a.active svg {
+  fill: #7d203a;
+  background-color: white;
+  border-radius: 50px;
+}
+
+
+/* For collapsed sidebar (icon-only ) */
+.sidebar-nav a.icon-only svg {
+  height: 24px;
+  width: 24px;
+}
+.sidebar-nav a.icon-only.active svg {
+  transform: scale(1.15);
+}
 
 .menu-icon {
   width: 24px;
@@ -344,12 +354,13 @@
   justify-content: center;
   color: white;
   margin-right: 12px;
-  opacity: 0.9; /* Slightly more visible */
+  opacity: 0.9; 
   flex-shrink: 0; /* Prevent icon from shrinking */
 }
+
 .sidebar.mini .unavailable-tooltip {
   right: auto;
-  left: 60px; /* Match the width of the collapsed sidebar */
+  left: 60px; 
   transform: translateY(-50%);
 }
 
@@ -369,14 +380,14 @@
   font-weight: 500;
 }
 
-/* Add pulse animation for visibility */
+/*  animation for visibility */
 @keyframes pulse {
   0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
   70% { box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
   100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
-/* Apply animation only on page load */
+/*  animation only on page load */
 .sidebar-edge-toggle {
   animation: pulse 1.5s ease-in-out 3;
 }
@@ -584,7 +595,7 @@
     transform: translateX(-100%);
   }
   
-  /* Ensure toggle is visible in mobile */
+  /*  toggle is visible in mobile */
   .sidebar-edge-toggle {
     display: none;
   }
@@ -648,12 +659,11 @@
 }
 
 @media (min-width: 1281px) {
-  /* For larger screens, keep it from becoming too small */
   .sidebar.open {
     width: 220px;
   }
 }
-/* Fix for collapsed sidebar icons */
+
 .sidebar.mini .menu-icon {
   width: 24px;
   height: 24px;
@@ -668,19 +678,16 @@
   height: 24px;
 }
 
-/* Fix for user avatar in collapsed mode */
 .sidebar.mini .user-avatar {
   width: 36px;
   height: 36px;
 }
 
-/* Ensure icons are visible in collapsed mode */
 .sidebar.mini .sidebar-nav a {
   padding: 12px;
   justify-content: center;
 }
 
-/* Remove CSS background images and replace with SVG */
 .menu-icon svg {
   fill: currentColor;
   width: 24px;

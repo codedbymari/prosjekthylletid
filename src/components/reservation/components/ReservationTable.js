@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FiUser, FiCalendar, FiClock, FiCheckCircle, FiArrowUp, FiArrowDown } from 'react-icons/fi';
-import StatusBadge from '../common/StatusBadge';
+import StatusBadge from '../../common/StatusBadge';
 
 function ReservationTable({
   data,

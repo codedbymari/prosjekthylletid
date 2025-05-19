@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import colors from '../../utils/colors';
-import './PickupDistributionChart.css';
+import './styles/PickupDistributionChart.css';
 
 const PickupDistributionChart = ({ data, containerWidth = 600 }) => {
   const calculateCumulative = () => {

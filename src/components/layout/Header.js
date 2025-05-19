@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import './Header.css';
+import './styles/Header.css';
 
 const Header = ({ isSidebarCollapsed }) => {
   const location = useLocation();
@@ -11,8 +11,8 @@ const Header = ({ isSidebarCollapsed }) => {
     '/': 'Hjem',
     '/laaner': 'Låner',
     '/reservering': 'Reservering',
-    '/reservering/aktive': 'Aktive reserveringer',
-    '/reservering/innstillinger': 'Innstillinger',
+    '/reservering/aktive': 'Reservering',
+    '/reservering/innstillinger': 'Reservering',
     '/statistikk': 'Statistikk',
     '/innkjøp': 'Innkjøp',
     '/samlinger': 'Samlinger',

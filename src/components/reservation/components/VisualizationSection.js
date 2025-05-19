@@ -22,11 +22,11 @@ import {
   Label,
   ReferenceLine 
 } from 'recharts';
-import ScatterPlot from '../chart/ScatterPlot';
-import PickupDistributionChart from '../chart/PickupDistributionChart';
-import ExportMenu from './ExportMenu';
-import colors from '../../utils/colors';
-import './VisualizationSection.css';
+import ScatterPlot from '../../chart/ScatterPlot';
+import PickupDistributionChart from '../../chart/PickupDistributionChart';
+import ExportMenu from '../components/ExportMenu';
+import colors from '../../../utils/colors';
+import '../styles/VisualizationSection.css';
 
 function VisualizationSection({ 
   materialData, 

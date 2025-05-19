@@ -1,7 +1,7 @@
 // src/components/chart/BarChart.jsx
 import React from 'react';
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
-import './BarChart.css';
+import './styles/BarChart.css';
 
 const BarChart = ({ 
   data, 
