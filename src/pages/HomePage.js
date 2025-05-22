@@ -29,7 +29,7 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <p>
-                Prosjektet har som mål å forbedre bibliotekets ressursutnyttelse ved å analysere hvor lenge bøker står uavhentet på hentehyllen. 
+                Prosjektet har som mål å forbedre bibliotekets ressursutnyttelse ved å analysere hvor lenge materialer står uavhentet på hentehyllen. 
                 Målet er å redusere ventetid og gjøre populære titler raskere tilgjengelig for utlån.
 
 
@@ -59,7 +59,7 @@ const HomePage = () => {
                     </svg>
                   </div>
                   <h3>Analyse</h3>
-                  <p>Innsikt i hvor lenge bøker blir stående, og hvordan dette varierer over tid</p>
+                  <p>Innsikt i hvor lenge materialer blir stående, og hvordan dette varierer over tid</p>
                 </div>
                 
                 <div className="feature-item">

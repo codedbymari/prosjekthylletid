@@ -143,7 +143,7 @@ const BorrowerDetails = ({
           </div>
           <div className="info-column">
             <div className="info-item">
-              <span className="info-label">Totalt antall bøker:</span>
+              <span className="info-label">Totalt antall materialer:</span>
               <span className="info-value">{borrowerInfo.totalBooks}</span>
             </div>
             <div className="info-item">
