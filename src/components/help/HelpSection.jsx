@@ -9,9 +9,7 @@ function HelpSection() {
     { id: 'oversikt', title: 'Oversikt' },
     { id: 'reservasjon', title: 'Reservering' },
     { id: 'statistikk', title: 'Statistikk og rapporter' },
-    { id: 'filtrering', title: 'Filtreringsalternativer' },
     { id: 'eksport', title: 'Eksportere data' },
-    { id: 'snarveier', title: 'Tastatursnarveier' },
   ];
   
   // Innhold for hver kategori
@@ -29,7 +27,7 @@ function HelpSection() {
         </ul>
         
         <h3>Navigasjon</h3>
-        <p>Bruk sidepanelet til venstre for å navigere mellom de forskjellige modulene i systemet. Trykk på ikonet øverst til venstre for å vise/skjule sidepanelet på mobile enheter.</p>
+        <p>Bruk sidepanelet til venstre for å navigere mellom de forskjellige sidene i systemet. Trykk på ikonet nede til venstre for å vise/skjule sidepanelet.</p>
         
         <h3>Filialbytte</h3>
         <p>Du kan bytte filial ved å:</p>
@@ -37,37 +35,37 @@ function HelpSection() {
           <li>Klikke på brukerprofilen din øverst i sidepanelet</li>
           <li>Velge ny filial fra rullegardinmenyen</li>
         </ol>
-        <p>Alternativt kan du bytte filial direkte fra hovedoversikten ved å bruke filialvelgeren øverst på dashbordet.</p>
+        <p>Alternativt kan du bytte filial direkte fra hjemsiden ved å bruke filialvelgeren øverst på dashbordet.</p>
       </div>
     ),
     
     reservasjon: (
       <div className="help-content">
-        <h2>Reservasjonsmodulen</h2>
-        <p>Reservasjonsmodulen gir deg oversikt over alle materialer som venter på hentehylla, og lar deg analysere hentetider og trender.</p>
+        <h2>Reservasjonssiden</h2>
+        <p> Reservasjonssiden gir deg oversikt over alle materialer som venter på hentehylla, og lar deg analysere hentetider og trender.</p>
         
         <h3>Reservasjonsoversikt</h3>
         <p>Her ser du alle materialer på hentehylla. Du kan:</p>
         <ul>
-          <li>Filtrere materialer basert på ulike kriterier (dager på hylla, materialtype, etc.)</li>
+          <li>Filtrere materialer basert på ulike kriterier (dager på hylla,tittle ,status etc.)</li>
           <li>Sortere listen ved å klikke på kolonneoverskriftene</li>
-          <li>Bytte mellom liste-, kort- eller tabellvisning</li>
+          <li>Bytte mellom kort- eller tabellvisning</li>
         </ul>
         
         <h3>Statistikk</h3>
-        <p>Under statistikk-fanen kan du:</p>
+        <p>Under statistikkoversikten  kan du:</p>
         <ul>
           <li>Se gjennomsnittlig hentetid for ulike materialtyper</li>
           <li>Identifisere trender for når lånere henter materiale</li>
-          <li>Sammenligne data mellom avdelinger</li>
+          <li> og mye mer med diagrammene som er visualisert</li>
         </ul>
         
         <h3>Administrere reservasjonsinnstillinger</h3>
         <p>Under innstillinger kan du tilpasse:</p>
         <ul>
-          <li>Varsler for materialer som har stått lenge</li>
-          <li>Standard statistikkvisninger</li>
-          <li>Rapportformater</li>
+          <li>Hentefrist</li>
+          <li>Påminnelse: Antall dager før hentefrist som </li>
+          <p> påminnelse sendes automatisk til låner.</p>
         </ul>
       </div>
     ),
@@ -75,7 +73,7 @@ function HelpSection() {
     statistikk: (
       <div className="help-content">
         <h2>Statistikk og rapporter</h2>
-        <p>Systemet tilbyr kraftige statistikk- og rapportfunksjoner for å analysere data om hylletider.</p>
+        <p>Systemet tilbyr  statistikk- og rapportfunksjoner for å analysere data om hylletider.</p>
         
         <h3>Tilgjengelige grafer</h3>
         <ul>
@@ -104,40 +102,8 @@ function HelpSection() {
       </div>
     ),
     
-    filtrering: (
-      <div className="help-content">
-        <h2>Filtreringsalternativer</h2>
-        <p>Systemet tilbyr omfattende filtreringsmuligheter for å finne akkurat den informasjonen du trenger.</p>
-        
-        <h3>Filtrere reservasjonsoversikten</h3>
-        <p>I reservasjonsoversikten kan du filtrere på:</p>
-        <ul>
-          <li><strong>Dager på hylla:</strong> Antall dager materialet har stått på hentehylla</li>
-          <li><strong>Materialtype:</strong> Bok, film, lydbok, etc.</li>
-          <li><strong>Avdeling:</strong> Voksne, barn, etc.</li>
-          <li><strong>Status:</strong> Aktiv, utløpt, etc.</li>
-          <li><strong>Utlånstype:</strong> Standard, korttids, etc.</li>
-        </ul>
-        
-        <h3>Avansert filtrering</h3>
-        <p>For mer komplekse søk:</p>
-        <ol>
-          <li>Klikk på "Avansert filter" i filtermenyen</li>
-          <li>Legg til flere filterkriterier med "+" knappen</li>
-          <li>Velg logiske operatorer (AND/OR) mellom kriteriene</li>
-          <li>Klikk "Anvend filter" for å utføre søket</li>
-        </ol>
-        
-        <h3>Lagre filter</h3>
-        <p>Du kan lagre dine mest brukte filtre for senere bruk:</p>
-        <ol>
-          <li>Sett opp filteret slik du ønsker</li>
-          <li>Klikk på "Lagre filter"-ikonet</li>
-          <li>Gi filteret et navn</li>
-          <li>Filteret vil nå være tilgjengelig i "Lagrede filtre"-menyen</li>
-        </ol>
-      </div>
-    ),
+    
+   
     
     eksport: (
       <div className="help-content">
@@ -161,90 +127,11 @@ function HelpSection() {
           <li>Klikk "Eksporter"</li>
         </ol>
         
-        <h3>Automatiserte rapporter</h3>
-        <p>Du kan sette opp automatiserte rapporter som sendes på e-post:</p>
-        <ol>
-          <li>Gå til "Innstillinger" under Reserveringsmodulen</li>
-          <li>Velg "Planlagte rapporter"</li>
-          <li>Klikk "Ny planlagt rapport"</li>
-          <li>Definer rapporttype, format, frekvens og mottakere</li>
-          <li>Klikk "Lagre"</li>
-        </ol>
-      </div>
-    ),
-    
-    snarveier: (
-      <div className="help-content">
-        <h2>Tastatursnarveier</h2>
-        <p>For å jobbe mer effektivt kan du bruke følgende tastatursnarveier:</p>
-        
-        <h3>Navigasjon</h3>
-        <table className="shortcuts-table">
-          <tbody>
-            <tr>
-              <td><kbd>F1</kbd></td>
-              <td>Åpne denne hjelpeseksjonen</td>
-            </tr>
-            <tr>
-              <td><kbd>Alt</kbd> + <kbd>H</kbd></td>
-              <td>Gå til Hjem</td>
-            </tr>
-            <tr>
-              <td><kbd>Alt</kbd> + <kbd>R</kbd></td>
-              <td>Gå til Reservering</td>
-            </tr>
-            <tr>
-              <td><kbd>Alt</kbd> + <kbd>L</kbd></td>
-              <td>Gå til Lånere</td>
-            </tr>
-            <tr>
-              <td><kbd>Alt</kbd> + <kbd>⇧</kbd> + <kbd>S</kbd></td>
-              <td>Åpne/lukke sidepanelet</td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <h3>Reserveringsoversikt</h3>
-        <table className="shortcuts-table">
-          <tbody>
-            <tr>
-              <td><kbd>Ctrl</kbd> + <kbd>F</kbd></td>
-              <td>Fokuser på søkefeltet</td>
-            </tr>
-            <tr>
-              <td><kbd>Ctrl</kbd> + <kbd>⇧</kbd> + <kbd>F</kbd></td>
-              <td>Åpne avansert filter</td>
-            </tr>
-            <tr>
-              <td><kbd>Ctrl</kbd> + <kbd>E</kbd></td>
-              <td>Eksporter data</td>
-            </tr>
-            <tr>
-              <td><kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd></td>
-              <td>Bytt mellom listevisning, kortvisning og tabellvisning</td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <h3>Generelt</h3>
-        <table className="shortcuts-table">
-          <tbody>
-            <tr>
-              <td><kbd>Esc</kbd></td>
-              <td>Lukk modaler, dialoger eller menyer</td>
-            </tr>
-            <tr>
-              <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
-              <td>Lagre endringer (hvor tilgjengelig)</td>
-            </tr>
-            <tr>
-              <td><kbd>Ctrl</kbd> + <kbd>P</kbd></td>
-              <td>Skriv ut nåværende visning</td>
-            </tr>
-          </tbody>
-        </table>
+   
       </div>
     )
+    
+    
   };
   
   return (
@@ -263,9 +150,7 @@ function HelpSection() {
           ))}
         </ul>
         <div className="help-contact">
-          <h3>Trenger du mer hjelp?</h3>
-          <p>Kontakt biblioteksystemadministrator:</p>
-          <p>admin@nordrefollo.no</p>
+   
         </div>
       </div>
       <div className="help-content-container">

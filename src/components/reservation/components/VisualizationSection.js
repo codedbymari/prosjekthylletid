@@ -246,7 +246,7 @@ reminderDays={reminderDays}
 className="intro-toggle-btn" 
  onClick={() => setShowIntro(true)}
  >
- <span>Første Side</span>
+ <span> Oversikt</span>
  </button>
  </>
  )}

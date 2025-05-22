@@ -35,8 +35,7 @@ const UnavailableFeatureTooltip = ({ isVisible, onClose, position, message, }) =
         }}
       >
       
-        <p className="tooltip-message">{message || 'Denne funksjonen er ikke tilgjengelig i prototypen.'}</p>
-        <button className="tooltip-close" onClick={onClose}>Lukk</button>
+        <p className="tooltip-message">{message || 'Denne siden er ikke tilgjengelig i prototypen.'}</p>
       </div>
     </div>
   );

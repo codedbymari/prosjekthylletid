@@ -18,7 +18,9 @@ const Header = ({ isSidebarCollapsed }) => {
     '/samlinger': 'Samlinger',
     '/fjernlån': 'Fjernlån',
     '/arrangementer': 'Arrangementer',
-    '/oppsett': 'Oppsett'
+    '/oppsett': 'Oppsett',
+    '/hjelp': 'Hjelp'
+
   }), []);
 
   const getTitleFromPath = (path) => {
@@ -58,7 +60,6 @@ const Header = ({ isSidebarCollapsed }) => {
           <h1 className="page-title">{pageTitle}</h1>
         </div>
         <div className="header-actions">
-          {/* Header actions go here */}
         </div>
       </div>
 

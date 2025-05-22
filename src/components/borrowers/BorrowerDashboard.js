@@ -125,7 +125,7 @@ const BorrowerDetails = ({
               <span className="info-value">{borrowerId}</span>
             </div>
             <div className="info-item">
-              <span className="info-label">Epost:</span>
+              <span className="info-label">E-post:</span>
               <span className="info-value">{borrowerInfo.contact}</span>
             </div>
             <div className="info-item">
@@ -368,7 +368,7 @@ function BorrowerDashboard() {
             date: formatDate(new Date().toISOString()),
             subject: 'Påminnelse om reservering',
             message: `Hei, ${firstItem.borrower.name}. Det er 2 dager igjen av hentefristen på din reservering: «${item.title}» av ${item.author}. Siste frist: ${formatDate(item.readyDate)}. Hylle: ${item.pickupNumber}. Velkommen innom! Hilsen Nordre Follo Bibliotek`,
-            sentVia: ['melding', 'epost']
+            sentVia: ['SMS', 'E-post']
           });
         });
       }
@@ -381,7 +381,7 @@ function BorrowerDashboard() {
             date: formatDate(new Date().toISOString()),
             subject: 'Forsinket innlevering',
             message: `Hei, ${firstItem.borrower.name}. Boken «${item.title}» av ${item.author} skulle vært levert for 6 dager siden. Lever snarest for å unngå purregebyr på 100 kr. Hilsen Nordre Follo Bibliotek.`,
-            sentVia: ['melding', 'epost']
+            sentVia: ['SMS', 'E-post']
           });
         });
       }
@@ -392,7 +392,7 @@ function BorrowerDashboard() {
           date: formatDate(new Date().toISOString()),
           subject: 'Velkommen til biblioteket',
           message: `Hei, ${firstItem.borrower.name}. Takk for at du bruker Nordre Follo Bibliotek. Husk at du kan fornye dine lån på nett eller i vår app. Hilsen Nordre Follo Bibliotek.`,
-          sentVia: ['epost']
+          sentVia: ['E-post']
         });
       }
       
