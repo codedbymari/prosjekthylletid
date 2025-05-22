@@ -1,4 +1,4 @@
-// mockData.js
+// src/utils/ mockData.js
 export const generateMockData = () => {
   const today = new Date();
   
