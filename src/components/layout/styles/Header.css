@@ -34,7 +34,7 @@ body.sidebar-collapsed .app-header {
   display: flex !important;
   align-items: flex-start !important; 
   justify-content: space-between !important;
-  padding: 5px 20px 0 20px !important; 
+  padding: 5px 20px 0 40px !important; 
 }
 
 .page-title-wrapper {
@@ -73,6 +73,7 @@ body.sidebar-collapsed .app-header {
   transition: left 0.3s ease;
   padding-bottom: 10px;
   padding-top: 5px;
+  margin-left: 20px;
 }
 
 /* When sidebar is collapsed */
@@ -108,9 +109,9 @@ body.sidebar-collapsed .nav-tabs {
 /* Main content  */
 .content-area {
   margin-left: var(--sidebar-width-desktop);
-  margin-top: var(--header-height); 
-  padding: 20px;
+  margin-top: 40px; 
   transition: margin-left 0.3s ease;
+
 }
 
 body.sidebar-collapsed .content-area {

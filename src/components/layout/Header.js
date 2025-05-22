@@ -9,7 +9,7 @@ const Header = ({ isSidebarCollapsed }) => {
 
   const routeTitles = useMemo(() => ({
     '/': 'Hjem',
-    '/laaner': 'Låner',
+    '/laaner': 'Lånere',
     '/reservering': 'Reservering',
     '/reservering/aktive': 'Reservering',
     '/reservering/innstillinger': 'Reservering',

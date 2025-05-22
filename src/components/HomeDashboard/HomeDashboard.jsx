@@ -152,7 +152,7 @@ const HomeDashboard = () => {
           description: 'Praktiser norsk i en uformell setting. Alle språknivåer er velkomne. Kaffe og te serveres.',
           date: formatDate(addDays(today, 0)),
           time: '17:00 - 18:30',
-          location: `${currentBranch.name}, Kafé Lesehesten`,
+          location: `${currentBranch.name}`,
           attendees: 18,
           maxAttendees: 30,
           isNew: false,

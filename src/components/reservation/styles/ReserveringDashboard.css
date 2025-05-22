@@ -80,7 +80,9 @@ button {
   gap: 8px;
   box-shadow: var(--shadow-sm);
 }
-
+.content-area {
+  margin-top: var(--header-height)!important!; 
+}
 .btn-primary:hover, .btn-primary:focus {
   background-color: var(--primary-light);
   box-shadow: var(--shadow-md);

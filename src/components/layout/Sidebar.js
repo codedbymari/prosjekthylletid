@@ -362,9 +362,7 @@ function Sidebar({ unavailableRoutes = [], onUnavailableFeature }) {
           {isOpen && (
             <>
               <div className="user-name">Alex Bergersen</div>
-              <div className="user-meta">
-                <span className="user-branch">{selectedBranch}</span>
-              </div>
+           
             </>
           )}
           
